@@ -5,8 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>at.ac.tuwien.complang.vpsbcm</groupId>
-    <artifactId>robfac</artifactId>
+    <artifactId>robnur</artifactId>
+    <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>shared</module>
+        <module>spacebased</module>
+        <module>nonspacebased</module>
+    </modules>
 
     <repositories>
         <repository>
@@ -17,9 +23,16 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.mozartspaces</groupId>
-            <artifactId>mozartspaces-runtime</artifactId>
-            <version>2.3-SNAPSHOT</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>2.12.0</version>
         </dependency>
     </dependencies>
 </project>
