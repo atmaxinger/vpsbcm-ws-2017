@@ -127,7 +127,7 @@ public class StorageServiceImpl extends StorageService {
         }
     }
 
-    public Water accessWaterCock() {
+    public Water accessTap() {
         ArrayList<Water> waterArrayList = null;
 
         try {

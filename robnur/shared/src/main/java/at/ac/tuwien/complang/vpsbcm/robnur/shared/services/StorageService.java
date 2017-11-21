@@ -31,7 +31,7 @@ public abstract class StorageService {
 
     public abstract void putVegetableFertilizer(VegetableFertilizer vegetableFertilizer);
 
-    public abstract Water accessWaterCock();
+    public abstract Water accessTap();
 
     public abstract void putWater(Water water);
 
@@ -79,7 +79,7 @@ public abstract class StorageService {
         int howMany = (int)Math.ceil((float)amount / 250.0f);
 
         for (int i = 0; i < howMany; i++){
-            Water w = accessWaterCock();
+            Water w = accessTap();
             water.setAmount(water.getAmount()+ w.getAmount());
         }
 
