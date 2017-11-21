@@ -1,6 +1,8 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces;
 
-public class SoilPackage {
+import java.io.Serializable;
+
+public class SoilPackage implements Serializable{
 
     private int amount;
 
