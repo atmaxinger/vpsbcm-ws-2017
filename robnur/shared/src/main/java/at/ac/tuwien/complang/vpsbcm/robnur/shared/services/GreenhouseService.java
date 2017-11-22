@@ -1,8 +1,8 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.services;
 
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlant;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.PlantPoint;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
+
+import java.util.List;
 
 public interface GreenhouseService {
 
@@ -13,4 +13,8 @@ public interface GreenhouseService {
     PlantPoint<VegetablePlant> getHarvestReadyVegetablePlantPoint();
 
     PlantPoint<FlowerPlant> getHarvestReadyFlowerPlantPoint();
+
+    List<VegetablePlant> readAllVegetablePlants();
+
+    List<FlowerPlant> readAllFlowerPlants();
 }

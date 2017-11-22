@@ -1,9 +1,8 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.services;
 
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Bouquet;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableBasket;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
+
+import java.util.List;
 
 public interface MarketService {
 
@@ -19,4 +18,11 @@ public interface MarketService {
 
     VegetableBasket getVegetableBasket();
 
+    List<Bouquet> readAllBouquets();
+
+    void sellBouquet(Bouquet bouquet);
+
+    List<VegetableBasket> readAllVegetableBaskets();
+
+    void sellVegetableBasket(VegetableBasket vegetableBasket);
 }

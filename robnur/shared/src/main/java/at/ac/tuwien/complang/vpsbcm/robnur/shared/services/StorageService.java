@@ -13,9 +13,11 @@ import java.util.List;
 public abstract class StorageService {
 
     // TODO: consider abstract method for deciding which plant should be planted
-    public abstract Plant getPlantSeed();
+    public abstract Plant getSeed();
 
-    public abstract void putPlantSeed(Plant plant);
+    public abstract void putSeed(Plant plant);
+
+    public abstract List<Plant> readAllSeeds();
 
     // TODO: consider abstract method for delivering already used packages
 
@@ -23,13 +25,19 @@ public abstract class StorageService {
 
     public abstract void putSoilPackage(SoilPackage soilPackage);
 
+    public abstract List<SoilPackage> readAllSoilPackage();
+
     public abstract List<FlowerFertilizer> getFlowerFertilizer(int amount);
 
     public abstract void putFlowerFertilizer(FlowerFertilizer flowerFertilizer);
 
+    public abstract List<FlowerFertilizer> readAllFlowerFertilizer();
+
     public abstract List<VegetableFertilizer> getVegetableFertilizer(int amount);
 
     public abstract void putVegetableFertilizer(VegetableFertilizer vegetableFertilizer);
+
+    public abstract List<VegetableFertilizer> readAllVegetableFertilizer();
 
     public abstract Water accessTap();
 

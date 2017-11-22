@@ -39,7 +39,7 @@ public class StorageServiceImpl extends StorageService {
         waterContainer = CapiUtil.lookupOrCreateContainer("waterContainer",spaceUri,coords,null,capi);
     }
 
-    public Plant getPlantSeed() {
+    public Plant getSeed() {
         ArrayList<Plant> plants = null;
 
         try {
@@ -50,12 +50,25 @@ public class StorageServiceImpl extends StorageService {
         return plants.get(0);
     }
 
-    public void putPlantSeed(Plant plant) {
+    public void putSeed(Plant plant) {
         try {
             capi.write(seedContainer,new Entry(plant));
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public List<Plant> readAllSeeds() {
+        List<Plant> plants = null;
+
+        try {
+            plants = capi.read(seedContainer,AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_ALL),MzsConstants.RequestTimeout.ZERO,null);
+        } catch (MzsCoreException e) {
+            e.printStackTrace();
+        }
+
+        return plants;
     }
 
     protected List<SoilPackage> getAllSoilPackages() {
@@ -76,6 +89,11 @@ public class StorageServiceImpl extends StorageService {
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public List<SoilPackage> readAllSoilPackage() {
+        return null;
     }
 
     public List<FlowerFertilizer> getFlowerFertilizer(int amount) {
@@ -99,6 +117,19 @@ public class StorageServiceImpl extends StorageService {
         }
     }
 
+    @Override
+    public List<FlowerFertilizer> readAllFlowerFertilizer() {
+        List<FlowerFertilizer> flowerFertilizers = null;
+
+        try {
+            flowerFertilizers = capi.read(flowerFertilizerContainer,AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_ALL),MzsConstants.RequestTimeout.ZERO,null);
+        } catch (MzsCoreException e) {
+            e.printStackTrace();
+        }
+
+        return flowerFertilizers;
+    }
+
     public List<VegetableFertilizer> getVegetableFertilizer(int amount) {
         ArrayList<VegetableFertilizer> vegetableFertilizers = null;
 
@@ -117,6 +148,19 @@ public class StorageServiceImpl extends StorageService {
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public List<VegetableFertilizer> readAllVegetableFertilizer() {
+        List<VegetableFertilizer> vegetableFertilizers = null;
+
+        try {
+            vegetableFertilizers = capi.read(vegetableFertilizerContainer,AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_ALL),MzsConstants.RequestTimeout.ZERO,null);
+        } catch (MzsCoreException e) {
+            e.printStackTrace();
+        }
+
+        return vegetableFertilizers;
     }
 
     public void putWater(Water water){
