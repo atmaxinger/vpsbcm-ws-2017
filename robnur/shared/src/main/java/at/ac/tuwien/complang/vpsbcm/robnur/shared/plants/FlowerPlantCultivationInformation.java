@@ -4,6 +4,9 @@ public class FlowerPlantCultivationInformation extends CultivationInformation {
 
     private FlowerType flowerType;
 
+    public FlowerPlantCultivationInformation() {
+    }
+
     public FlowerPlantCultivationInformation(FlowerPlantCultivationInformation cultivationInformation) {
         super(cultivationInformation);
         flowerType = cultivationInformation.flowerType;

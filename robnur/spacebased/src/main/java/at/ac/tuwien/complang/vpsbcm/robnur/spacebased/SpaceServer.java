@@ -1,5 +1,7 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased;
 
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.gui.RobNurGUI;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.gui.StorageController;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.FlowerFertilizer;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.SoilPackage;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.Water;
@@ -16,6 +18,7 @@ public class SpaceServer {
         MzsCore core = DefaultMzsCore.newInstance();
         Capi capi = new Capi(core);
 
+        System.out.println("URL: " + core.getConfig().getSpaceUri());
 
 
         try {

@@ -6,6 +6,9 @@ public class VegetablePlantCultivationInformation extends CultivationInformation
 
     private int maxNumberOfHarvests;
 
+    public VegetablePlantCultivationInformation() {
+    }
+
     public VegetablePlantCultivationInformation(VegetablePlantCultivationInformation cultivationInformation) {
         super(cultivationInformation);
         vegetableType = cultivationInformation.vegetableType;

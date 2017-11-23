@@ -1,6 +1,8 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.plants;
 
-public abstract class CultivationInformation {
+import java.io.Serializable;
+
+public abstract class CultivationInformation implements Serializable {
 
     /* 0.2 ... 0.5 */
     private float growthRate;
@@ -14,6 +16,9 @@ public abstract class CultivationInformation {
     private int waterAmount;
 
     private int soilAmount;
+
+    public CultivationInformation() {
+    }
 
     public CultivationInformation(CultivationInformation cultivationInformation){
         growthRate = cultivationInformation.growthRate;

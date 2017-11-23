@@ -93,7 +93,15 @@ public class StorageServiceImpl extends StorageService {
 
     @Override
     public List<SoilPackage> readAllSoilPackage() {
-        return null;
+        ArrayList<SoilPackage> packages = null;
+
+        try {
+            packages = capi.read(soilContainer, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_ALL), MzsConstants.RequestTimeout.ZERO, null);
+        } catch (MzsCoreException e) {
+            e.printStackTrace();
+        }
+
+        return packages;
     }
 
     public List<FlowerFertilizer> getFlowerFertilizer(int amount) {

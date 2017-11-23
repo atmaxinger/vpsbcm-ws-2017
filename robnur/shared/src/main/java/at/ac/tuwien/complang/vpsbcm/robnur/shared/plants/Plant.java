@@ -2,7 +2,7 @@ package at.ac.tuwien.complang.vpsbcm.robnur.shared.plants;
 
 import java.io.Serializable;
 
-public abstract class Plant implements Serializable{
+public abstract class Plant implements Serializable {
 
     /* 0 ... 100 */
     private int growth;
