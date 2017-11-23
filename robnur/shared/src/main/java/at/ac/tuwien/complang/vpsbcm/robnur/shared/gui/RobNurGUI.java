@@ -1,5 +1,6 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.gui;
 
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.*;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -11,6 +12,13 @@ import java.io.IOException;
 import java.net.URL;
 
 public class RobNurGUI extends Application {
+
+    public static CompostService compostService;
+    public static ConfigService configService;
+    public static GreenhouseService greenhouseService;
+    public static MarketService marketService;
+    public static PackingService packingService;
+    public static StorageService storageService;
 
     public void execute(String[] args) {
         launch(args);
@@ -28,6 +36,7 @@ public class RobNurGUI extends Application {
             e.printStackTrace();
         }
         Scene scene = new Scene(root);
+
         primaryStage.setScene(scene);
         primaryStage.show();
     }

@@ -24,8 +24,8 @@ import java.util.Optional;
 
 public class StorageController {
 
-    public static StorageService storageService;
-    private ConfigService configService = new ConfigService();
+    private StorageService storageService = RobNurGUI.storageService;
+    private ConfigService configService = RobNurGUI.configService;
 
     public TableView<SeedsTableDataModel> tvSeeds;
     public TableColumn<SeedsTableDataModel, String> tcSeedType;
