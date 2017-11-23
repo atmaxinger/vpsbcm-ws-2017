@@ -6,18 +6,25 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.SoilPackage;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.VegetableFertilizer;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.Water;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.StorageService;
-import org.mozartspaces.capi3.AnyCoordinator;
-import org.mozartspaces.capi3.FifoCoordinator;
+import org.mozartspaces.capi3.*;
 import org.mozartspaces.core.*;
+import org.mozartspaces.core.aspects.ContainerIPoint;
+import org.mozartspaces.notifications.Notification;
+import org.mozartspaces.notifications.NotificationListener;
+import org.mozartspaces.notifications.NotificationManager;
+import org.mozartspaces.notifications.Operation;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 public class StorageServiceImpl extends StorageService {
 
     private Capi capi;
+    private NotificationManager notificationManager;
 
     private ContainerReference seedContainer;
     private ContainerReference soilContainer;
@@ -30,6 +37,8 @@ public class StorageServiceImpl extends StorageService {
         MzsCore core = DefaultMzsCore.newInstanceWithoutSpace();
 
         capi = new Capi(core);
+        notificationManager = new NotificationManager(core);
+
         List<FifoCoordinator> coords = null;//Arrays.asList(new FifoCoordinator());
 
         seedContainer = CapiUtil.lookupOrCreateContainer("seedContainer",spaceUri,coords,null,capi);
@@ -37,6 +46,15 @@ public class StorageServiceImpl extends StorageService {
         flowerFertilizerContainer = CapiUtil.lookupOrCreateContainer("flowerFertilizerContainer",spaceUri,coords,null,capi);
         vegetableFertilizerContainer = CapiUtil.lookupOrCreateContainer("vegetableFertilizerContainer",spaceUri,coords,null,capi);
         waterContainer = CapiUtil.lookupOrCreateContainer("waterContainer",spaceUri,coords,null,capi);
+
+        try {
+            notificationManager.createNotification(seedContainer, (notification, operation, list) -> seedsChanged.handle(readAllSeeds()), Operation.DELETE, Operation.TAKE, Operation.WRITE);
+            notificationManager.createNotification(soilContainer, (notification, operation, list) -> soilPackagesChanged.handle(readAllSoilPackage()), Operation.DELETE, Operation.TAKE, Operation.WRITE);
+            notificationManager.createNotification(flowerFertilizerContainer, (notification, operation, list) -> flowerFertilizerChanged.handle(readAllFlowerFertilizer()), Operation.DELETE, Operation.TAKE, Operation.WRITE);
+            notificationManager.createNotification(vegetableFertilizerContainer, (notification, operation, list) -> vegetableFertilizerChanged.handle(readAllVegetableFertilizer()), Operation.DELETE, Operation.TAKE, Operation.WRITE);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public Plant getSeed() {

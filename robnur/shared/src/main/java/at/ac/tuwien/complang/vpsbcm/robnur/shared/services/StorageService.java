@@ -1,6 +1,7 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.services;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Plant;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.FlowerFertilizer;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.SoilPackage;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.VegetableFertilizer;
@@ -11,6 +12,33 @@ import java.util.Collections;
 import java.util.List;
 
 public abstract class StorageService {
+
+    public interface Callback<T> {
+        void handle(T data);
+    }
+
+
+    protected Callback<List<Plant>> seedsChanged;
+    protected Callback<List<SoilPackage>> soilPackagesChanged;
+    protected Callback<List<FlowerFertilizer>> flowerFertilizerChanged;
+    protected Callback<List<VegetableFertilizer>> vegetableFertilizerChanged;
+
+
+    public void onSeedsChanged(Callback<List<Plant>> seedsChanged) {
+        this.seedsChanged = seedsChanged;
+    }
+
+    public void onSoilPackagesChanged(Callback<List<SoilPackage>> soilPackagesChanged) {
+        this.soilPackagesChanged = soilPackagesChanged;
+    }
+
+    public void onFlowerFertilizerChanged(Callback<List<FlowerFertilizer>> flowerFertilizerChanged) {
+        this.flowerFertilizerChanged = flowerFertilizerChanged;
+    }
+
+    public void onVegetableFertilizerChanged(Callback<List<VegetableFertilizer>> vegetableFertilizerChanged) {
+        this.vegetableFertilizerChanged = vegetableFertilizerChanged;
+    }
 
     // TODO: consider abstract method for deciding which plant should be planted
     public abstract Plant getSeed();

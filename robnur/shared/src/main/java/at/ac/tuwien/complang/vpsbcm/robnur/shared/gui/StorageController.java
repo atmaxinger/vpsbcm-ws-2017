@@ -135,10 +135,10 @@ public class StorageController {
         return count;
     }
 
-    private void initSeedsTableView() {
-        ObservableList<SeedsTableDataModel> obs = FXCollections.observableArrayList();
 
-        List<Plant> allSeeds = storageService.readAllSeeds();
+    private void initSeedsData(List<Plant> allSeeds) {
+        ObservableList<SeedsTableDataModel> obs = tvSeeds.getItems();
+        obs.clear();
 
         List<FlowerPlantCultivationInformation> fcpis = configService.getFlowerPlantCultivationInformation();
         for(FlowerPlantCultivationInformation fcpi : fcpis) {
@@ -185,6 +185,13 @@ public class StorageController {
 
             obs.add(dataModel);
         }
+    }
+
+    private void initSeedsTableView() {
+        List<Plant> allSeeds = storageService.readAllSeeds();
+        initSeedsData(allSeeds);
+
+        storageService.onSeedsChanged(data -> initSeedsData(data));
 
         tcSeedType.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().type));
         tcSeedCount.setCellValueFactory(param -> new ReadOnlyStringWrapper("" + param.getValue().amount));
@@ -198,13 +205,12 @@ public class StorageController {
 
             return new ReadOnlyObjectWrapper<>(btnBuy);
         });
-
-
-        tvSeeds.setItems(obs);
     }
 
-    private void initResourcesTableView() {
-        ObservableList<ResourceTableDataModel> obs = FXCollections.observableArrayList();
+
+    private void initResourcesData() {
+        ObservableList<ResourceTableDataModel> obs = tvResources.getItems();
+        obs.clear();
 
         ResourceTableDataModel soil = new ResourceTableDataModel() {
             @Override
@@ -269,8 +275,15 @@ public class StorageController {
         water.canBuy = false;
 
         obs.addAll(soil, flowerFertilizer, vegFert, water);
+    }
 
-        tvResources.setItems(obs);
+
+    private void initResourcesTableView() {
+        initResourcesData();
+
+        storageService.onFlowerFertilizerChanged(data -> initResourcesData());
+        storageService.onSoilPackagesChanged(data -> initResourcesData());
+        storageService.onVegetableFertilizerChanged(data -> initResourcesData());
 
         tcResourcesArt.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().resource));
         tcResourcesAmountStatus.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().amount));
