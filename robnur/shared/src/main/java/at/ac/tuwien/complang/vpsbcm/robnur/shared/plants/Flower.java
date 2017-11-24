@@ -1,6 +1,8 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.plants;
 
-public class Flower {
+import java.io.Serializable;
+
+public class Flower implements Serializable {
 
     private FlowerPlant parentFlowerPlant;
 

@@ -1,6 +1,8 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.plants;
 
-public class Vegetable {
+import java.io.Serializable;
+
+public class Vegetable implements Serializable {
 
     private VegetablePlant parentVegetablePlant;
 
