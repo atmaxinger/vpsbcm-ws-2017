@@ -14,13 +14,15 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 public class GUI {
-    public static void main(String[] args) throws URISyntaxException, MzsCoreException {
+    public static void main(String[] args) throws URISyntaxException, MzsCoreException, InterruptedException {
         URI uri = new URI("xvsm://localhost:9876");
 
         StorageService storageService = new StorageServiceImpl(uri);
-        //GreenhouseService greenhouseService = new GreenhouseServiceImpl(uri);
+        GreenhouseService greenhouseService = new GreenhouseServiceImpl(uri);
 
         RobNurGUI.storageService = storageService;
+        RobNurGUI.greenhouseService = greenhouseService;
+
         RobNurGUI.configService = new ConfigService();
 
         RobNurGUI robNurGUI = new RobNurGUI();

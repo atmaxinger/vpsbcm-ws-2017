@@ -6,13 +6,15 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import org.mozartspaces.capi3.*;
 import org.mozartspaces.core.*;
 import org.mozartspaces.notifications.NotificationManager;
+import org.mozartspaces.notifications.Operation;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
-public class GreenhouseServiceImpl implements GreenhouseService {
+public class GreenhouseServiceImpl extends GreenhouseService {
 
     private static final String FLOWER_LABEL = "flower";
     private static final String VEGETABLE_LABEL = "vegetable";
@@ -23,7 +25,17 @@ public class GreenhouseServiceImpl implements GreenhouseService {
 
     private ContainerReference greenhouseContainer;
 
-    public GreenhouseServiceImpl(URI spaceUri) throws MzsCoreException {
+    private void raiseChangedEvent() {
+        if(greenhouseChanged != null) {
+            List<Plant> pants = new LinkedList<>();
+            pants.addAll(readAllFlowerPlants());
+            pants.addAll(readAllVegetablePlants());
+
+            greenhouseChanged.handle(pants);
+        }
+    }
+
+    public GreenhouseServiceImpl(URI spaceUri) throws MzsCoreException, InterruptedException {
         this.spaceUri = spaceUri;
 
         MzsCore core = DefaultMzsCore.newInstanceWithoutSpace();
@@ -43,6 +55,8 @@ public class GreenhouseServiceImpl implements GreenhouseService {
                 greenhouseContainer = capi.lookupContainer(greenhouseContainerName, spaceUri, MzsConstants.RequestTimeout.DEFAULT, null);
             }
         }
+
+        notificationManager.createNotification(greenhouseContainer, (notification, operation, list) -> raiseChangedEvent(), Operation.DELETE, Operation.TAKE, Operation.WRITE);
     }
 
     @Override
@@ -82,7 +96,7 @@ public class GreenhouseServiceImpl implements GreenhouseService {
 
             List<Selector> selectors = Arrays.asList(
                     LabelCoordinator.newSelector(VEGETABLE_LABEL, MzsConstants.Selecting.COUNT_MAX),
-                    QueryCoordinator.newSelector(query.filter(growthProperty.greaterThanOrEqualTo(100)), MzsConstants.Selecting.COUNT_MAX)
+                    QueryCoordinator.newSelector(query.filter(growthProperty.greaterThanOrEqualTo(100)).cnt(0,1), MzsConstants.Selecting.COUNT_MAX)
             );
 
             ArrayList<VegetablePlant> vegetablePlants = capi.take(greenhouseContainer, selectors , MzsConstants.RequestTimeout.DEFAULT, transactionReference);
@@ -97,7 +111,6 @@ public class GreenhouseServiceImpl implements GreenhouseService {
                     this.plant(plant, transaction);
                 }
             }
-
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -116,7 +129,7 @@ public class GreenhouseServiceImpl implements GreenhouseService {
 
             List<Selector> selectors = Arrays.asList(
                     LabelCoordinator.newSelector(FLOWER_LABEL, MzsConstants.Selecting.COUNT_MAX),
-                    QueryCoordinator.newSelector(query.filter(growthProperty.greaterThanOrEqualTo(100)), MzsConstants.Selecting.COUNT_MAX)
+                    QueryCoordinator.newSelector(query.filter(growthProperty.greaterThanOrEqualTo(100)).cnt(0,1), MzsConstants.Selecting.COUNT_MAX)
             );
 
             ArrayList<FlowerPlant> ps = capi.take(greenhouseContainer, selectors , MzsConstants.RequestTimeout.DEFAULT, tref);

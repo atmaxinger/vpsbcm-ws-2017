@@ -80,6 +80,14 @@ public class PlantAndHarvestRobot extends Robot {
                 }
             }
 
+            // TODO: REMOVE
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+
             Transaction t = transactionService.beginTransaction(-1);
 
             // get seeds

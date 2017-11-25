@@ -16,7 +16,7 @@ import java.net.URISyntaxException;
 
 public class SpacePlantAndHarvestRobot {
 
-    public static void main(String[] args) throws URISyntaxException, MzsCoreException {
+    public static void main(String[] args) throws URISyntaxException, MzsCoreException, InterruptedException {
         URI uri = new URI("xvsm://localhost:9876");
         StorageService storageService = new StorageServiceImpl(uri);
         PackingService packingService = new PackingServiceImpl(uri);

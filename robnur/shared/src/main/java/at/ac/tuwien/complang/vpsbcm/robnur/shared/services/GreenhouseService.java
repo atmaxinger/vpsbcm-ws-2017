@@ -1,20 +1,26 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.services;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.VegetableFertilizer;
 
 import java.util.List;
 
-public interface GreenhouseService {
+public abstract class GreenhouseService {
 
-    void plant(VegetablePlant vegetablePlant, Transaction transaction);
+    protected StorageService.Callback<List<Plant>> greenhouseChanged;
+    public void onGreenhouseChanged(StorageService.Callback<List<Plant>> greenhouseChanged) {
+        this.greenhouseChanged = greenhouseChanged;
+    }
 
-    void plant(FlowerPlant flowerPlant, Transaction transaction);
+    public abstract void plant(VegetablePlant vegetablePlant, Transaction transaction);
 
-    List<Vegetable> harvestVegetablePlant(Transaction transaction);
+    public abstract void plant(FlowerPlant flowerPlant, Transaction transaction);
 
-    List<Flower> harvestFlowerPlant(Transaction transaction);
+    public abstract List<Vegetable> harvestVegetablePlant(Transaction transaction);
 
-    List<VegetablePlant> readAllVegetablePlants();
+    public abstract List<Flower> harvestFlowerPlant(Transaction transaction);
 
-    List<FlowerPlant> readAllFlowerPlants();
+    public abstract List<VegetablePlant> readAllVegetablePlants();
+
+    public abstract List<FlowerPlant> readAllFlowerPlants();
 }

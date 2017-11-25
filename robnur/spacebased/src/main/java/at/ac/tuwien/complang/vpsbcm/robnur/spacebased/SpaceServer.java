@@ -122,8 +122,10 @@ public class SpaceServer {
             //--------------------------------------------
             //--------------------------------------------
 
+            VegetablePlant vp = null;
+
             Transaction t = transactionService.beginTransaction(-1);
-            VegetablePlant vp = new VegetablePlant();
+            vp = new VegetablePlant();
             vp.setCultivationInformation(configService.getVegetablePlantCultivationInformation().get(0));
             vp.setGrowth(10);
             greenhouseService.plant(vp, t);
@@ -157,13 +159,15 @@ public class SpaceServer {
             t = transactionService.beginTransaction(-1);
 
             List<VegetablePlant> vegs1 = greenhouseService.readAllVegetablePlants();
-            List<Vegetable> vegs = greenhouseService.harvestVegetablePlant(t);
+           // List<Vegetable> vegs = greenhouseService.harvestVegetablePlant(t);
 
             t.commit();
 
         } catch (MzsCoreException e) {
             e.printStackTrace();
         } catch (URISyntaxException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
