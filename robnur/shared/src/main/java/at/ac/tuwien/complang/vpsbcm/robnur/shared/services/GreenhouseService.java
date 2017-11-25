@@ -20,6 +20,9 @@ public abstract class GreenhouseService {
 
     public abstract List<Flower> harvestFlowerPlant(Transaction transaction);
 
+    public abstract List<VegetablePlant> getAllVegetablePlants(Transaction transaction);
+    public abstract List<FlowerPlant> getAllFlowerPlants(Transaction transaction);
+
     public abstract List<VegetablePlant> readAllVegetablePlants();
 
     public abstract List<FlowerPlant> readAllFlowerPlants();

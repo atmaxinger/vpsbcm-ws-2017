@@ -145,6 +145,47 @@ public class GreenhouseServiceImpl extends GreenhouseService {
     }
 
     @Override
+    public List<VegetablePlant> getAllVegetablePlants(Transaction transaction) {
+        TransactionReference transactionReference = TransactionServiceImpl.getTransactionReference(transaction);
+
+        try {
+            List<Selector> selectors = Arrays.asList(
+                    LabelCoordinator.newSelector(VEGETABLE_LABEL, MzsConstants.Selecting.COUNT_MAX)
+            );
+
+            ArrayList<VegetablePlant> vegetablePlants = capi.take(greenhouseContainer, selectors , MzsConstants.RequestTimeout.DEFAULT, transactionReference);
+
+            return vegetablePlants;
+        } catch (MzsCoreException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    @Override
+    public List<FlowerPlant> getAllFlowerPlants(Transaction transaction) {
+        TransactionReference tref = TransactionServiceImpl.getTransactionReference(transaction);
+
+        try {
+            ComparableProperty growthProperty = ComparableProperty.forName("growth");
+            Query query = new Query();
+
+            List<Selector> selectors = Arrays.asList(
+                    LabelCoordinator.newSelector(FLOWER_LABEL, MzsConstants.Selecting.COUNT_MAX)
+            );
+
+            ArrayList<FlowerPlant> ps = capi.take(greenhouseContainer, selectors , MzsConstants.RequestTimeout.DEFAULT, tref);
+            return ps;
+        } catch (MzsCoreException e) {
+            e.printStackTrace();
+        }
+
+
+        return null;
+    }
+
+    @Override
     public List<VegetablePlant> readAllVegetablePlants() {
         List<VegetablePlant> vegetablePlants = null;
         try {
