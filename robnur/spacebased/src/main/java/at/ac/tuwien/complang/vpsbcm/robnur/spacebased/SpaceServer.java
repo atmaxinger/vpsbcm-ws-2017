@@ -75,6 +75,9 @@ public class SpaceServer {
         ConfigService configService = new ConfigService();
 
         try {
+
+
+
             ContainerReference waterContainer = CapiUtil.lookupOrCreateContainer("waterContainer", core.getConfig().getSpaceUri(), null,null, capi);
             WaterAspect was = new WaterAspect(capi);
             capi.addContainerAspect(was, waterContainer, ContainerIPoint.POST_TAKE);
@@ -153,6 +156,7 @@ public class SpaceServer {
 
             t = transactionService.beginTransaction(-1);
 
+            List<VegetablePlant> vegs1 = greenhouseService.readAllVegetablePlants();
             List<Vegetable> vegs = greenhouseService.harvestVegetablePlant(t);
 
             t.commit();

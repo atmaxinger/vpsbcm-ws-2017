@@ -14,7 +14,7 @@ public interface GreenhouseService {
 
     List<Flower> harvestFlowerPlant(Transaction t);
 
-    VegetablePlant readAllVegetablePlants();
+    List<VegetablePlant> readAllVegetablePlants();
 
-    FlowerPlant readAllFlowerPlants();
+    List<FlowerPlant> readAllFlowerPlants();
 }

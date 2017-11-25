@@ -7,7 +7,6 @@ import org.mozartspaces.capi3.*;
 import org.mozartspaces.core.*;
 import org.mozartspaces.notifications.NotificationManager;
 
-import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -127,12 +126,18 @@ public class GreenhouseServiceImpl implements GreenhouseService {
     }
 
     @Override
-    public VegetablePlant readAllVegetablePlants() {
-        return null;
+    public List<VegetablePlant> readAllVegetablePlants() {
+        List<VegetablePlant> vegetablePlants = null;
+        try {
+            vegetablePlants = capi.read(greenhouseContainer, LabelCoordinator.newSelector("veg",LabelCoordinator.LabelSelector.COUNT_MAX),MzsConstants.RequestTimeout.DEFAULT,null);
+        } catch (MzsCoreException e) {
+            e.printStackTrace();
+        }
+        return vegetablePlants;
     }
 
     @Override
-    public FlowerPlant readAllFlowerPlants() {
+    public List<FlowerPlant> readAllFlowerPlants() {
         return null;
     }
 }
