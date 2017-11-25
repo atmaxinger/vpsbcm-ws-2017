@@ -79,7 +79,7 @@ public class SpaceServer {
 
 
             ContainerReference waterContainer = CapiUtil.lookupOrCreateContainer("waterContainer", core.getConfig().getSpaceUri(), null,null, capi);
-            WaterAspect was = new WaterAspect(capi);
+            WaterAspect was = new WaterAspect();
             capi.addContainerAspect(was, waterContainer, ContainerIPoint.POST_TAKE);
 
             StorageService storageService = new StorageServiceImpl(core.getConfig().getSpaceUri());

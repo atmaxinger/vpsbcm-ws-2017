@@ -16,12 +16,6 @@ import java.util.List;
 
 public class WaterAspect extends AbstractContainerAspect {
 
-    private Capi capi;
-
-    public WaterAspect(Capi capi) {
-        this.capi = capi;
-    }
-
     @Override
     public AspectResult postTake(TakeEntriesRequest<?> request,
                                  Transaction tx,
@@ -41,11 +35,13 @@ public class WaterAspect extends AbstractContainerAspect {
         water.setAmount(250);
 
         try {
-            capi.write(request.getContainer(), new Entry(water));
+            new Capi(getCore()).write(request.getContainer(), new Entry(water));
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
 
         return AspectResult.OK;
     }
+
+
 }
