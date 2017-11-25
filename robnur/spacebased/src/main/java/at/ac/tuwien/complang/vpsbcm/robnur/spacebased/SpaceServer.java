@@ -6,10 +6,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.FlowerFertilizer;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.SoilPackage;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.Water;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.GreenhouseService;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.StorageService;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TranscationService;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.*;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.GreenhouseServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.StorageServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.TransactionServiceImpl;
@@ -75,6 +72,8 @@ public class SpaceServer {
 
         //testTrans(capi);
 
+        ConfigService configService = new ConfigService();
+
         try {
             ContainerReference waterContainer = CapiUtil.lookupOrCreateContainer("waterContainer", core.getConfig().getSpaceUri(), null,null, capi);
             WaterAspect was = new WaterAspect(capi);
@@ -121,26 +120,32 @@ public class SpaceServer {
             //--------------------------------------------
 
             Transaction t = transactionService.beginTransaction(-1);
-
-
             VegetablePlant vp = new VegetablePlant();
-            vp.setCultivationInformation(new VegetablePlantCultivationInformation());
+            vp.setCultivationInformation(configService.getVegetablePlantCultivationInformation().get(0));
             vp.setGrowth(10);
-
             greenhouseService.plant(vp, t);
+            t.commit();
+
+            t = transactionService.beginTransaction(-1);
 
             FlowerPlant fp = new FlowerPlant();
+            fp.setCultivationInformation(configService.getFlowerPlantCultivationInformation().get(0));
             fp.setGrowth(100);
             greenhouseService.plant(fp, t);
+            t.commit();
 
+            t = transactionService.beginTransaction(-1);
 
             vp = new VegetablePlant();
-            vp.setCultivationInformation(new VegetablePlantCultivationInformation());
+            vp.setCultivationInformation(configService.getVegetablePlantCultivationInformation().get(0));
             vp.setGrowth(100);
             greenhouseService.plant(vp, t);
+            t.commit();
+
+            t = transactionService.beginTransaction(-1);
 
             vp = new VegetablePlant();
-            vp.setCultivationInformation(new VegetablePlantCultivationInformation());
+            vp.setCultivationInformation(configService.getVegetablePlantCultivationInformation().get(0));
             vp.setGrowth(101);
             greenhouseService.plant(vp, t);
 

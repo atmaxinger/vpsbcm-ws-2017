@@ -78,18 +78,20 @@ public class GreenhouseServiceImpl implements GreenhouseService {
             Query query = new Query();
 
             List<Selector> selectors = Arrays.asList(
-                    LabelCoordinator.newSelector("veg"),
-                    QueryCoordinator.newSelector(query.filter(growthProperty.greaterThanOrEqualTo(100)).cnt(1))
+                    LabelCoordinator.newSelector("veg", MzsConstants.Selecting.COUNT_MAX),
+                    QueryCoordinator.newSelector(query.filter(growthProperty.greaterThanOrEqualTo(100)), MzsConstants.Selecting.COUNT_MAX)
             );
 
             ArrayList<VegetablePlant> ps = capi.take(greenhouseContainer, selectors , MzsConstants.RequestTimeout.DEFAULT, tref);
-            VegetablePlant plant = ps.get(0);
+            if(ps.size() > 0) {
+                VegetablePlant plant = ps.get(0);
 
-            vegs = Vegetable.fromVegetablePlant(plant);
+                vegs = Vegetable.fromVegetablePlant(plant);
 
-            // If this plant can still be harvested
-            if(plant.getCultivationInformation().getRemainingNumberOfHarvests() > 0) {
-                this.plant(plant, t);
+                // If this plant can still be harvested
+                if (plant.getCultivationInformation().getRemainingNumberOfHarvests() > 0) {
+                    this.plant(plant, t);
+                }
             }
         } catch (MzsCoreException e) {
             e.printStackTrace();
@@ -108,14 +110,15 @@ public class GreenhouseServiceImpl implements GreenhouseService {
             Query query = new Query();
 
             List<Selector> selectors = Arrays.asList(
-                    LabelCoordinator.newSelector("flo"),
-                    QueryCoordinator.newSelector(query.filter(growthProperty.greaterThanOrEqualTo(100)).cnt(1))
+                    LabelCoordinator.newSelector("flo", MzsConstants.Selecting.COUNT_MAX),
+                    QueryCoordinator.newSelector(query.filter(growthProperty.greaterThanOrEqualTo(100)), MzsConstants.Selecting.COUNT_MAX)
             );
 
             ArrayList<FlowerPlant> ps = capi.take(greenhouseContainer, selectors , MzsConstants.RequestTimeout.DEFAULT, tref);
-            FlowerPlant plant = ps.get(0);
-
-            flowers = Flower.fromFlowerPlant(plant);
+            if(ps.size() > 0) {
+                FlowerPlant plant = ps.get(0);
+                flowers = Flower.fromFlowerPlant(plant);
+            }
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
