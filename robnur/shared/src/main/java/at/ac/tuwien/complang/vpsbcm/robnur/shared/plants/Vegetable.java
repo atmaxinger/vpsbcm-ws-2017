@@ -12,24 +12,26 @@ public class Vegetable implements Serializable {
         return parentVegetablePlant;
     }
 
-    public static List<Vegetable> fromVegetablePlant(VegetablePlant plant) {
-        List<Vegetable> vegs = new LinkedList<>();
+    public static List<Vegetable> harvestVegetablesFormPlant(VegetablePlant plant) {
+        List<Vegetable> vegetables = new LinkedList<>();
 
         if(plant.getCultivationInformation().getRemainingNumberOfHarvests() > 0) {
+
             for(int i=0; i < plant.getCultivationInformation().getHarvest(); i++) {
-                Vegetable v = new Vegetable();
-                v.setParentVegetablePlant(plant);
-                vegs.add(v);
+                Vegetable vegetable = new Vegetable();
+                vegetable.setParentVegetablePlant(plant);
+                vegetables.add(vegetable);
             }
 
             plant.getCultivationInformation()
                     .setRemainingNumberOfHarvests(
                             plant.getCultivationInformation()
                                     .getRemainingNumberOfHarvests()-1);
+
             plant.setGrowth(40);
         }
 
-        return vegs;
+        return vegetables;
     }
 
     public void setParentVegetablePlant(VegetablePlant parentVegetablePlant) {

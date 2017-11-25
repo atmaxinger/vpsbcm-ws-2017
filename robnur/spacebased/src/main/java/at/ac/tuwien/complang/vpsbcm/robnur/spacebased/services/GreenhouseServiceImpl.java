@@ -14,6 +14,9 @@ import java.util.List;
 
 public class GreenhouseServiceImpl implements GreenhouseService {
 
+    private static final String FLOWER_LABEL = "flower";
+    private static final String VEGETABLE_LABEL = "vegetable";
+
     private URI spaceUri;
     private Capi capi;
     private NotificationManager notificationManager;
@@ -27,25 +30,26 @@ public class GreenhouseServiceImpl implements GreenhouseService {
         capi = new Capi(core);
         notificationManager = new NotificationManager(core);
 
-        List<Coordinator> coords = Arrays.asList(new LabelCoordinator(), new QueryCoordinator());
+        List<Coordinator> coordinators = Arrays.asList(new LabelCoordinator(), new QueryCoordinator());
 
-        String greenhouseContainerName="greenhouseContainer";
+        String greenhouseContainerName = "greenhouseContainer";
+
         try {
-            greenhouseContainer = capi.lookupContainer(greenhouseContainerName, spaceUri, -2L, null);
+            greenhouseContainer = capi.lookupContainer(greenhouseContainerName, spaceUri, MzsConstants.RequestTimeout.DEFAULT, null);
         } catch (ContainerNotFoundException var9) {
             try {
-                greenhouseContainer = capi.createContainer(greenhouseContainerName, spaceUri, 20, coords, (List)null, null); // create bounded container
+                greenhouseContainer = capi.createContainer(greenhouseContainerName, spaceUri, 20, coordinators, null, null); // create bounded container
             } catch (ContainerNameNotAvailableException var8) {
-                greenhouseContainer = capi.lookupContainer(greenhouseContainerName, spaceUri, -2L, null);
+                greenhouseContainer = capi.lookupContainer(greenhouseContainerName, spaceUri, MzsConstants.RequestTimeout.DEFAULT, null);
             }
         }
     }
 
     @Override
-    public void plant(VegetablePlant veg, Transaction t) {
-        TransactionReference ref = TransactionServiceImpl.getTransactionReference(t);
+    public void plant(VegetablePlant vegetablePlant, Transaction transaction) {
+        TransactionReference ref = TransactionServiceImpl.getTransactionReference(transaction);
 
-        Entry entry = new Entry(veg, LabelCoordinator.newCoordinationData("veg"));
+        Entry entry = new Entry(vegetablePlant, LabelCoordinator.newCoordinationData(VEGETABLE_LABEL));
         try {
             capi.write(greenhouseContainer, MzsConstants.RequestTimeout.DEFAULT, ref, entry);
         }
@@ -55,10 +59,10 @@ public class GreenhouseServiceImpl implements GreenhouseService {
     }
 
     @Override
-    public void plant(FlowerPlant plant, Transaction t) {
-        TransactionReference ref = TransactionServiceImpl.getTransactionReference(t);
+    public void plant(FlowerPlant flowerPlant, Transaction transaction) {
+        TransactionReference ref = TransactionServiceImpl.getTransactionReference(transaction);
 
-        Entry entry = new Entry(plant, LabelCoordinator.newCoordinationData("flo"));
+        Entry entry = new Entry(flowerPlant, LabelCoordinator.newCoordinationData(FLOWER_LABEL));
         try {
             capi.write(greenhouseContainer, MzsConstants.RequestTimeout.DEFAULT, ref, entry);
         }
@@ -68,40 +72,42 @@ public class GreenhouseServiceImpl implements GreenhouseService {
     }
 
     @Override
-    public List<Vegetable> harvestVegetablePlant(Transaction t) {
-        TransactionReference tref = TransactionServiceImpl.getTransactionReference(t);
-        List<Vegetable> vegs = null;
+    public List<Vegetable> harvestVegetablePlant(Transaction transaction) {
+        TransactionReference transactionReference = TransactionServiceImpl.getTransactionReference(transaction);
+        List<Vegetable> vegetables = null;
 
         try {
             ComparableProperty growthProperty = ComparableProperty.forName("growth");
             Query query = new Query();
 
             List<Selector> selectors = Arrays.asList(
-                    LabelCoordinator.newSelector("veg", MzsConstants.Selecting.COUNT_MAX),
+                    LabelCoordinator.newSelector(VEGETABLE_LABEL, MzsConstants.Selecting.COUNT_MAX),
                     QueryCoordinator.newSelector(query.filter(growthProperty.greaterThanOrEqualTo(100)), MzsConstants.Selecting.COUNT_MAX)
             );
 
-            ArrayList<VegetablePlant> ps = capi.take(greenhouseContainer, selectors , MzsConstants.RequestTimeout.DEFAULT, tref);
-            if(ps.size() > 0) {
-                VegetablePlant plant = ps.get(0);
+            ArrayList<VegetablePlant> vegetablePlants = capi.take(greenhouseContainer, selectors , MzsConstants.RequestTimeout.DEFAULT, transactionReference);
 
-                vegs = Vegetable.fromVegetablePlant(plant);
+            if(vegetablePlants.size() > 0) {
+                VegetablePlant plant = vegetablePlants.get(0);
 
-                // If this plant can still be harvested
+                vegetables = Vegetable.harvestVegetablesFormPlant(plant);
+
+                // if this plant can still be harvested then "plant" it again
                 if (plant.getCultivationInformation().getRemainingNumberOfHarvests() > 0) {
-                    this.plant(plant, t);
+                    this.plant(plant, transaction);
                 }
             }
+
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
 
-        return vegs;
+        return vegetables;
     }
 
     @Override
-    public List<Flower> harvestFlowerPlant(Transaction t) {
-        TransactionReference tref = TransactionServiceImpl.getTransactionReference(t);
+    public List<Flower> harvestFlowerPlant(Transaction transaction) {
+        TransactionReference tref = TransactionServiceImpl.getTransactionReference(transaction);
         List<Flower> flowers = null;
 
         try {
@@ -109,7 +115,7 @@ public class GreenhouseServiceImpl implements GreenhouseService {
             Query query = new Query();
 
             List<Selector> selectors = Arrays.asList(
-                    LabelCoordinator.newSelector("flo", MzsConstants.Selecting.COUNT_MAX),
+                    LabelCoordinator.newSelector(FLOWER_LABEL, MzsConstants.Selecting.COUNT_MAX),
                     QueryCoordinator.newSelector(query.filter(growthProperty.greaterThanOrEqualTo(100)), MzsConstants.Selecting.COUNT_MAX)
             );
 
@@ -129,7 +135,7 @@ public class GreenhouseServiceImpl implements GreenhouseService {
     public List<VegetablePlant> readAllVegetablePlants() {
         List<VegetablePlant> vegetablePlants = null;
         try {
-            vegetablePlants = capi.read(greenhouseContainer, LabelCoordinator.newSelector("veg",LabelCoordinator.LabelSelector.COUNT_MAX),MzsConstants.RequestTimeout.DEFAULT,null);
+            vegetablePlants = capi.read(greenhouseContainer, LabelCoordinator.newSelector(VEGETABLE_LABEL,LabelCoordinator.LabelSelector.COUNT_MAX),MzsConstants.RequestTimeout.DEFAULT,null);
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -138,6 +144,12 @@ public class GreenhouseServiceImpl implements GreenhouseService {
 
     @Override
     public List<FlowerPlant> readAllFlowerPlants() {
-        return null;
+        List<FlowerPlant> flowerPlants = null;
+        try {
+            flowerPlants = capi.read(greenhouseContainer, LabelCoordinator.newSelector(FLOWER_LABEL,LabelCoordinator.LabelSelector.COUNT_MAX),MzsConstants.RequestTimeout.DEFAULT,null);
+        } catch (MzsCoreException e) {
+            e.printStackTrace();
+        }
+        return flowerPlants;
     }
 }

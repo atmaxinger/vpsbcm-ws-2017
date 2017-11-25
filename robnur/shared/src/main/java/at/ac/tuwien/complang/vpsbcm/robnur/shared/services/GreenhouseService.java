@@ -6,13 +6,13 @@ import java.util.List;
 
 public interface GreenhouseService {
 
-    void plant(VegetablePlant veg, Transaction t);
+    void plant(VegetablePlant vegetablePlant, Transaction transaction);
 
-    void plant(FlowerPlant plant, Transaction t);
+    void plant(FlowerPlant flowerPlant, Transaction transaction);
 
-    List<Vegetable> harvestVegetablePlant(Transaction t);
+    List<Vegetable> harvestVegetablePlant(Transaction transaction);
 
-    List<Flower> harvestFlowerPlant(Transaction t);
+    List<Flower> harvestFlowerPlant(Transaction transaction);
 
     List<VegetablePlant> readAllVegetablePlants();
 
