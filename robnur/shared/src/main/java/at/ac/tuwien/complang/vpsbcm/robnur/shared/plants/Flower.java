@@ -1,8 +1,22 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.plants;
 
 import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Flower implements Serializable {
+
+    public static List<Flower> fromFlowerPlant(FlowerPlant plant) {
+        List<Flower> flowers = new LinkedList<>();
+
+        for(int i=0; i < plant.getCultivationInformation().getHarvest(); i++) {
+            Flower f = new Flower();
+            f.setParentFlowerPlant(plant);
+            flowers.add(f);
+        }
+
+        return flowers;
+    }
 
     private FlowerPlant parentFlowerPlant;
 

@@ -65,7 +65,7 @@ public class ConfigService {
         i.setFertilizerAmount(1);
         i.setGrowthRate(0.2f);
         i.setHarvest(6);
-        i.setMaxNumberOfHarvests(2);
+        i.setRemainingNumberOfHarvests(2);
         i.setUpgradeLevel(0);
         ci.add(i);
 
@@ -76,7 +76,7 @@ public class ConfigService {
         i.setFertilizerAmount(2);
         i.setGrowthRate(0.35f);
         i.setHarvest(3);
-        i.setMaxNumberOfHarvests(3);
+        i.setRemainingNumberOfHarvests(3);
         i.setUpgradeLevel(0);
         ci.add(i);
 
@@ -87,7 +87,7 @@ public class ConfigService {
         i.setFertilizerAmount(1);
         i.setGrowthRate(0.2f);
         i.setHarvest(6);
-        i.setMaxNumberOfHarvests(2);
+        i.setRemainingNumberOfHarvests(2);
         i.setUpgradeLevel(0);
         ci.add(i);
 
@@ -98,7 +98,7 @@ public class ConfigService {
         i.setFertilizerAmount(1);
         i.setGrowthRate(0.2f);
         i.setHarvest(6);
-        i.setMaxNumberOfHarvests(1);
+        i.setRemainingNumberOfHarvests(1);
         i.setUpgradeLevel(0);
         ci.add(i);
 

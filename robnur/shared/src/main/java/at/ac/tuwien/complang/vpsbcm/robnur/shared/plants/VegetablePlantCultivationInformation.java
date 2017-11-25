@@ -23,11 +23,11 @@ public class VegetablePlantCultivationInformation extends CultivationInformation
         this.vegetableType = vegetableType;
     }
 
-    public int getMaxNumberOfHarvests() {
+    public int getRemainingNumberOfHarvests() {
         return maxNumberOfHarvests;
     }
 
-    public void setMaxNumberOfHarvests(int maxNumberOfHarvests) {
+    public void setRemainingNumberOfHarvests(int maxNumberOfHarvests) {
         this.maxNumberOfHarvests = maxNumberOfHarvests;
     }
 }

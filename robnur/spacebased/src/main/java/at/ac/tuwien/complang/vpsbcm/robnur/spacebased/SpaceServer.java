@@ -2,17 +2,70 @@ package at.ac.tuwien.complang.vpsbcm.robnur.spacebased;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.gui.RobNurGUI;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.gui.StorageController;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.FlowerFertilizer;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.SoilPackage;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.Water;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.GreenhouseService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.StorageService;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TranscationService;
+import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.GreenhouseServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.StorageServiceImpl;
+import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.TransactionServiceImpl;
+import org.mozartspaces.capi3.AnyCoordinator;
+import org.mozartspaces.capi3.ContainerFullException;
 import org.mozartspaces.core.*;
 import org.mozartspaces.core.aspects.ContainerIPoint;
 
 import java.net.URISyntaxException;
+import java.util.List;
 
 public class SpaceServer {
+
+    static void testTrans(Capi capi)  {
+        try {
+            ContainerReference cref1 = capi.createContainer("asdf", capi.getCore().getConfig().getSpaceUri(), 1, null, null);
+            ContainerReference cref2 = capi.createContainer("xxx", capi.getCore().getConfig().getSpaceUri(), 1, null, null);
+
+            capi.write(cref1, new Entry("a"));
+            capi.write(cref2, new Entry("begone"));
+
+
+            TransactionReference t = capi.createTransaction(1000, capi.getCore().getConfig().getSpaceUri());
+
+            List<String> jkl = capi.read(cref2, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_ALL), MzsConstants.RequestTimeout.INFINITE, null);
+
+            try {
+                capi.take(cref2, AnyCoordinator.newSelector(1), MzsConstants.RequestTimeout.DEFAULT, t);
+                capi.write(new Entry("shouldnotseeme"), cref1, MzsConstants.RequestTimeout.DEFAULT, t);
+                capi.commitTransaction(t);
+            } catch (MzsTimeoutException ex) {
+                System.out.println("TTRANSACTION EXC");
+            }
+            catch (ContainerFullException ex) {
+                System.out.println("CONTAINER FULL EXCEPTION 1");
+            }
+
+
+
+            List<String> asdf = capi.read(cref1, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_ALL), MzsConstants.TransactionTimeout.INFINITE, null);
+            jkl = capi.read(cref2, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_ALL), MzsConstants.TransactionTimeout.INFINITE, null);
+
+            System.out.println();
+            System.out.println();
+            System.out.println("HI");
+            System.out.println(
+            );
+            System.out.println();
+
+
+
+
+        } catch (MzsCoreException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void main(String[] args) {
         MzsCore core = DefaultMzsCore.newInstance();
@@ -20,6 +73,7 @@ public class SpaceServer {
 
         System.out.println("URL: " + core.getConfig().getSpaceUri());
 
+        //testTrans(capi);
 
         try {
             ContainerReference waterContainer = CapiUtil.lookupOrCreateContainer("waterContainer", core.getConfig().getSpaceUri(), null,null, capi);
@@ -27,6 +81,8 @@ public class SpaceServer {
             capi.addContainerAspect(was, waterContainer, ContainerIPoint.POST_TAKE);
 
             StorageService storageService = new StorageServiceImpl(core.getConfig().getSpaceUri());
+            GreenhouseService greenhouseService = new GreenhouseServiceImpl(core.getConfig().getSpaceUri());
+            TranscationService transactionService = new TransactionServiceImpl(core.getConfig().getSpaceUri());
 
             storageService.putFlowerFertilizer(new FlowerFertilizer());
             storageService.putFlowerFertilizer(new FlowerFertilizer());
@@ -56,6 +112,45 @@ public class SpaceServer {
             storageService.putWater(water);
 
             storageService.getWater(600);
+
+
+
+
+
+            //--------------------------------------------
+            //--------------------------------------------
+
+            Transaction t = transactionService.beginTransaction(-1);
+
+
+            VegetablePlant vp = new VegetablePlant();
+            vp.setCultivationInformation(new VegetablePlantCultivationInformation());
+            vp.setGrowth(10);
+
+            greenhouseService.plant(vp, t);
+
+            FlowerPlant fp = new FlowerPlant();
+            fp.setGrowth(100);
+            greenhouseService.plant(fp, t);
+
+
+            vp = new VegetablePlant();
+            vp.setCultivationInformation(new VegetablePlantCultivationInformation());
+            vp.setGrowth(100);
+            greenhouseService.plant(vp, t);
+
+            vp = new VegetablePlant();
+            vp.setCultivationInformation(new VegetablePlantCultivationInformation());
+            vp.setGrowth(101);
+            greenhouseService.plant(vp, t);
+
+            t.commit();
+
+            t = transactionService.beginTransaction(-1);
+
+            List<Vegetable> vegs = greenhouseService.harvestVegetablePlant(t);
+
+            t.commit();
 
         } catch (MzsCoreException e) {
             e.printStackTrace();

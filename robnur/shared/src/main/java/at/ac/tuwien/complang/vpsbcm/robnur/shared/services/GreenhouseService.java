@@ -6,15 +6,15 @@ import java.util.List;
 
 public interface GreenhouseService {
 
-    PlantPoint getFreePlantPoint();
+    void plant(VegetablePlant veg, Transaction t);
 
-    void setPlantPoint(PlantPoint plantPoint);
+    void plant(FlowerPlant plant, Transaction t);
 
-    PlantPoint<VegetablePlant> getHarvestReadyVegetablePlantPoint();
+    List<Vegetable> harvestVegetablePlant(Transaction t);
 
-    PlantPoint<FlowerPlant> getHarvestReadyFlowerPlantPoint();
+    List<Flower> harvestFlowerPlant(Transaction t);
 
-    List<VegetablePlant> readAllVegetablePlants();
+    VegetablePlant readAllVegetablePlants();
 
-    List<FlowerPlant> readAllFlowerPlants();
+    FlowerPlant readAllFlowerPlants();
 }
