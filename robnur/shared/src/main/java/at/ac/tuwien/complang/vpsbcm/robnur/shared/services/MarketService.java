@@ -14,12 +14,6 @@ public interface MarketService {
 
     int getAmountOfVegetableBaskets();
 
-    /* TODO: needed ? */
-    Bouquet getBouquet();
-
-    /* TODO: needed ? */
-    VegetableBasket getVegetableBasket();
-
     List<Bouquet> readAllBouquets();
 
     void sellBouquet(Bouquet bouquet);

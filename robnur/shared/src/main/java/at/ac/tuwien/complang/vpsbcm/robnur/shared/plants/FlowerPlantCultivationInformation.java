@@ -19,4 +19,19 @@ public class FlowerPlantCultivationInformation extends CultivationInformation {
     public void setFlowerType(FlowerType flowerType) {
         this.flowerType = flowerType;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FlowerPlantCultivationInformation that = (FlowerPlantCultivationInformation) o;
+
+        return flowerType == that.flowerType;
+    }
+
+    @Override
+    public int hashCode() {
+        return flowerType != null ? flowerType.hashCode() : 0;
+    }
 }

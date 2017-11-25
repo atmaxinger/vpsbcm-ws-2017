@@ -2,10 +2,7 @@ package services;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.MarketService;
-import com.sun.source.tree.AssertTree;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -84,7 +81,7 @@ public abstract class MarketServiceTest{
     @Test
     public void putBoutique_ShouldWork(){
         Assert.assertTrue(marketService.readAllBouquets().size() == 2);
-        Assert.assertTrue(marketService.getBouquet().equals(bouquet1) || marketService.getBouquet().equals(bouquet2));
+        Assert.assertTrue(marketService.readAllBouquets().get(0).equals(bouquet1) || marketService.readAllBouquets().get(1).equals(bouquet2));
     }
 
     @Test
@@ -95,26 +92,12 @@ public abstract class MarketServiceTest{
     @Test
     public void putVegetableBasket_ShouldWork(){
         Assert.assertTrue(marketService.readAllVegetableBaskets().size() == 2);
-        Assert.assertTrue(marketService.getVegetableBasket().equals(vegetableBasket1) || marketService.getVegetableBasket().equals(vegetableBasket2));
+        Assert.assertTrue(marketService.readAllVegetableBaskets().get(0).equals(vegetableBasket1) || marketService.readAllVegetableBaskets().get(1).equals(vegetableBasket2));
     }
 
     @Test
     public void getAmountOfVegetableBaskets_ShouldWork(){
         Assert.assertTrue(marketService.readAllVegetableBaskets().size() == 2);
-    }
-
-    @Test
-    public void getBouquet_ShouldWork(){
-        Assert.assertTrue(marketService.readAllBouquets().size() == 2);
-        Assert.assertTrue(marketService.getBouquet().equals(bouquet1) || marketService.getBouquet().equals(bouquet2));
-        Assert.assertTrue(marketService.readAllBouquets().size() == 1);
-    }
-
-    @Test
-    public void getVegetableBasket_ShouldWork(){
-        Assert.assertTrue(marketService.readAllVegetableBaskets().size() == 2);
-        Assert.assertTrue(marketService.getVegetableBasket().equals(vegetableBasket1) || marketService.getVegetableBasket().equals(vegetableBasket2));
-        Assert.assertTrue(marketService.readAllVegetableBaskets().size() == 1);
     }
 
     @Test
@@ -125,7 +108,7 @@ public abstract class MarketServiceTest{
     @Test
     public void sellBouquet_ShouldWork() {
         marketService.sellBouquet(bouquet2);
-        Assert.assertTrue(marketService.readAllVegetableBaskets().size() == 1);
+        Assert.assertTrue(marketService.readAllBouquets().size() == 1);
         Assert.assertTrue(marketService.readAllBouquets().get(0).equals(bouquet1));
     }
 

@@ -10,7 +10,7 @@ public class MarketServiceSpaceBasedTest extends MarketServiceTest {
     MzsCore core;
 
     @Before
-    public void setup2(){
+    public void setup(){
 
         core = DefaultMzsCore.newInstance();
 

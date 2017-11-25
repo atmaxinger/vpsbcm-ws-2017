@@ -30,4 +30,22 @@ public class VegetablePlantCultivationInformation extends CultivationInformation
     public void setRemainingNumberOfHarvests(int maxNumberOfHarvests) {
         this.maxNumberOfHarvests = maxNumberOfHarvests;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        VegetablePlantCultivationInformation that = (VegetablePlantCultivationInformation) o;
+
+        if (maxNumberOfHarvests != that.maxNumberOfHarvests) return false;
+        return vegetableType == that.vegetableType;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = vegetableType != null ? vegetableType.hashCode() : 0;
+        result = 31 * result + maxNumberOfHarvests;
+        return result;
+    }
 }
