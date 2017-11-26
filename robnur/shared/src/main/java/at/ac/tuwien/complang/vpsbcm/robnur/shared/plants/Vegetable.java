@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Vegetable implements Serializable{
+public class Vegetable extends Idable implements Serializable{
 
     private VegetablePlant parentVegetablePlant;
 
@@ -36,20 +36,5 @@ public class Vegetable implements Serializable{
 
     public void setParentVegetablePlant(VegetablePlant parentVegetablePlant) {
         this.parentVegetablePlant = parentVegetablePlant;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Vegetable vegetable = (Vegetable) o;
-
-        return parentVegetablePlant != null ? parentVegetablePlant.equals(vegetable.parentVegetablePlant) : vegetable.parentVegetablePlant == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return parentVegetablePlant != null ? parentVegetablePlant.hashCode() : 0;
     }
 }
