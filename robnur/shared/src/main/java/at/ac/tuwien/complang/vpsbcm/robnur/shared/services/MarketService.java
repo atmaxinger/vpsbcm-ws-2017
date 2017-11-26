@@ -4,21 +4,30 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
 
 import java.util.List;
 
-public interface MarketService {
+public abstract class MarketService {
 
-    void putBouquet(Bouquet bouquet);
+    public interface Callback<T1,T2> {
+        void handle(T1 p1, T2 p2);
+    }
 
-    int getAmountOfBouquets();
+    protected Callback<List<VegetableBasket>, List<Bouquet>> marketChanged;
+    public void onMarketChanged(Callback<List<VegetableBasket>, List<Bouquet>> marketChanged) {
+        this.marketChanged = marketChanged;
+    }
 
-    void putVegetableBasket(VegetableBasket vegetableBasket);
+    public abstract void putBouquet(Bouquet bouquet);
 
-    int getAmountOfVegetableBaskets();
+    public abstract int getAmountOfBouquets();
 
-    List<Bouquet> readAllBouquets();
+    public abstract void putVegetableBasket(VegetableBasket vegetableBasket);
 
-    void sellBouquet(Bouquet bouquet);
+    public abstract int getAmountOfVegetableBaskets();
 
-    List<VegetableBasket> readAllVegetableBaskets();
+    public abstract List<Bouquet> readAllBouquets();
 
-    void sellVegetableBasket(VegetableBasket vegetableBasket);
+    public abstract void sellBouquet(Bouquet bouquet);
+
+    public abstract List<VegetableBasket> readAllVegetableBaskets();
+
+    public abstract void sellVegetableBasket(VegetableBasket vegetableBasket);
 }

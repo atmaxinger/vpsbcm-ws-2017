@@ -1,25 +1,35 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Bouquet;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Plant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableBasket;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.MarketService;
 import org.mozartspaces.capi3.*;
 import org.mozartspaces.core.*;
+import org.mozartspaces.notifications.NotificationManager;
+import org.mozartspaces.notifications.Operation;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
-public class MarketServiceImpl implements MarketService {
+public class MarketServiceImpl extends MarketService {
 
     private URI spaceUri;
     private Capi capi;
+    private NotificationManager notificationManager;
 
     private ContainerReference bouquetContainer;
     private ContainerReference vegetableBasketContainer;
 
+    private void raiseChangedEvent() {
+        if(marketChanged != null) {
+            marketChanged.handle(readAllVegetableBaskets(), readAllBouquets());
+        }
+    }
 
     public MarketServiceImpl(URI spaceUri) {
 
@@ -27,13 +37,19 @@ public class MarketServiceImpl implements MarketService {
 
         MzsCore core = DefaultMzsCore.newInstanceWithoutSpace();
         capi = new Capi(core);
+        notificationManager = new NotificationManager(core);
 
         List<Coordinator> coordinators = Arrays.asList(new AnyCoordinator(), new QueryCoordinator());
 
         try {
             bouquetContainer = CapiUtil.lookupOrCreateContainer("bouquetContainer", spaceUri, coordinators, null,capi);
             vegetableBasketContainer = CapiUtil.lookupOrCreateContainer("vegetableBasketContainer", spaceUri, coordinators, null,capi);
+
+            notificationManager.createNotification(bouquetContainer, (notification, operation, list) -> raiseChangedEvent(), Operation.DELETE, Operation.TAKE, Operation.WRITE);
+            notificationManager.createNotification(vegetableBasketContainer, (notification, operation, list) -> raiseChangedEvent(), Operation.DELETE, Operation.TAKE, Operation.WRITE);
         } catch (MzsCoreException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
