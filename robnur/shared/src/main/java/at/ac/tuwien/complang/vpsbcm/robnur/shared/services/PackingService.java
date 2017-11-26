@@ -11,13 +11,11 @@ public interface PackingService {
 
     void putVegetable(Vegetable vegetable);
 
-    // TODO: consider implementing abstract method that gets all the different flowers for a bouquet
-    List<Flower> getFlowersForBouquet(int amount);
+    Flower getFlower(String flowerId, Transaction transaction);
 
-    // TODO: consider implementing abstract method that gets all the different vegetables for a basket
-    List<Vegetable> getVegetableForBasket(int amount);
+    Vegetable getVegetable(String vegetableId, Transaction transaction);
 
-    List<Flower> readAllFlowers();
+    List<Flower> readAllFlowers(Transaction transaction);
 
-    List<Vegetable> readAllVegetables();
+    List<Vegetable> readAllVegetables(Transaction transaction);
 }

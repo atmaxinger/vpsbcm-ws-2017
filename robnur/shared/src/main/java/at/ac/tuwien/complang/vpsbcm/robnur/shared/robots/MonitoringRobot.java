@@ -6,18 +6,18 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Plant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.GreenhouseService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TranscationService;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
 
 import java.util.List;
 import java.util.Random;
 
 public class MonitoringRobot extends Robot {
     private GreenhouseService greenhouseService;
-    private TranscationService transactionService;
+    private TransactionService transactionService;
 
     private Random rand = new Random();
 
-    public MonitoringRobot(GreenhouseService greenhouseService, TranscationService transactionService) {
+    public MonitoringRobot(GreenhouseService greenhouseService, TransactionService transactionService) {
         this.greenhouseService = greenhouseService;
         this.transactionService = transactionService;
     }

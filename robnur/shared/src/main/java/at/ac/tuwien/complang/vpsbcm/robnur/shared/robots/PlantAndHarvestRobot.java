@@ -1,7 +1,6 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.robots;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Flower;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Plant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.*;
 
@@ -12,10 +11,10 @@ public class PlantAndHarvestRobot extends Robot {
 
     private StorageService storageService;
     private GreenhouseService greenhouseService;
-    private TranscationService transactionService;
+    private TransactionService transactionService;
     private PackingService packingService;
 
-    public PlantAndHarvestRobot(StorageService storageService, GreenhouseService greenhouseService, TranscationService transactionService, PackingService packingService) {
+    public PlantAndHarvestRobot(StorageService storageService, GreenhouseService greenhouseService, TransactionService transactionService, PackingService packingService) {
         this.storageService = storageService;
         this.greenhouseService = greenhouseService;
         this.transactionService = transactionService;

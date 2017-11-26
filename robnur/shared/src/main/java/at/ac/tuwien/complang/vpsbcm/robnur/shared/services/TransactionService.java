@@ -1,5 +1,5 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.services;
 
-public interface TranscationService {
+public interface TransactionService {
     Transaction beginTransaction(long timeoutMillis);
 }

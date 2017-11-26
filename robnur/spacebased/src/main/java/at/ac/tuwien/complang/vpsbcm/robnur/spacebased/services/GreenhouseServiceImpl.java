@@ -135,7 +135,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             ArrayList<FlowerPlant> ps = capi.take(greenhouseContainer, selectors , MzsConstants.RequestTimeout.DEFAULT, tref);
             if(ps.size() > 0) {
                 FlowerPlant plant = ps.get(0);
-                flowers = Flower.fromFlowerPlant(plant);
+                flowers = Flower.harvestFlowerFromFlowerPlant(plant);
             }
         } catch (MzsCoreException e) {
             e.printStackTrace();

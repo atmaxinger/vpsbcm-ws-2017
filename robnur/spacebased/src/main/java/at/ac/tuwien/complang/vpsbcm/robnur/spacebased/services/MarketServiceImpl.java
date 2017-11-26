@@ -1,19 +1,17 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Bouquet;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Plant;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableBasket;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.MarketService;
-import org.mozartspaces.capi3.*;
+import org.mozartspaces.capi3.AnyCoordinator;
+import org.mozartspaces.capi3.Coordinator;
+import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.core.*;
 import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 public class MarketServiceImpl extends MarketService {

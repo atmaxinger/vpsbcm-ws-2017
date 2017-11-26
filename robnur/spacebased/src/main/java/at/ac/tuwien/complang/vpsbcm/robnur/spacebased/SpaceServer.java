@@ -1,13 +1,13 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased;
 
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.gui.RobNurGUI;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.gui.StorageController;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.FlowerFertilizer;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.SoilPackage;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.Water;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.*;
+import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.robots.SpacePackRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.GreenhouseServiceImpl;
+import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.PackingServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.StorageServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.TransactionServiceImpl;
 import org.mozartspaces.capi3.AnyCoordinator;
@@ -76,15 +76,13 @@ public class SpaceServer {
 
         try {
 
-
-
             ContainerReference waterContainer = CapiUtil.lookupOrCreateContainer("waterContainer", core.getConfig().getSpaceUri(), null,null, capi);
             WaterAspect was = new WaterAspect();
             capi.addContainerAspect(was, waterContainer, ContainerIPoint.POST_TAKE);
 
             StorageService storageService = new StorageServiceImpl(core.getConfig().getSpaceUri());
             GreenhouseService greenhouseService = new GreenhouseServiceImpl(core.getConfig().getSpaceUri());
-            TranscationService transactionService = new TransactionServiceImpl(core.getConfig().getSpaceUri());
+            TransactionService transactionService = new TransactionServiceImpl(core.getConfig().getSpaceUri());
 
             storageService.putFlowerFertilizer(new FlowerFertilizer());
             storageService.putFlowerFertilizer(new FlowerFertilizer());

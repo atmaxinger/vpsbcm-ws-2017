@@ -1,12 +1,12 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TranscationService;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
 import org.mozartspaces.core.*;
 
 import java.net.URI;
 
-public class TransactionServiceImpl implements TranscationService {
+public class TransactionServiceImpl implements TransactionService {
 
     public static TransactionReference getTransactionReference(Transaction transaction) {
         if(transaction instanceof TransactionImpl) {
