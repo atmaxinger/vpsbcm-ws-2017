@@ -7,10 +7,6 @@ import java.util.List;
 
 public interface ResearchService {
 
-    Flower getFlowerOfSameType(int amount);
-
-    Vegetable getVegetableOfSameType(int amount);
-
     void putFlower(Flower flower);
 
     void putVegetable(Vegetable vegetable);

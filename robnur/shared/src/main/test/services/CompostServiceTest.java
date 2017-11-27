@@ -36,8 +36,6 @@ public abstract class CompostServiceTest {
         flower2 = new Flower();
         flower2.setParentFlowerPlant(flowerPlant2);
 
-        /* VegetableBasket */
-
         VegetablePlantCultivationInformation vegetablePlantCultivationInformation1 = new VegetablePlantCultivationInformation();
         vegetablePlantCultivationInformation1.setVegetableType(VegetableType.CARROT);
 
@@ -55,8 +53,6 @@ public abstract class CompostServiceTest {
 
         vegetable2 = new Vegetable();
         vegetable2.setParentVegetablePlant(vegetablePlant2);
-
-        /* Market */
 
         compostService.putFlowerPlant(flowerPlant1);
         compostService.putFlowerPlant(flowerPlant2);
