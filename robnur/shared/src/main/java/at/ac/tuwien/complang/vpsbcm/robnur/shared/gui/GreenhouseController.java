@@ -41,18 +41,7 @@ public class GreenhouseController {
 
         tcPlantId.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getId()));
 
-        tcPlant.setCellValueFactory(param ->{
-            String type="unknown";
-            Plant p = param.getValue();
-
-            if(p instanceof VegetablePlant) {
-                type = ((VegetablePlant) p).getCultivationInformation().getVegetableType().toString();
-            } else if(p instanceof FlowerPlant) {
-                type = ((FlowerPlant) p).getCultivationInformation().getFlowerType().toString();
-            }
-
-            return new ReadOnlyStringWrapper(type);
-        });
+        tcPlant.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getTypeName()));
 
         tcGrowth.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue().getGrowth()));
 
