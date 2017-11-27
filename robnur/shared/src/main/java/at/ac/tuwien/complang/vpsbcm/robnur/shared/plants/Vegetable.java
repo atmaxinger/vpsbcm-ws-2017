@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Vegetable extends Idable implements Serializable{
+public class Vegetable extends Harvestable implements Serializable{
 
     private VegetablePlant parentVegetablePlant;
 
@@ -36,5 +36,10 @@ public class Vegetable extends Idable implements Serializable{
 
     public void setParentVegetablePlant(VegetablePlant parentVegetablePlant) {
         this.parentVegetablePlant = parentVegetablePlant;
+    }
+
+    @Override
+    public Plant getParentPlant() {
+        return getParentVegetablePlant();
     }
 }

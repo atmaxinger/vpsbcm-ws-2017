@@ -2,7 +2,7 @@ package at.ac.tuwien.complang.vpsbcm.robnur.shared.plants;
 
 import java.io.Serializable;
 
-public abstract class CultivationInformation implements Serializable {
+public abstract class CultivationInformation extends Idable implements Serializable {
 
     /* 0.2 ... 0.5 */
     private float growthRate;

@@ -1,10 +1,10 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.gui;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Bouquet;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.EndProduct;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Idable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableBasket;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.MarketService;
-import javafx.beans.Observable;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ObservableList;
@@ -17,18 +17,18 @@ import java.util.List;
 
 public class MarketController {
     
-    public TableView<Idable> tvMarket;
-    public TableColumn<Idable, Integer> tcIndex;
-    public TableColumn<Idable, String> tcBasketId;
-    public TableColumn<Idable, String> tcType;
-    public TableColumn<Idable, Button> tcInfo;
-    public TableColumn<Idable, Button> tcBuy;
+    public TableView<EndProduct> tvMarket;
+    public TableColumn<EndProduct, Integer> tcIndex;
+    public TableColumn<EndProduct, String> tcBasketId;
+    public TableColumn<EndProduct, String> tcType;
+    public TableColumn<EndProduct, Button> tcInfo;
+    public TableColumn<EndProduct, Button> tcBuy;
 
 
     private MarketService marketService = RobNurGUI.marketService;
 
     private void updateData(List<VegetableBasket> vegetableBasketList, List<Bouquet> bouquetList) {
-        ObservableList<Idable> obs = tvMarket.getItems();
+        ObservableList<EndProduct> obs = tvMarket.getItems();
         obs.clear();
 
         obs.addAll(vegetableBasketList);
@@ -60,6 +60,12 @@ public class MarketController {
 
         tcInfo.setCellValueFactory(column -> {
             Button btn = new Button("Infos");
+
+            btn.setOnAction(event -> {
+                EndProductInformationDialog bi = new EndProductInformationDialog();
+                bi.show(column.getValue());
+            });
+
             return new ReadOnlyObjectWrapper<>(btn);
         });
 

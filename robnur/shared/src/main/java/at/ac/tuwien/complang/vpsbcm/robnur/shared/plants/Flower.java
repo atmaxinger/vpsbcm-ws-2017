@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Flower extends Idable {
+public class Flower extends Harvestable implements Serializable {
 
     private FlowerPlant parentFlowerPlant;
 
@@ -26,5 +26,10 @@ public class Flower extends Idable {
         }
 
         return flowers;
+    }
+
+    @Override
+    public Plant getParentPlant() {
+        return getParentFlowerPlant();
     }
 }

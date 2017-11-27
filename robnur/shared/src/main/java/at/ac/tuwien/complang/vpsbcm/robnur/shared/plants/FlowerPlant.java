@@ -13,4 +13,9 @@ public class FlowerPlant extends Plant implements Serializable {
     public void setCultivationInformation(FlowerPlantCultivationInformation cultivationInformation) {
         this.cultivationInformation = cultivationInformation;
     }
+
+    @Override
+    public String getTypeName() {
+        return getCultivationInformation().getFlowerType().toString();
+    }
 }
