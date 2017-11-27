@@ -35,7 +35,7 @@ public abstract class MarketServiceTest{
         flower1.setParentFlowerPlant(flowerPlant1);
 
         Flower flower2 = new Flower();
-        flower1.setParentFlowerPlant(flowerPlant2);
+        flower2.setParentFlowerPlant(flowerPlant2);
 
         bouquet1 = new Bouquet();
         bouquet1.setFlowers(Arrays.asList(flower1,flower2));

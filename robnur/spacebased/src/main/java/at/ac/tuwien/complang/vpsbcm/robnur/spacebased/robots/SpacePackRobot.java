@@ -1,9 +1,5 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.robots;
 
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Flower;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlant;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlantCultivationInformation;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PackRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.*;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.*;
