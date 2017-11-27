@@ -40,93 +40,41 @@ public class CompostServiceImpl implements CompostService {
 
     @Override
     public void putFlowerPlant(FlowerPlant flowerPlant) {
-        try {
-            capi.write(flowerPlantContainer,new Entry(flowerPlant));
-        } catch (MzsCoreException e) {
-            e.printStackTrace();
-        }
+        ServiceUtil.writeItem(flowerPlant,flowerPlantContainer,null,capi);
     }
 
     @Override
     public void putVegetablePlant(VegetablePlant vegetablePlant) {
-        try {
-            capi.write(vegetablePlantContainer,new Entry(vegetablePlant));
-        } catch (MzsCoreException e) {
-            e.printStackTrace();
-        }
+        ServiceUtil.writeItem(vegetablePlant,vegetablePlantContainer,null,capi);
     }
 
     @Override
     public void putFlower(Flower flower) {
-        try {
-            capi.write(flowerContainer,new Entry(flower));
-        } catch (MzsCoreException e) {
-            e.printStackTrace();
-        }
+        ServiceUtil.writeItem(flower,flowerContainer,null,capi);
     }
 
     @Override
     public void putVegetable(Vegetable vegetable) {
-        try {
-            capi.write(vegetableContainer,new Entry(vegetable));
-        } catch (MzsCoreException e) {
-            e.printStackTrace();
-        }
+        ServiceUtil.writeItem(vegetable,vegetableContainer,null,capi);
     }
 
     @Override
     public List<FlowerPlant> readAllFlowerPlants() {
-
-        List<FlowerPlant> flowerPlants = null;
-
-        try {
-            flowerPlants = capi.read(flowerPlantContainer,AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX),MzsConstants.RequestTimeout.DEFAULT,null);
-        } catch (MzsCoreException e) {
-            e.printStackTrace();
-        }
-
-        return flowerPlants;
+        return ServiceUtil.readAllItems(flowerPlantContainer,null,capi);
     }
 
     @Override
     public List<VegetablePlant> readAllVegetablePlants() {
-
-        List<VegetablePlant> vegetablePlants = null;
-
-        try {
-            vegetablePlants = capi.read(vegetablePlantContainer,AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX),MzsConstants.RequestTimeout.DEFAULT,null);
-        } catch (MzsCoreException e) {
-            e.printStackTrace();
-        }
-
-        return vegetablePlants;
+        return ServiceUtil.readAllItems(vegetablePlantContainer,null,capi);
     }
 
     @Override
     public List<Flower> readAllFlowers() {
-
-        List<Flower> flowers = null;
-
-        try {
-            flowers = capi.read(flowerContainer,AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX),MzsConstants.RequestTimeout.DEFAULT,null);
-        } catch (MzsCoreException e) {
-            e.printStackTrace();
-        }
-
-        return flowers;
+        return ServiceUtil.readAllItems(flowerContainer,null,capi);
     }
 
     @Override
     public List<Vegetable> readAllVegetables() {
-
-        List<Vegetable> vegetables = null;
-
-        try {
-            vegetables = capi.read(vegetableContainer,AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX),MzsConstants.RequestTimeout.DEFAULT,null);
-        } catch (MzsCoreException e) {
-            e.printStackTrace();
-        }
-
-        return vegetables;
+        return ServiceUtil.readAllItems(vegetableContainer,null,capi);
     }
 }

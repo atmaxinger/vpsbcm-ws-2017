@@ -35,47 +35,21 @@ public class ResearchServiceImpl implements ResearchService {
 
     @Override
     public void putFlower(Flower flower) {
-        try {
-            capi.write(flowerContainer,new Entry(flower));
-        } catch (MzsCoreException e) {
-            e.printStackTrace();
-        }
+        ServiceUtil.writeItem(flower,flowerContainer,null,capi);
     }
 
     @Override
     public void putVegetable(Vegetable vegetable) {
-        try {
-            capi.write(vegetableContainer,new Entry(vegetable));
-        } catch (MzsCoreException e) {
-            e.printStackTrace();
-        }
+        ServiceUtil.writeItem(vegetable,vegetableContainer,null,capi);
     }
 
     @Override
     public List<Flower> readAllFlowers() {
-
-        List<Flower> flowers = null;
-
-        try {
-            flowers = capi.read(flowerContainer,AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX),MzsConstants.RequestTimeout.DEFAULT,null);
-        } catch (MzsCoreException e) {
-            e.printStackTrace();
-        }
-
-        return flowers;
+        return ServiceUtil.readAllItems(flowerContainer,null,capi);
     }
 
     @Override
     public List<Vegetable> readAllVegetables() {
-
-        List<Vegetable> vegetables = null;
-
-        try {
-            vegetables = capi.read(vegetableContainer,AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX),MzsConstants.RequestTimeout.DEFAULT,null);
-        } catch (MzsCoreException e) {
-            e.printStackTrace();
-        }
-
-        return vegetables;
+        return ServiceUtil.readAllItems(vegetableContainer,null,capi);
     }
 }
