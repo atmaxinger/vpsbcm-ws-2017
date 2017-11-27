@@ -163,6 +163,8 @@ public class PackRobot extends Robot {
                         vegetablesForVegetableBasket.add(packingService.getVegetable(vegetablesOfSameType.get(i).getId(),transaction));
                     }
 
+                    vegetableBasket.setVegetables(vegetablesForVegetableBasket);
+
                     transaction.commit();
 
                     waitPackingTime();
