@@ -160,7 +160,7 @@ public class PackRobot extends Robot {
                     List<Vegetable> vegetablesForVegetableBasket = new ArrayList<>();
 
                     for (int i = 0; i < 5; i++){
-                        vegetablesForVegetableBasket.add(packingService.getVegetable(v.getId(),transaction));
+                        vegetablesForVegetableBasket.add(packingService.getVegetable(vegetablesOfSameType.get(i).getId(),transaction));
                     }
 
                     transaction.commit();
