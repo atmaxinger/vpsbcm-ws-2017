@@ -6,10 +6,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.SoilPackage;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.Water;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.*;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.robots.SpacePackRobot;
-import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.GreenhouseServiceImpl;
-import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.PackingServiceImpl;
-import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.StorageServiceImpl;
-import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.TransactionServiceImpl;
+import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.*;
 import org.mozartspaces.capi3.AnyCoordinator;
 import org.mozartspaces.capi3.ContainerFullException;
 import org.mozartspaces.core.*;
@@ -20,153 +17,118 @@ import java.util.List;
 
 public class SpaceServer {
 
-    static void testTrans(Capi capi)  {
-        try {
-            ContainerReference cref1 = capi.createContainer("asdf", capi.getCore().getConfig().getSpaceUri(), 1, null, null);
-            ContainerReference cref2 = capi.createContainer("xxx", capi.getCore().getConfig().getSpaceUri(), 1, null, null);
+    public static void main(String[] args) {
 
-            capi.write(cref1, new Entry("a"));
-            capi.write(cref2, new Entry("begone"));
+        MzsCore core = DefaultMzsCore.newInstance();
 
+        ConfigService configService = null;
+        configService = new ConfigServiceImpl(core.getConfig().getSpaceUri());
 
-            TransactionReference t = capi.createTransaction(1000, capi.getCore().getConfig().getSpaceUri());
+        putInitialFlowerPlantCultivationInformation(configService);
+        putInitialVegetablePlantCultivationInformation(configService);
+    }
 
-            List<String> jkl = capi.read(cref2, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_ALL), MzsConstants.RequestTimeout.INFINITE, null);
+    public static void putInitialFlowerPlantCultivationInformation(ConfigService configService) {
 
-            try {
-                capi.take(cref2, AnyCoordinator.newSelector(1), MzsConstants.RequestTimeout.DEFAULT, t);
-                capi.write(new Entry("shouldnotseeme"), cref1, MzsConstants.RequestTimeout.DEFAULT, t);
-                capi.commitTransaction(t);
-            } catch (MzsTimeoutException ex) {
-                System.out.println("TTRANSACTION EXC");
-            }
-            catch (ContainerFullException ex) {
-                System.out.println("CONTAINER FULL EXCEPTION 1");
-            }
+        if (configService.readAllFlowerPlantCultivationInformation(null).size() == 0) {
 
+            FlowerPlantCultivationInformation flowerPlantCultivationInformation = new FlowerPlantCultivationInformation();
+            flowerPlantCultivationInformation.setFlowerType(FlowerType.ROSE);
+            flowerPlantCultivationInformation.setSoilAmount(20);
+            flowerPlantCultivationInformation.setWaterAmount(250);
+            flowerPlantCultivationInformation.setFertilizerAmount(1);
+            flowerPlantCultivationInformation.setGrowthRate(0.25f);
+            flowerPlantCultivationInformation.setHarvest(4);
+            flowerPlantCultivationInformation.setUpgradeLevel(0);
 
+            configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, null);
 
-            List<String> asdf = capi.read(cref1, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_ALL), MzsConstants.TransactionTimeout.INFINITE, null);
-            jkl = capi.read(cref2, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_ALL), MzsConstants.TransactionTimeout.INFINITE, null);
+            flowerPlantCultivationInformation = new FlowerPlantCultivationInformation();
+            flowerPlantCultivationInformation.setFlowerType(FlowerType.TULIP);
+            flowerPlantCultivationInformation.setSoilAmount(15);
+            flowerPlantCultivationInformation.setWaterAmount(375);
+            flowerPlantCultivationInformation.setFertilizerAmount(2);
+            flowerPlantCultivationInformation.setGrowthRate(0.5f);
+            flowerPlantCultivationInformation.setHarvest(2);
+            flowerPlantCultivationInformation.setUpgradeLevel(0);
 
-            System.out.println();
-            System.out.println();
-            System.out.println("HI");
-            System.out.println(
-            );
-            System.out.println();
+            configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, null);
 
+            flowerPlantCultivationInformation = new FlowerPlantCultivationInformation();
+            flowerPlantCultivationInformation.setFlowerType(FlowerType.DAISY);
+            flowerPlantCultivationInformation.setSoilAmount(23);
+            flowerPlantCultivationInformation.setWaterAmount(237);
+            flowerPlantCultivationInformation.setFertilizerAmount(1);
+            flowerPlantCultivationInformation.setGrowthRate(0.25f);
+            flowerPlantCultivationInformation.setHarvest(4);
+            flowerPlantCultivationInformation.setUpgradeLevel(0);
 
+            configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, null);
 
+            flowerPlantCultivationInformation = new FlowerPlantCultivationInformation();
+            flowerPlantCultivationInformation.setFlowerType(FlowerType.VIOLET);
+            flowerPlantCultivationInformation.setSoilAmount(27);
+            flowerPlantCultivationInformation.setWaterAmount(250);
+            flowerPlantCultivationInformation.setFertilizerAmount(1);
+            flowerPlantCultivationInformation.setGrowthRate(0.25f);
+            flowerPlantCultivationInformation.setHarvest(4);
+            flowerPlantCultivationInformation.setUpgradeLevel(0);
 
-        } catch (MzsCoreException e) {
-            e.printStackTrace();
+            configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, null);
         }
     }
 
-    public static void main(String[] args) {
-        MzsCore core = DefaultMzsCore.newInstance();
-        Capi capi = new Capi(core);
+    public static void putInitialVegetablePlantCultivationInformation(ConfigService configService) {
 
-        System.out.println("URL: " + core.getConfig().getSpaceUri());
+        if (configService.readAllVegetablePlantCultivationInformation(null).size() == 0) {
 
-        //testTrans(capi);
+            VegetablePlantCultivationInformation vegetablePlantCultivationInformation = new VegetablePlantCultivationInformation();
+            vegetablePlantCultivationInformation.setVegetableType(VegetableType.PEPPER);
+            vegetablePlantCultivationInformation.setSoilAmount(30);
+            vegetablePlantCultivationInformation.setWaterAmount(450);
+            vegetablePlantCultivationInformation.setFertilizerAmount(1);
+            vegetablePlantCultivationInformation.setGrowthRate(0.2f);
+            vegetablePlantCultivationInformation.setHarvest(6);
+            vegetablePlantCultivationInformation.setRemainingNumberOfHarvests(2);
+            vegetablePlantCultivationInformation.setUpgradeLevel(0);
 
-        ConfigService configService = new ConfigService();
+            configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation,null);
 
-        try {
+            vegetablePlantCultivationInformation = new VegetablePlantCultivationInformation();
+            vegetablePlantCultivationInformation.setVegetableType(VegetableType.TOMATO);
+            vegetablePlantCultivationInformation.setSoilAmount(25);
+            vegetablePlantCultivationInformation.setWaterAmount(600);
+            vegetablePlantCultivationInformation.setFertilizerAmount(2);
+            vegetablePlantCultivationInformation.setGrowthRate(0.35f);
+            vegetablePlantCultivationInformation.setHarvest(3);
+            vegetablePlantCultivationInformation.setRemainingNumberOfHarvests(3);
+            vegetablePlantCultivationInformation.setUpgradeLevel(0);
 
-            ContainerReference waterContainer = CapiUtil.lookupOrCreateContainer("waterContainer", core.getConfig().getSpaceUri(), null,null, capi);
-            WaterAspect was = new WaterAspect();
-            capi.addContainerAspect(was, waterContainer, ContainerIPoint.POST_TAKE);
+            configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation,null);
 
-            StorageService storageService = new StorageServiceImpl(core.getConfig().getSpaceUri());
-            GreenhouseService greenhouseService = new GreenhouseServiceImpl(core.getConfig().getSpaceUri());
-            TransactionService transactionService = new TransactionServiceImpl(core.getConfig().getSpaceUri());
+            vegetablePlantCultivationInformation = new VegetablePlantCultivationInformation();
+            vegetablePlantCultivationInformation.setVegetableType(VegetableType.CARROT);
+            vegetablePlantCultivationInformation.setSoilAmount(30);
+            vegetablePlantCultivationInformation.setWaterAmount(450);
+            vegetablePlantCultivationInformation.setFertilizerAmount(1);
+            vegetablePlantCultivationInformation.setGrowthRate(0.2f);
+            vegetablePlantCultivationInformation.setHarvest(6);
+            vegetablePlantCultivationInformation.setRemainingNumberOfHarvests(2);
+            vegetablePlantCultivationInformation.setUpgradeLevel(0);
 
-            storageService.putFlowerFertilizer(new FlowerFertilizer());
-            storageService.putFlowerFertilizer(new FlowerFertilizer());
-            storageService.putFlowerFertilizer(new FlowerFertilizer());
-            storageService.putFlowerFertilizer(new FlowerFertilizer());
-            storageService.getFlowerFertilizer(2);
+            configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation,null);
 
-            SoilPackage soilPackage1 = new SoilPackage();
-            soilPackage1.setAmount(50);
-            SoilPackage soilPackage2 = new SoilPackage();
-            soilPackage2.setAmount(10);
-            SoilPackage soilPackage3 = new SoilPackage();
-            soilPackage3.setAmount(40);
-            SoilPackage soilPackage4 = new SoilPackage();
-            soilPackage4.setAmount(30);
+            vegetablePlantCultivationInformation = new VegetablePlantCultivationInformation();
+            vegetablePlantCultivationInformation.setVegetableType(VegetableType.SALAD);
+            vegetablePlantCultivationInformation.setSoilAmount(30);
+            vegetablePlantCultivationInformation.setWaterAmount(450);
+            vegetablePlantCultivationInformation.setFertilizerAmount(1);
+            vegetablePlantCultivationInformation.setGrowthRate(0.2f);
+            vegetablePlantCultivationInformation.setHarvest(6);
+            vegetablePlantCultivationInformation.setRemainingNumberOfHarvests(1);
+            vegetablePlantCultivationInformation.setUpgradeLevel(0);
 
-            storageService.putSoilPackage(soilPackage1);
-            storageService.putSoilPackage(soilPackage2);
-            storageService.putSoilPackage(soilPackage3);
-            storageService.putSoilPackage(soilPackage4);
-
-            storageService.getSoil(30);
-            storageService.getSoil(200);
-
-            Water water = new Water();
-            water.setAmount(250);
-            storageService.putWater(water);
-
-            storageService.getWater(600);
-
-
-
-
-
-            //--------------------------------------------
-            //--------------------------------------------
-
-            VegetablePlant vp = null;
-
-            Transaction t = transactionService.beginTransaction(-1);
-            vp = new VegetablePlant();
-            vp.setCultivationInformation(configService.getVegetablePlantCultivationInformation().get(0));
-            vp.setGrowth(10);
-            greenhouseService.plant(vp, t);
-            t.commit();
-
-            t = transactionService.beginTransaction(-1);
-
-            FlowerPlant fp = new FlowerPlant();
-            fp.setCultivationInformation(configService.getFlowerPlantCultivationInformation().get(0));
-            fp.setGrowth(100);
-            greenhouseService.plant(fp, t);
-            t.commit();
-
-            t = transactionService.beginTransaction(-1);
-
-            vp = new VegetablePlant();
-            vp.setCultivationInformation(configService.getVegetablePlantCultivationInformation().get(0));
-            vp.setGrowth(100);
-            greenhouseService.plant(vp, t);
-            t.commit();
-
-            t = transactionService.beginTransaction(-1);
-
-            vp = new VegetablePlant();
-            vp.setCultivationInformation(configService.getVegetablePlantCultivationInformation().get(0));
-            vp.setGrowth(101);
-            greenhouseService.plant(vp, t);
-
-            t.commit();
-
-            t = transactionService.beginTransaction(-1);
-
-            List<VegetablePlant> vegs1 = greenhouseService.readAllVegetablePlants();
-           // List<Vegetable> vegs = greenhouseService.harvestVegetablePlant(t);
-
-            t.commit();
-
-        } catch (MzsCoreException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation,null);
         }
     }
 }

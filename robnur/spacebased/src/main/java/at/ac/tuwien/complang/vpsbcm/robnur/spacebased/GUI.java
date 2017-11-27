@@ -3,10 +3,7 @@ package at.ac.tuwien.complang.vpsbcm.robnur.spacebased;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.gui.RobNurGUI;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.gui.StorageController;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.*;
-import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.GreenhouseServiceImpl;
-import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.MarketServiceImpl;
-import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.PackingServiceImpl;
-import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.StorageServiceImpl;
+import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.*;
 import org.mozartspaces.core.MzsCore;
 import org.mozartspaces.core.MzsCoreException;
 
@@ -27,7 +24,7 @@ public class GUI {
         RobNurGUI.marketService = marketService;
         RobNurGUI.packingService = packingService;
 
-        RobNurGUI.configService = new ConfigService();
+        RobNurGUI.configService = new ConfigServiceImpl(uri);
 
         RobNurGUI robNurGUI = new RobNurGUI();
         robNurGUI.execute(args);

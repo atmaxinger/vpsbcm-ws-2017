@@ -140,7 +140,7 @@ public class StorageController {
         ObservableList<SeedsTableDataModel> obs = tvSeeds.getItems();
         obs.clear();
 
-        List<FlowerPlantCultivationInformation> fcpis = configService.getFlowerPlantCultivationInformation();
+        List<FlowerPlantCultivationInformation> fcpis = configService.readAllFlowerPlantCultivationInformation(null);
         for(FlowerPlantCultivationInformation fcpi : fcpis) {
             SeedsTableDataModel dataModel = new SeedsTableDataModel() {
                 @Override
@@ -163,7 +163,7 @@ public class StorageController {
             obs.add(dataModel);
         }
 
-        List<VegetablePlantCultivationInformation> vpis = configService.getVegetablePlantCultivationInformation();
+        List<VegetablePlantCultivationInformation> vpis = configService.readAllVegetablePlantCultivationInformation(null);
         for(VegetablePlantCultivationInformation vpci : vpis) {
             SeedsTableDataModel dataModel = new SeedsTableDataModel() {
                 @Override
