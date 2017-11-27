@@ -18,6 +18,11 @@
         <fx:include source="greenhouse.fxml" />
       </content>
     </Tab>
+    <Tab text="Packing">
+      <content>
+        <fx:include source="packing.fxml" />
+      </content>
+    </Tab>
       <Tab text="Shop">
         <content>
           <fx:include source="market.fxml" />

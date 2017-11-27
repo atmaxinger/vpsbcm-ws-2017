@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.net.URI;
 
-public class PackingServiceImpl implements PackingService {
+public class PackingServiceImpl extends PackingService {
 
     Capi capi;
 
@@ -34,6 +34,13 @@ public class PackingServiceImpl implements PackingService {
 
         vegetableContainer = CapiUtil.lookupOrCreateContainer("packingVegetableContainer", spaceUri, coordinators, null, capi);
         flowerContainer = CapiUtil.lookupOrCreateContainer("packingFlowerContainer", spaceUri, coordinators, null, capi);
+
+        try {
+            notificationManager.createNotification(vegetableContainer, (notification, operation, list) -> raiseVegetablesChanged(), Operation.DELETE, Operation.TAKE, Operation.WRITE);
+            notificationManager.createNotification(flowerContainer, (notification, operation, list) -> raiseFlowersChanged(), Operation.DELETE, Operation.TAKE, Operation.WRITE);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -62,7 +69,7 @@ public class PackingServiceImpl implements PackingService {
         Query query = new Query();
 
         ComparableProperty idProperty = ComparableProperty.forName("id");
-        List<Selector> selectors = Arrays.asList(QueryCoordinator.newSelector(query.filter(idProperty.matches(flowerId)))); // TODO: check if that actually works
+        List<Selector> selectors = Arrays.asList(QueryCoordinator.newSelector(query.filter(idProperty.matches(flowerId)).cnt(0,1), MzsConstants.Selecting.COUNT_MAX)); // TODO: check if that actually works
 
         List<Flower> flowers = null;
 
@@ -82,7 +89,7 @@ public class PackingServiceImpl implements PackingService {
         Query query = new Query();
 
         ComparableProperty idProperty = ComparableProperty.forName("id");
-        List<Selector> selectors = Arrays.asList(QueryCoordinator.newSelector(query.filter(idProperty.matches(vegetableId)))); // TODO: check if that actually works
+        List<Selector> selectors = Arrays.asList(QueryCoordinator.newSelector(query.filter(idProperty.matches(vegetableId)).cnt(0,1), MzsConstants.Selecting.COUNT_MAX)); // TODO: check if that actually works
 
         List<Vegetable> vegetables = null;
 

@@ -2,12 +2,10 @@ package at.ac.tuwien.complang.vpsbcm.robnur.spacebased;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.gui.RobNurGUI;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.gui.StorageController;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ConfigService;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.GreenhouseService;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.MarketService;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.StorageService;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.*;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.GreenhouseServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.MarketServiceImpl;
+import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.PackingServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.StorageServiceImpl;
 import org.mozartspaces.core.MzsCore;
 import org.mozartspaces.core.MzsCoreException;
@@ -22,10 +20,12 @@ public class GUI {
         StorageService storageService = new StorageServiceImpl(uri);
         GreenhouseService greenhouseService = new GreenhouseServiceImpl(uri);
         MarketService marketService = new MarketServiceImpl(uri);
+        PackingService packingService = new PackingServiceImpl(uri);
 
         RobNurGUI.storageService = storageService;
         RobNurGUI.greenhouseService = greenhouseService;
         RobNurGUI.marketService = marketService;
+        RobNurGUI.packingService = packingService;
 
         RobNurGUI.configService = new ConfigService();
 

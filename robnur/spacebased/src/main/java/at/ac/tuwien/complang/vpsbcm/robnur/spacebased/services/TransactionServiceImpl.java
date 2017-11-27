@@ -9,7 +9,7 @@ import java.net.URI;
 public class TransactionServiceImpl implements TransactionService {
 
     public static TransactionReference getTransactionReference(Transaction transaction) {
-        if(transaction instanceof TransactionImpl) {
+        if(transaction != null && transaction instanceof TransactionImpl) {
             return ((TransactionImpl) transaction).ref;
         }
 
