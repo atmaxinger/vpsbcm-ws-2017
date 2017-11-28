@@ -25,113 +25,58 @@ public class PackingServiceImpl extends PackingService {
     ContainerReference flowerContainer;
     NotificationManager notificationManager;
 
-    public PackingServiceImpl(URI spaceUri) throws MzsCoreException {
+    public PackingServiceImpl(URI spaceUri) {
         MzsCore core = DefaultMzsCore.newInstanceWithoutSpace();
         capi = new Capi(core);
         notificationManager = new NotificationManager(core);
 
-        List<Coordinator> coordinators = Arrays.asList(new FifoCoordinator(), new QueryCoordinator());
-
-        vegetableContainer = CapiUtil.lookupOrCreateContainer("packingVegetableContainer", spaceUri, coordinators, null, capi);
-        flowerContainer = CapiUtil.lookupOrCreateContainer("packingFlowerContainer", spaceUri, coordinators, null, capi);
+        List<Coordinator> coordinators = Arrays.asList(new AnyCoordinator(), new FifoCoordinator(), new QueryCoordinator());
 
         try {
-            notificationManager.createNotification(vegetableContainer, (notification, operation, list) -> raiseVegetablesChanged(), Operation.DELETE, Operation.TAKE, Operation.WRITE);
-            notificationManager.createNotification(flowerContainer, (notification, operation, list) -> raiseFlowersChanged(), Operation.DELETE, Operation.TAKE, Operation.WRITE);
-        } catch (InterruptedException e) {
+            vegetableContainer = CapiUtil.lookupOrCreateContainer("packingVegetableContainer", spaceUri, coordinators, null, capi);
+            flowerContainer = CapiUtil.lookupOrCreateContainer("packingFlowerContainer", spaceUri, coordinators, null, capi);
+
+            try {
+                notificationManager.createNotification(vegetableContainer, (notification, operation, list) -> raiseVegetablesChanged(), Operation.DELETE, Operation.TAKE, Operation.WRITE);
+                notificationManager.createNotification(flowerContainer, (notification, operation, list) -> raiseFlowersChanged(), Operation.DELETE, Operation.TAKE, Operation.WRITE);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        } catch (MzsCoreException e) {
             e.printStackTrace();
         }
     }
 
     @Override
     public void putFlower(Flower flower) {
-        try {
-            capi.write(flowerContainer, new Entry(flower));
-        } catch (MzsCoreException e) {
-            e.printStackTrace();
-        }
+        ServiceUtil.writeItem(flower,flowerContainer,null,capi);
     }
 
     @Override
     public void putVegetable(Vegetable vegetable) {
-        try {
-            capi.write(vegetableContainer, new Entry(vegetable));
-        } catch (MzsCoreException e) {
-            e.printStackTrace();
-        }
+        ServiceUtil.writeItem(vegetable,vegetableContainer,null,capi);
     }
 
     @Override
-    public Flower getFlower(String flowerId, Transaction transaction) {
-
-        TransactionReference transactionReference = TransactionServiceImpl.getTransactionReference(transaction);
-
-        Query query = new Query();
-
-        ComparableProperty idProperty = ComparableProperty.forName("id");
-        List<Selector> selectors = Arrays.asList(QueryCoordinator.newSelector(query.filter(idProperty.matches(flowerId)).cnt(0,1), MzsConstants.Selecting.COUNT_MAX)); // TODO: check if that actually works
-
-        List<Flower> flowers = null;
-
-        try {
-            flowers = capi.take(flowerContainer,selectors,MzsConstants.RequestTimeout.DEFAULT,transactionReference);
-        } catch (MzsCoreException e) {
-            e.printStackTrace();
-        }
-
-        return flowers.get(0);
+    public Flower getFlower(String id, Transaction transaction) {
+        return ServiceUtil.getItemById(id,flowerContainer,transaction,capi);
     }
 
     @Override
-    public Vegetable getVegetable(String vegetableId, Transaction transaction) {
-        TransactionReference transactionReference = TransactionServiceImpl.getTransactionReference(transaction);
-
-        Query query = new Query();
-
-        ComparableProperty idProperty = ComparableProperty.forName("id");
-        List<Selector> selectors = Arrays.asList(QueryCoordinator.newSelector(query.filter(idProperty.matches(vegetableId)).cnt(0,1), MzsConstants.Selecting.COUNT_MAX)); // TODO: check if that actually works
-
-        List<Vegetable> vegetables = null;
-
-        try {
-            vegetables = capi.take(vegetableContainer,selectors,MzsConstants.RequestTimeout.DEFAULT,transactionReference);
-        } catch (MzsCoreException e) {
-            e.printStackTrace();
-        }
-
-        return vegetables.get(0);
+    public Vegetable getVegetable(String id, Transaction transaction) {
+        return ServiceUtil.getItemById(id,vegetableContainer,transaction,capi);
     }
 
     @Override
     public List<Flower> readAllFlowers(Transaction transaction) {
-
-        TransactionReference transactionReference = TransactionServiceImpl.getTransactionReference(transaction);
-
-        List<Flower> flowers = null;
-
-        try {
-            flowers = capi.read(flowerContainer, FifoCoordinator.newSelector(FifoCoordinator.FifoSelector.COUNT_MAX), MzsConstants.RequestTimeout.INFINITE, transactionReference);
-        } catch (MzsCoreException e) {
-            e.printStackTrace();
-        }
-
-        return flowers;
+        Selector selector = FifoCoordinator.newSelector(FifoCoordinator.FifoSelector.COUNT_MAX);
+        return ServiceUtil.readAllItems(flowerContainer,selector,transaction,capi);
     }
 
     @Override
     public List<Vegetable> readAllVegetables(Transaction transaction) {
-
-        TransactionReference transactionReference = TransactionServiceImpl.getTransactionReference(transaction);
-
-        List<Vegetable> vegetables = null;
-
-        try {
-            vegetables = capi.read(vegetableContainer, FifoCoordinator.newSelector(FifoCoordinator.FifoSelector.COUNT_MAX), MzsConstants.RequestTimeout.INFINITE, transactionReference);
-        } catch (MzsCoreException e) {
-            e.printStackTrace();
-        }
-
-        return vegetables;
+        Selector selector = FifoCoordinator.newSelector(FifoCoordinator.FifoSelector.COUNT_MAX);
+        return ServiceUtil.readAllItems(vegetableContainer,selector,transaction,capi);
     }
 
     public void registerPackRobot(PackRobot packRobot){
