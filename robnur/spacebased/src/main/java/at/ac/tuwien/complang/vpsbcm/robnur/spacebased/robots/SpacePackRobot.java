@@ -19,6 +19,7 @@ public class SpacePackRobot {
         TransactionService transactionService = new TransactionServiceImpl(uri);
 
         PackRobot packRobot = new PackRobot(packingService,marketService,researchService,transactionService);
+        packRobot.setId("p1");
         packingService.registerPackRobot(packRobot);
     }
 }

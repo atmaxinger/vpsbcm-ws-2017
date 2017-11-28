@@ -4,15 +4,15 @@ import org.apache.log4j.Logger;
 
 public abstract class Robot {
 
-    private int id;
+    private String id;
 
     final static Logger logger = Logger.getLogger(Robot.class);
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 }

@@ -33,6 +33,7 @@ public class PlantAndHarvestRobot extends Robot {
 
         if(harvested != null && harvested.size() > 0) {
             for(Vegetable veg : harvested) {
+                veg.setHarvestRobot(this.getId());
                 packingService.putVegetable(veg);
             }
 
@@ -53,6 +54,7 @@ public class PlantAndHarvestRobot extends Robot {
 
         if(harvested != null && harvested.size() > 0) {
             for(Flower flo : harvested) {
+                flo.setHarvestRobot(this.getId());
                 packingService.putFlower(flo);
             }
 

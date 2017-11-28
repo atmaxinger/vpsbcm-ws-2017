@@ -107,6 +107,7 @@ public class PackRobot extends Robot {
 
             Bouquet bouquet = new Bouquet();
             bouquet.setFlowers(flowersForBouquet);
+            bouquet.setPackingRobotId(getId());
 
             marketService.putBouquet(bouquet);
 
@@ -157,6 +158,7 @@ public class PackRobot extends Robot {
                     // create vegetable basket
 
                     VegetableBasket vegetableBasket = new VegetableBasket();
+                    vegetableBasket.setPackingRobotId(getId());
                     List<Vegetable> vegetablesForVegetableBasket = new ArrayList<>();
 
                     for (int i = 0; i < 5; i++){

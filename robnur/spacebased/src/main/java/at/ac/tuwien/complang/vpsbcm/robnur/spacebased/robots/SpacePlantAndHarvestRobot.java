@@ -25,7 +25,7 @@ public class SpacePlantAndHarvestRobot {
 
 
         PlantAndHarvestRobot robot = new PlantAndHarvestRobot(storageService, greenhouseService, transactionService, packingService);
-
+        robot.setId("ph1");
         robot.doStuff();
     }
 }
