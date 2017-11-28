@@ -11,7 +11,11 @@ public interface ResearchService {
 
     void putVegetable(Vegetable vegetable);
 
-    List<Flower> readAllFlowers();
+    void deleteFlower(Flower flower,Transaction transaction);
 
-    List<Vegetable> readAllVegetables();
+    void deleteVegetable(Vegetable vegetable,Transaction transaction);
+
+    List<Flower> readAllFlowers(Transaction transaction);
+
+    List<Vegetable> readAllVegetables(Transaction transaction);
 }

@@ -46,6 +46,16 @@ public class ConfigServiceImpl implements ConfigService {
     }
 
     @Override
+    public void deleteFlowerPlantCultivationInformation(String id, Transaction transaction) {
+         ServiceUtil.getItemById(id,flowerPlantCultivationInformationContainer,transaction,capi);
+    }
+
+    @Override
+    public void deleteVegetablePlantCultivationInformation(String id, Transaction transaction) {
+        ServiceUtil.getItemById(id,vegetablePlantCultivationInformationContainer,transaction,capi);
+    }
+
+    @Override
     public void putFlowerPlantCultivationInformation(FlowerPlantCultivationInformation flowerPlantCultivationInformation, Transaction transaction) {
         ServiceUtil.writeItem(flowerPlantCultivationInformation,flowerPlantCultivationInformationContainer,transaction,capi);
     }

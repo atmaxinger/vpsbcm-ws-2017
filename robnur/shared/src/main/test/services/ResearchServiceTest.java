@@ -60,23 +60,23 @@ public abstract class ResearchServiceTest {
 
     @Test
     public void putFlower_ShouldWork(){
-        Assert.assertTrue(researchService.readAllFlowers().size() == 2);
-        Assert.assertTrue(researchService.readAllFlowers().get(0).equals(flower1) || researchService.readAllFlowers().get(1).equals(flower1));
+        Assert.assertTrue(researchService.readAllFlowers(null).size() == 2);
+        Assert.assertTrue(researchService.readAllFlowers(null).get(0).equals(flower1) || researchService.readAllFlowers(null).get(1).equals(flower1));
     }
 
     @Test
     public void putVegetable_ShouldWork(){
-        Assert.assertTrue(researchService.readAllFlowers().size() == 2);
-        Assert.assertTrue(researchService.readAllFlowers().get(0).equals(flower1) || researchService.readAllFlowers().get(1).equals(flower1));
+        Assert.assertTrue(researchService.readAllFlowers(null).size() == 2);
+        Assert.assertTrue(researchService.readAllFlowers(null).get(0).equals(flower1) || researchService.readAllFlowers(null).get(1).equals(flower1));
     }
 
     @Test
     public void readAllFlowers_ShouldWork(){
-        Assert.assertTrue(researchService.readAllFlowers().size() == 2);
+        Assert.assertTrue(researchService.readAllFlowers(null).size() == 2);
     }
 
     @Test
     public void readAllVegetables_ShouldWork(){
-        Assert.assertTrue(researchService.readAllVegetables().size() == 2);
+        Assert.assertTrue(researchService.readAllVegetables(null).size() == 2);
     }
 }

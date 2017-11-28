@@ -3,6 +3,7 @@ package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Flower;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ResearchService;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import org.mozartspaces.capi3.AnyCoordinator;
 import org.mozartspaces.capi3.Coordinator;
 import org.mozartspaces.core.*;
@@ -44,12 +45,22 @@ public class ResearchServiceImpl implements ResearchService {
     }
 
     @Override
-    public List<Flower> readAllFlowers() {
-        return ServiceUtil.readAllItems(flowerContainer,null,capi);
+    public void deleteFlower(Flower flower, Transaction transaction) {
+        ServiceUtil.deleteItemById(flower.getId(),flowerContainer,transaction,capi);
     }
 
     @Override
-    public List<Vegetable> readAllVegetables() {
-        return ServiceUtil.readAllItems(vegetableContainer,null,capi);
+    public void deleteVegetable(Vegetable vegetable,Transaction transaction) {
+        ServiceUtil.deleteItemById(vegetable.getId(),flowerContainer,transaction,capi);
+    }
+
+    @Override
+    public List<Flower> readAllFlowers(Transaction transaction) {
+        return ServiceUtil.readAllItems(flowerContainer,transaction,capi);
+    }
+
+    @Override
+    public List<Vegetable> readAllVegetables(Transaction transaction) {
+        return ServiceUtil.readAllItems(vegetableContainer,transaction,capi);
     }
 }

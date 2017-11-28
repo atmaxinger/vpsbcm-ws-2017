@@ -13,41 +13,16 @@ import java.util.List;
 
 public abstract class StorageService {
 
-    public interface Callback<T> {
-        void handle(T data);
-    }
-
-
     protected Callback<List<Plant>> seedsChanged;
     protected Callback<List<SoilPackage>> soilPackagesChanged;
     protected Callback<List<FlowerFertilizer>> flowerFertilizerChanged;
     protected Callback<List<VegetableFertilizer>> vegetableFertilizerChanged;
 
-
-    public void onSeedsChanged(Callback<List<Plant>> seedsChanged) {
-        this.seedsChanged = seedsChanged;
-    }
-
-    public void onSoilPackagesChanged(Callback<List<SoilPackage>> soilPackagesChanged) {
-        this.soilPackagesChanged = soilPackagesChanged;
-    }
-
-    public void onFlowerFertilizerChanged(Callback<List<FlowerFertilizer>> flowerFertilizerChanged) {
-        this.flowerFertilizerChanged = flowerFertilizerChanged;
-    }
-
-    public void onVegetableFertilizerChanged(Callback<List<VegetableFertilizer>> vegetableFertilizerChanged) {
-        this.vegetableFertilizerChanged = vegetableFertilizerChanged;
-    }
-
-    // TODO: consider abstract method for deciding which plant should be planted
     public abstract Plant getSeed();
 
     public abstract void putSeed(Plant plant);
 
     public abstract List<Plant> readAllSeeds();
-
-    // TODO: consider abstract method for delivering already used packages
 
     protected abstract List<SoilPackage> getAllSoilPackages();
 
@@ -120,6 +95,29 @@ public abstract class StorageService {
         }
 
         return water;
+    }
+
+
+    /* TODO move interface to new file */
+    public interface Callback<T> {
+        void handle(T data);
+    }
+
+
+    public void onSeedsChanged(Callback<List<Plant>> seedsChanged) {
+        this.seedsChanged = seedsChanged;
+    }
+
+    public void onSoilPackagesChanged(Callback<List<SoilPackage>> soilPackagesChanged) {
+        this.soilPackagesChanged = soilPackagesChanged;
+    }
+
+    public void onFlowerFertilizerChanged(Callback<List<FlowerFertilizer>> flowerFertilizerChanged) {
+        this.flowerFertilizerChanged = flowerFertilizerChanged;
+    }
+
+    public void onVegetableFertilizerChanged(Callback<List<VegetableFertilizer>> vegetableFertilizerChanged) {
+        this.vegetableFertilizerChanged = vegetableFertilizerChanged;
     }
 
 }

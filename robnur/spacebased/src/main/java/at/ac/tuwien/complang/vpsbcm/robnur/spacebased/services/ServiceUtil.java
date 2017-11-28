@@ -19,7 +19,7 @@ public class ServiceUtil {
         Query query = new Query();
 
         ComparableProperty idProperty = ComparableProperty.forName("id");
-        java.util.List<Selector> selectors = Arrays.asList(QueryCoordinator.newSelector(query.filter(idProperty.matches(id)).cnt(0,1), MzsConstants.Selecting.COUNT_MAX)); // TODO: check if that actually works
+        java.util.List<Selector> selectors = Arrays.asList(QueryCoordinator.newSelector(query.filter(idProperty.matches(id)).cnt(0,1), MzsConstants.Selecting.COUNT_MAX));
 
         List<T> result = null;
 
@@ -57,5 +57,9 @@ public class ServiceUtil {
     public static <T extends Serializable> List<T> readAllItems(ContainerReference containerReference, Transaction transaction,Capi capi) {
 
         return readAllItems(containerReference, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_ALL), transaction,capi);
+    }
+
+    public static void deleteItemById(String id, ContainerReference containerReference, Transaction transaction, Capi capi) {
+        getItemById(id,containerReference,transaction,capi);
     }
 }

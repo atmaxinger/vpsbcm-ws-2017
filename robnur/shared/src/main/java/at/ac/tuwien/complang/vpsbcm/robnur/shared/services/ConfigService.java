@@ -11,6 +11,10 @@ public interface ConfigService {
 
     VegetablePlantCultivationInformation getVegetablePlantCultivationInformation(String id, Transaction transaction);
 
+    void deleteFlowerPlantCultivationInformation(String id, Transaction transaction);
+
+    void deleteVegetablePlantCultivationInformation(String id, Transaction transaction);
+
     void putFlowerPlantCultivationInformation(FlowerPlantCultivationInformation flowerPlantCultivationInformation, Transaction transaction);
 
     void putVegetablePlantCultivationInformation(VegetablePlantCultivationInformation vegetablePlantCultivationInformation, Transaction transaction);
