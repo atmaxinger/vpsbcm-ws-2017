@@ -60,6 +60,18 @@ public class ServiceUtil {
     }
 
     public static void deleteItemById(String id, ContainerReference containerReference, Transaction transaction, Capi capi) {
-        getItemById(id,containerReference,transaction,capi);
+        TransactionReference transactionReference = TransactionServiceImpl.getTransactionReference(transaction);
+
+        Query query = new Query();
+
+        ComparableProperty idProperty = ComparableProperty.forName("id");
+        java.util.List<Selector> selectors = Arrays.asList(QueryCoordinator.newSelector(query.filter(idProperty.matches(id)).cnt(0,1), MzsConstants.Selecting.COUNT_MAX));
+
+
+        try {
+            capi.delete(containerReference,selectors,MzsConstants.RequestTimeout.DEFAULT,transactionReference);
+        } catch (MzsCoreException e) {
+            e.printStackTrace();
+        }
     }
 }

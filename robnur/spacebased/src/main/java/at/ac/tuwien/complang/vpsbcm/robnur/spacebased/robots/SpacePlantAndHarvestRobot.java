@@ -18,14 +18,16 @@ public class SpacePlantAndHarvestRobot {
 
     public static void main(String[] args) throws URISyntaxException, MzsCoreException, InterruptedException {
         URI uri = new URI("xvsm://localhost:9876");
-        StorageService storageService = new StorageServiceImpl(uri);
+        StorageServiceImpl storageService = new StorageServiceImpl(uri);
         PackingService packingService = new PackingServiceImpl(uri);
-        GreenhouseService greenhouseService = new GreenhouseServiceImpl(uri);
+        GreenhouseServiceImpl greenhouseService = new GreenhouseServiceImpl(uri);
         TransactionService transactionService = new TransactionServiceImpl(uri);
 
 
         PlantAndHarvestRobot robot = new PlantAndHarvestRobot(storageService, greenhouseService, transactionService, packingService);
         robot.setId("ph1");
-        robot.doStuff();
+
+        greenhouseService.registerPlantAndHarvestRobot(robot);
+        storageService.registerPlantAndHarvestRobot(robot);
     }
 }

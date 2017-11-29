@@ -17,15 +17,19 @@ import java.util.List;
 
 public class SpaceServer {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws MzsCoreException {
 
         MzsCore core = DefaultMzsCore.newInstance();
+        Capi capi = new Capi(core);
 
         ConfigService configService = null;
         configService = new ConfigServiceImpl(core.getConfig().getSpaceUri());
 
         putInitialFlowerPlantCultivationInformation(configService);
         putInitialVegetablePlantCultivationInformation(configService);
+
+        ContainerReference waterContainer = CapiUtil.lookupOrCreateContainer("waterContainer", core.getConfig().getSpaceUri(), null,null, capi);
+        capi.addContainerAspect(new WaterAspect(), waterContainer, ContainerIPoint.POST_TAKE);
     }
 
     public static void putInitialFlowerPlantCultivationInformation(ConfigService configService) {

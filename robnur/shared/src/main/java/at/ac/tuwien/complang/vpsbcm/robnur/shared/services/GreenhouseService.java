@@ -16,14 +16,49 @@ public abstract class GreenhouseService {
 
     public abstract void plant(FlowerPlant flowerPlant, Transaction transaction);
 
-    public abstract List<Vegetable> harvestVegetablePlant(Transaction transaction);
+    public List<Vegetable> tryHarvestVegetablePlant(Transaction transaction) {
+        VegetablePlant plant = getHarvestableVegetablePlant(transaction);
 
-    public abstract List<Flower> harvestFlowerPlant(Transaction transaction);
+        if(plant != null) {
+            List<Vegetable> vegetables = Vegetable.harvestVegetablesFormPlant(plant);
+
+            // if this plant can still be harvested then "plant" it again
+            if (plant.getCultivationInformation().getRemainingNumberOfHarvests() > 0) {
+                this.plant(plant, transaction);
+            }
+
+            return vegetables;
+        }
+
+        return null;
+    }
+
+    public List<Flower> tryHarvestFlowerPlant(Transaction transaction) {
+        FlowerPlant plant = getHarvestableFlowerPlant(transaction);
+
+        if(plant != null) {
+            return Flower.harvestFlowerFromFlowerPlant(plant);
+        }
+
+        return null;
+    }
 
     public abstract List<VegetablePlant> getAllVegetablePlants(Transaction transaction);
     public abstract List<FlowerPlant> getAllFlowerPlants(Transaction transaction);
 
-    public abstract List<VegetablePlant> readAllVegetablePlants();
 
-    public abstract List<FlowerPlant> readAllFlowerPlants();
+
+    public List<VegetablePlant> readAllVegetablePlants() {
+        return readAllVegetablePlants(null);
+    }
+    public abstract List<VegetablePlant> readAllVegetablePlants(Transaction transaction);
+    public List<FlowerPlant> readAllFlowerPlants() {
+        return readAllFlowerPlants(null);
+    }
+    public abstract List<FlowerPlant> readAllFlowerPlants(Transaction transaction);
+
+
+
+    protected abstract VegetablePlant getHarvestableVegetablePlant(Transaction t);
+    protected abstract FlowerPlant getHarvestableFlowerPlant(Transaction t);
 }

@@ -1,6 +1,7 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PlantAndHarvestRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.GreenhouseService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import org.mozartspaces.capi3.*;
@@ -59,6 +60,16 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         notificationManager.createNotification(greenhouseContainer, (notification, operation, list) -> raiseChangedEvent(), Operation.DELETE, Operation.TAKE, Operation.WRITE);
     }
 
+    public void registerPlantAndHarvestRobot(PlantAndHarvestRobot robot) {
+        try {
+            notificationManager.createNotification(greenhouseContainer, (notification, operation, list) -> { robot.tryHarvestPlant(); robot.tryPlant();}, Operation.WRITE, Operation.TAKE, Operation.DELETE);
+        } catch (MzsCoreException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void plant(VegetablePlant vegetablePlant, Transaction transaction) {
         TransactionReference ref = TransactionServiceImpl.getTransactionReference(transaction);
@@ -83,65 +94,6 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         catch (MzsCoreException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public List<Vegetable> harvestVegetablePlant(Transaction transaction) {
-        TransactionReference transactionReference = TransactionServiceImpl.getTransactionReference(transaction);
-        List<Vegetable> vegetables = null;
-
-        try {
-            ComparableProperty growthProperty = ComparableProperty.forName("growth");
-            Query query = new Query();
-
-            List<Selector> selectors = Arrays.asList(
-                    LabelCoordinator.newSelector(VEGETABLE_LABEL, MzsConstants.Selecting.COUNT_MAX),
-                    QueryCoordinator.newSelector(query.filter(growthProperty.greaterThanOrEqualTo(100)).cnt(0,1), MzsConstants.Selecting.COUNT_MAX)
-            );
-
-            ArrayList<VegetablePlant> vegetablePlants = capi.take(greenhouseContainer, selectors , MzsConstants.RequestTimeout.DEFAULT, transactionReference);
-
-            if(vegetablePlants.size() > 0) {
-                VegetablePlant plant = vegetablePlants.get(0);
-
-                vegetables = Vegetable.harvestVegetablesFormPlant(plant);
-
-                // if this plant can still be harvested then "plant" it again
-                if (plant.getCultivationInformation().getRemainingNumberOfHarvests() > 0) {
-                    this.plant(plant, transaction);
-                }
-            }
-        } catch (MzsCoreException e) {
-            e.printStackTrace();
-        }
-
-        return vegetables;
-    }
-
-    @Override
-    public List<Flower> harvestFlowerPlant(Transaction transaction) {
-        TransactionReference tref = TransactionServiceImpl.getTransactionReference(transaction);
-        List<Flower> flowers = null;
-
-        try {
-            ComparableProperty growthProperty = ComparableProperty.forName("growth");
-            Query query = new Query();
-
-            List<Selector> selectors = Arrays.asList(
-                    LabelCoordinator.newSelector(FLOWER_LABEL, MzsConstants.Selecting.COUNT_MAX),
-                    QueryCoordinator.newSelector(query.filter(growthProperty.greaterThanOrEqualTo(100)).cnt(0,1), MzsConstants.Selecting.COUNT_MAX)
-            );
-
-            ArrayList<FlowerPlant> ps = capi.take(greenhouseContainer, selectors , MzsConstants.RequestTimeout.DEFAULT, tref);
-            if(ps.size() > 0) {
-                FlowerPlant plant = ps.get(0);
-                flowers = Flower.harvestFlowerFromFlowerPlant(plant);
-            }
-        } catch (MzsCoreException e) {
-            e.printStackTrace();
-        }
-
-        return flowers;
     }
 
     @Override
@@ -186,10 +138,11 @@ public class GreenhouseServiceImpl extends GreenhouseService {
     }
 
     @Override
-    public List<VegetablePlant> readAllVegetablePlants() {
+    public List<VegetablePlant> readAllVegetablePlants(Transaction transaction) {
+        TransactionReference tref = TransactionServiceImpl.getTransactionReference(transaction);
         List<VegetablePlant> vegetablePlants = null;
         try {
-            vegetablePlants = capi.read(greenhouseContainer, LabelCoordinator.newSelector(VEGETABLE_LABEL,LabelCoordinator.LabelSelector.COUNT_MAX),MzsConstants.RequestTimeout.DEFAULT,null);
+            vegetablePlants = capi.read(greenhouseContainer, LabelCoordinator.newSelector(VEGETABLE_LABEL,LabelCoordinator.LabelSelector.COUNT_MAX),MzsConstants.RequestTimeout.DEFAULT,tref);
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -197,13 +150,66 @@ public class GreenhouseServiceImpl extends GreenhouseService {
     }
 
     @Override
-    public List<FlowerPlant> readAllFlowerPlants() {
+    public List<FlowerPlant> readAllFlowerPlants(Transaction transaction) {
+        TransactionReference tref = TransactionServiceImpl.getTransactionReference(transaction);
         List<FlowerPlant> flowerPlants = null;
         try {
-            flowerPlants = capi.read(greenhouseContainer, LabelCoordinator.newSelector(FLOWER_LABEL,LabelCoordinator.LabelSelector.COUNT_MAX),MzsConstants.RequestTimeout.DEFAULT,null);
+            flowerPlants = capi.read(greenhouseContainer, LabelCoordinator.newSelector(FLOWER_LABEL,LabelCoordinator.LabelSelector.COUNT_MAX),MzsConstants.RequestTimeout.DEFAULT,tref);
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
         return flowerPlants;
     }
+
+
+    @Override
+    protected VegetablePlant getHarvestableVegetablePlant(Transaction t) {
+        TransactionReference transactionReference = TransactionServiceImpl.getTransactionReference(t);
+
+        try {
+            ComparableProperty growthProperty = ComparableProperty.forName("growth");
+            Query query = new Query();
+
+            List<Selector> selectors = Arrays.asList(
+                    LabelCoordinator.newSelector(VEGETABLE_LABEL, MzsConstants.Selecting.COUNT_MAX),
+                    QueryCoordinator.newSelector(query.filter(growthProperty.greaterThanOrEqualTo(100)).cnt(0,1), MzsConstants.Selecting.COUNT_MAX)
+            );
+
+            ArrayList<VegetablePlant> vegetablePlants = capi.take(greenhouseContainer, selectors , MzsConstants.RequestTimeout.DEFAULT, transactionReference);
+
+            if(vegetablePlants.size() > 0) {
+                return vegetablePlants.get(0);
+            }
+        } catch (MzsCoreException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    @Override
+    protected FlowerPlant getHarvestableFlowerPlant(Transaction t) {
+        TransactionReference tref = TransactionServiceImpl.getTransactionReference(t);
+
+        try {
+            ComparableProperty growthProperty = ComparableProperty.forName("growth");
+            Query query = new Query();
+
+            List<Selector> selectors = Arrays.asList(
+                    LabelCoordinator.newSelector(FLOWER_LABEL, MzsConstants.Selecting.COUNT_MAX),
+                    QueryCoordinator.newSelector(query.filter(growthProperty.greaterThanOrEqualTo(100)).cnt(0,1), MzsConstants.Selecting.COUNT_MAX)
+            );
+
+            ArrayList<FlowerPlant> ps = capi.take(greenhouseContainer, selectors , MzsConstants.RequestTimeout.DEFAULT, tref);
+            if(ps.size() > 0) {
+                return ps.get(0);
+
+            }
+        } catch (MzsCoreException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
 }

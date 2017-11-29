@@ -19,6 +19,7 @@ import javafx.scene.control.*;
 import javafx.util.Callback;
 
 import javax.swing.text.html.Option;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,6 +47,7 @@ public class StorageController {
 
     private abstract class SeedsTableDataModel extends Buyable {
         String type;
+        boolean isFlower=true;
         int fertilizer;
         int soil;
         int water;
@@ -136,7 +138,11 @@ public class StorageController {
     }
 
 
-    private void initSeedsData(List<Plant> allSeeds) {
+    private void initSeedsData() {
+        List<Plant> allSeeds = new LinkedList<>();
+        allSeeds.addAll(storageService.readAllVegetableSeeds());
+        allSeeds.addAll(storageService.readAllFlowerSeeds());
+
         ObservableList<SeedsTableDataModel> obs = tvSeeds.getItems();
         obs.clear();
 
@@ -150,7 +156,7 @@ public class StorageController {
                         fp.setCultivationInformation(fcpi);
                         fp.setGrowth(-1);
 
-                        storageService.putSeed(fp);
+                        storageService.putSeed(fp, null);
                     }
                 }
             };
@@ -159,6 +165,7 @@ public class StorageController {
             dataModel.fertilizer = fcpi.getFertilizerAmount();
             dataModel.soil = fcpi.getSoilAmount();
             dataModel.water = fcpi.getWaterAmount();
+            dataModel.isFlower = true;
 
             obs.add(dataModel);
         }
@@ -173,10 +180,11 @@ public class StorageController {
                         vp.setCultivationInformation(vpci);
                         vp.setGrowth(-1);
 
-                        storageService.putSeed(vp);
+                        storageService.putSeed(vp, null);
                     }
                 }
             };
+            dataModel.isFlower = false;
             dataModel.amount =  getCountOfVeggiSeeds(allSeeds, vpci.getVegetableType());
             dataModel.type = vpci.getVegetableType().toString();
             dataModel.fertilizer = vpci.getFertilizerAmount();
@@ -188,10 +196,41 @@ public class StorageController {
     }
 
     private void initSeedsTableView() {
-        List<Plant> allSeeds = storageService.readAllSeeds();
-        initSeedsData(allSeeds);
+        initSeedsData();
 
-        storageService.onSeedsChanged(data -> initSeedsData(data));
+        storageService.onFlowerSeedChanged(data -> {
+            for (SeedsTableDataModel dm : tvSeeds.getItems()) {
+                if(dm.isFlower) {
+                    dm.amount=0;
+                }
+            }
+
+            for(FlowerPlant plant : data) {
+                for (SeedsTableDataModel dm : tvSeeds.getItems()) {
+                    if(dm.type.equals(plant.getTypeName())) {
+                        dm.amount+=1;
+                    }
+                }
+            }
+
+            tvSeeds.refresh();
+        });
+        storageService.onVegetableSeedsChanged(data -> {
+            for (SeedsTableDataModel dm : tvSeeds.getItems()) {
+                if(!dm.isFlower) {
+                    dm.amount=0;
+                }
+            }
+            for(VegetablePlant plant : data) {
+                for (SeedsTableDataModel dm : tvSeeds.getItems()) {
+                    if(dm.type.equals(plant.getTypeName())) {
+                        dm.amount+=1;
+                    }
+                }
+            }
+
+            tvSeeds.refresh();
+        });
 
         tcSeedType.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().type));
         tcSeedCount.setCellValueFactory(param -> new ReadOnlyStringWrapper("" + param.getValue().amount));
@@ -217,7 +256,7 @@ public class StorageController {
             void buyAction(int amount) {
                 for(int i=0; i< amount; i++) {
                     SoilPackage sp = new SoilPackage();
-                    storageService.putSoilPackage(sp);
+                    storageService.putSoilPackage(sp, null);
                 }
             }
         };
