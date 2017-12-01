@@ -256,6 +256,8 @@ public class PlantAndHarvestRobot extends Robot {
             storageService.getWater(nextSeed.getCultivationInformation().getWaterAmount());
             logger.debug(String.format("tryPlantPlant - got all water for %s", nextSeed.getTypeName()));
 
+            nextSeed.setPlantRobot(this.getId());
+
             // Step 5: plant the plant
             if (nextSeed instanceof VegetablePlant) {
                 if(!greenhouseService.plant((VegetablePlant) nextSeed, t)) {
