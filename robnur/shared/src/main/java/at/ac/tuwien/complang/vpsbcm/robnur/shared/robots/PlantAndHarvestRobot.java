@@ -44,6 +44,8 @@ public class PlantAndHarvestRobot extends Robot {
     public void tryPlant() {
         logger.debug("tryPlant");
 
+        boolean hasPlantedSomething = false;
+
         // Step 1: get current planted plants from greenhouse
         List<VegetablePlant> vegetablePlants = greenhouseService.readAllVegetablePlants();
         List<FlowerPlant> flowerPlants = greenhouseService.readAllFlowerPlants();
@@ -51,26 +53,36 @@ public class PlantAndHarvestRobot extends Robot {
         // Step 2: Check whether there are more flowers or vegetables currently planted
         if (vegetablePlants.size() < flowerPlants.size()) {
             // As there are more flowers planted, try to plant a vegetable
-            if (!tryPlantPlant(vegetablePlants, VegetableType.values())) {
+            hasPlantedSomething = tryPlantPlant(vegetablePlants, VegetableType.values());
+            if (!hasPlantedSomething) {
                 // If the vegetable could not be planted, try to plant a flower
-                tryPlantPlant(flowerPlants, FlowerType.values());
+                hasPlantedSomething = tryPlantPlant(flowerPlants, FlowerType.values());
             }
         } else if (vegetablePlants.size() > flowerPlants.size()) {
-            if (!tryPlantPlant(flowerPlants, FlowerType.values())) {
-                tryPlantPlant(vegetablePlants, VegetableType.values());
+            hasPlantedSomething = tryPlantPlant(flowerPlants, FlowerType.values());
+            if (!hasPlantedSomething) {
+                hasPlantedSomething = tryPlantPlant(vegetablePlants, VegetableType.values());
             }
         } else {
             // There are equal amounts of flowers and vegetables planted. Flip a coin.
             Random random = new Random();
             if (random.nextBoolean()) {
-                if (!tryPlantPlant(vegetablePlants, VegetableType.values())) {
-                    tryPlantPlant(flowerPlants, FlowerType.values());
+                hasPlantedSomething = tryPlantPlant(vegetablePlants, VegetableType.values());
+                if (!hasPlantedSomething) {
+                    hasPlantedSomething = tryPlantPlant(flowerPlants, FlowerType.values());
                 }
             } else {
-                if (!tryPlantPlant(flowerPlants, FlowerType.values())) {
-                    tryPlantPlant(vegetablePlants, VegetableType.values());
+                hasPlantedSomething = tryPlantPlant(flowerPlants, FlowerType.values());
+                if (!hasPlantedSomething) {
+                    hasPlantedSomething = tryPlantPlant(vegetablePlants, VegetableType.values());
                 }
             }
+        }
+
+        // If something has been planted, try again to harvest and plant
+        if(hasPlantedSomething) {
+            tryHarvestPlant();
+            tryPlant();
         }
     }
 
@@ -246,14 +258,23 @@ public class PlantAndHarvestRobot extends Robot {
 
             // Step 5: plant the plant
             if (nextSeed instanceof VegetablePlant) {
-                greenhouseService.plant((VegetablePlant) nextSeed, t);
+                if(!greenhouseService.plant((VegetablePlant) nextSeed, t)) {
+                    logger.debug(String.format("tryPlantPlant - could not plant %s - rollback", nextSeed.getTypeName()));
+                    t.rollback();
+                    return false;
+                }
                 logger.debug(String.format("tryPlantPlant - planted vegetable %s", nextSeed.getTypeName()));
             } else if (nextSeed instanceof FlowerPlant) {
-                greenhouseService.plant((FlowerPlant) nextSeed, t);
+                if(!greenhouseService.plant((FlowerPlant) nextSeed, t)) {
+                    logger.debug(String.format("tryPlantPlant - could not plant %s - rollback", nextSeed.getTypeName()));
+                    t.rollback();
+                    return false;
+                }
                 logger.debug(String.format("tryPlantPlant - planted flower %s", nextSeed.getTypeName()));
             } else {
                 logger.log(Priority.toPriority(Priority.ERROR_INT), String.format("tryPlantPlant - not planted - unknown plant"));
                 t.rollback();
+                return false;
             }
 
             t.commit();

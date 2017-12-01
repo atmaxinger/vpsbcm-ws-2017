@@ -1,7 +1,6 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.services;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.VegetableFertilizer;
 
 import java.util.List;
 
@@ -12,9 +11,9 @@ public abstract class GreenhouseService {
         this.greenhouseChanged = greenhouseChanged;
     }
 
-    public abstract void plant(VegetablePlant vegetablePlant, Transaction transaction);
+    public abstract boolean plant(VegetablePlant vegetablePlant, Transaction transaction);
 
-    public abstract void plant(FlowerPlant flowerPlant, Transaction transaction);
+    public abstract boolean plant(FlowerPlant flowerPlant, Transaction transaction);
 
     public List<Vegetable> tryHarvestVegetablePlant(Transaction transaction) {
         VegetablePlant plant = getHarvestableVegetablePlant(transaction);

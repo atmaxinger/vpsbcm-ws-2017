@@ -77,26 +77,37 @@ public class GreenhouseServiceImpl extends GreenhouseService {
     }
 
     @Override
-    public void plant(VegetablePlant vegetablePlant, Transaction transaction) {
+    public boolean plant(VegetablePlant vegetablePlant, Transaction transaction) {
         TransactionReference ref = TransactionServiceImpl.getTransactionReference(transaction);
 
         Entry entry = new Entry(vegetablePlant, LabelCoordinator.newCoordinationData(VEGETABLE_LABEL));
         try {
             capi.write(greenhouseContainer, MzsConstants.RequestTimeout.DEFAULT, ref, entry);
-        } catch (MzsCoreException e) {
+            return true;
+        } catch (ContainerFullException e) {
+            return false;
+        }
+        catch (MzsCoreException e) {
             e.printStackTrace();
+            return false;
         }
     }
 
     @Override
-    public void plant(FlowerPlant flowerPlant, Transaction transaction) {
+    public boolean plant(FlowerPlant flowerPlant, Transaction transaction) {
         TransactionReference ref = TransactionServiceImpl.getTransactionReference(transaction);
 
         Entry entry = new Entry(flowerPlant, LabelCoordinator.newCoordinationData(FLOWER_LABEL));
         try {
             capi.write(greenhouseContainer, MzsConstants.RequestTimeout.DEFAULT, ref, entry);
-        } catch (MzsCoreException e) {
+            return true;
+
+        } catch (ContainerFullException e) {
+            return false;
+        }
+        catch (MzsCoreException e) {
             e.printStackTrace();
+            return false;
         }
     }
 
