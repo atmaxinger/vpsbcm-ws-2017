@@ -12,10 +12,13 @@ import java.util.List;
 import java.util.Random;
 
 public class MonitoringRobot extends Robot {
+    private final int MONITORING_INTERVAL_MS = 2000;
+
     private GreenhouseService greenhouseService;
     private TransactionService transactionService;
 
     private Random rand = new Random();
+
 
     public MonitoringRobot(GreenhouseService greenhouseService, TransactionService transactionService) {
         this.greenhouseService = greenhouseService;
@@ -34,6 +37,8 @@ public class MonitoringRobot extends Robot {
     public void doStuff() {
 
         while (true) {
+            boolean didAnything = false;
+
             // get all available plants
             Transaction t = transactionService.beginTransaction(-1);
 
@@ -42,24 +47,35 @@ public class MonitoringRobot extends Robot {
 
             // grow
             for(VegetablePlant p : vegs) {
+                didAnything = true;
                 doGrow(p, p.getCultivationInformation());
             }
             for(FlowerPlant p : flos) {
+                didAnything = true;
                 doGrow(p, p.getCultivationInformation());
             }
 
             // write back plant
             for(VegetablePlant p : vegs) {
+                didAnything = true;
+
                 greenhouseService.plant(p, t);
             }
             for(FlowerPlant p : flos) {
+                didAnything = true;
+
                 greenhouseService.plant(p, t);
             }
 
-            t.commit();
+            if(didAnything) {
+                t.commit();
+            }
+            else {
+                t.rollback();
+            }
 
             try {
-                Thread.sleep(2000);
+                Thread.sleep(MONITORING_INTERVAL_MS);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

@@ -34,12 +34,14 @@ public class PlantAndHarvestRobot extends Robot {
     private PackingService packingService;
 
     public PlantAndHarvestRobot(StorageService storageService, GreenhouseService greenhouseService, TransactionService transactionService, PackingService packingService) {
+        logger.debug("PlantAndHarvestRobot constructor");
+
         this.storageService = storageService;
         this.greenhouseService = greenhouseService;
         this.transactionService = transactionService;
         this.packingService = packingService;
 
-        tryHarvestPlant();
+        tryHarvestPlant("constructor");
         tryPlant();
     }
 
@@ -48,12 +50,21 @@ public class PlantAndHarvestRobot extends Robot {
      *
      * @return true if something has been harvested
      */
-    private void tryHarvestVegetable() {
-        logger.log(Priority.DEBUG, "tryHarvestVegetable");
+    private void tryHarvestVegetable(String why) {
+        logger.log(Priority.DEBUG, "tryHarvestVegetable - " + why);
 
         Transaction t = transactionService.beginTransaction(1000);
         List<Vegetable> harvested = greenhouseService.tryHarvestVegetablePlant(t);
-        t.commit();
+        if(harvested != null) {
+            for(Vegetable vegetable : harvested) {
+                packingService.putVegetable(vegetable);
+            }
+
+            t.commit();
+        }
+        else {
+            t.rollback();
+        }
 
         if(harvested != null && harvested.size() > 0) {
             for(Vegetable veg : harvested) {
@@ -61,7 +72,7 @@ public class PlantAndHarvestRobot extends Robot {
                 packingService.putVegetable(veg);
             }
 
-            tryHarvestVegetable();
+            tryHarvestVegetable("recursion");
         }
     }
 
@@ -74,7 +85,16 @@ public class PlantAndHarvestRobot extends Robot {
 
         Transaction t = transactionService.beginTransaction(1000);
         List<Flower> harvested = greenhouseService.tryHarvestFlowerPlant(t);
-        t.commit();
+        if(harvested != null) {
+            for(Flower flower : harvested) {
+                packingService.putFlower(flower);
+            }
+
+            t.commit();
+        }
+        else {
+            t.rollback();
+        }
 
         if(harvested != null && harvested.size() > 0) {
             for(Flower flo : harvested) {
@@ -86,17 +106,16 @@ public class PlantAndHarvestRobot extends Robot {
         }
     }
 
-    public void tryHarvestPlant() {
+    public void tryHarvestPlant(String why) {
+        logger.debug("tryHarvestPlant - " + why);
+
         tryHarvestFlower();
-        tryHarvestVegetable();
+        tryHarvestVegetable("harvestPlant - " + why);
     }
 
-
-
-
-
     public void tryPlant() {
-        Transaction t = transactionService.beginTransaction(-1);
+        logger.debug("tryPlant");
+        Transaction t = transactionService.beginTransaction(60*1000);
 
         List<VegetablePlant> vegetablePlants = greenhouseService.readAllVegetablePlants(t);
         /*List<FlowerPlant> flowerPlants = greenhouseService.readAllFlowerPlants(t);
@@ -121,35 +140,43 @@ public class PlantAndHarvestRobot extends Robot {
 
 
     private boolean tryPlantVegetable(List<VegetablePlant> plantedVegetables, Transaction t) {
-        logger.log(Priority.DEBUG, "tryPlantVegetable");
+        logger.log(Priority.toPriority(Priority.DEBUG_INT), "tryPlantVegetable");
 
         VegetablePlant nextSeed = tryToGetNextVegetableSeed(plantedVegetables, t);
         if(nextSeed != null) {
+            logger.log(Priority.toPriority(Priority.DEBUG_INT), String.format("tryPlantVegetable - have nextSeed (%s)", nextSeed.getTypeName()));
 
-            System.err.println("HAVE SEED");
             if(!storageService.tryGetExactAmountOfSoil(nextSeed.getCultivationInformation().getSoilAmount(), t)) {
+                logger.log(Priority.toPriority(Priority.DEBUG_INT), String.format("tryPlantVegetable - did not get exact amount of soil for %s - rollback", nextSeed.getTypeName()));
+
                 t.rollback();
                 return false;
             }
 
-            System.err.println("HAVE SOIL");
+            logger.log(Priority.toPriority(Priority.DEBUG_INT), String.format("tryPlantVegetable - have all soil for %s", nextSeed.getTypeName()));
+
             List<VegetableFertilizer> fertilizers = storageService.getVegetableFertilizer(nextSeed.getCultivationInformation().getFertilizerAmount(), t);
             if(fertilizers == null || fertilizers.isEmpty()) {
+                logger.log(Priority.toPriority(Priority.DEBUG_INT), String.format("tryPlantVegetable - did not get enough fertilizer for %s - rollback", nextSeed.getTypeName()));
                 t.rollback();
                 return false;
             }
 
-            System.err.println("HAVE FERTILIZER");
+            logger.log(Priority.toPriority(Priority.DEBUG_INT), String.format("tryPlantVegetable - got all fertilizer for %s", nextSeed.getTypeName()));
             storageService.getWater(nextSeed.getCultivationInformation().getWaterAmount());
+            logger.log(Priority.toPriority(Priority.DEBUG_INT), String.format("tryPlantVegetable - got all water for %s", nextSeed.getTypeName()));
 
-            System.err.println("HAVE WATER");
+
             greenhouseService.plant(nextSeed, t);
 
-            System.err.println("HAVE PLANTED");
+            logger.log(Priority.toPriority(Priority.DEBUG_INT), String.format("tryPlantVegetable - planted %s", nextSeed.getTypeName()));
+
             t.commit();
-            System.err.println("HAVE COMMITTED");
+            logger.log(Priority.toPriority(Priority.DEBUG_INT), String.format("tryPlantVegetable - committed %s", nextSeed.getTypeName()));
             return true;
         }
+
+        logger.log(Priority.toPriority(Priority.DEBUG_INT), String.format("tryPlantVegetable - did not get any seed"));
 
         t.rollback();
         return false;

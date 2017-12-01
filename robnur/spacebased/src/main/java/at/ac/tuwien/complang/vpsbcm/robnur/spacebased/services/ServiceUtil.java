@@ -56,7 +56,7 @@ public class ServiceUtil {
 
     public static <T extends Serializable> List<T> readAllItems(ContainerReference containerReference, Transaction transaction,Capi capi) {
 
-        return readAllItems(containerReference, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_ALL), transaction,capi);
+        return readAllItems(containerReference, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), transaction,capi);
     }
 
     public static void deleteItemById(String id, ContainerReference containerReference, Transaction transaction, Capi capi) {

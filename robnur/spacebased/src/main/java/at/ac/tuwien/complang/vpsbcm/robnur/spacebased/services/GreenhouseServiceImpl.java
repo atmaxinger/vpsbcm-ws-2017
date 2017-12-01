@@ -4,6 +4,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PlantAndHarvestRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.GreenhouseService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
+import org.apache.log4j.Logger;
 import org.mozartspaces.capi3.*;
 import org.mozartspaces.core.*;
 import org.mozartspaces.notifications.NotificationManager;
@@ -16,6 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class GreenhouseServiceImpl extends GreenhouseService {
+    final static Logger logger = Logger.getLogger(GreenhouseServiceImpl.class);
 
     private static final String FLOWER_LABEL = "flower";
     private static final String VEGETABLE_LABEL = "vegetable";
@@ -62,7 +64,11 @@ public class GreenhouseServiceImpl extends GreenhouseService {
 
     public void registerPlantAndHarvestRobot(PlantAndHarvestRobot robot) {
         try {
-            notificationManager.createNotification(greenhouseContainer, (notification, operation, list) -> { robot.tryHarvestPlant(); robot.tryPlant();}, Operation.WRITE, Operation.TAKE, Operation.DELETE);
+            notificationManager.createNotification(greenhouseContainer, (notification, operation, list) -> {
+                    logger.debug("notify robot - greenhouseContainer " + operation.name());
+                    robot.tryHarvestPlant("notify greenhouseContainer " + operation.name());
+                    robot.tryPlant();
+                }, Operation.WRITE, Operation.TAKE, Operation.DELETE);
         } catch (MzsCoreException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {

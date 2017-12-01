@@ -18,13 +18,41 @@ public abstract class StorageService {
     }
 
 
-    protected Callback<List<FlowerPlant>> flowerSeedsChanged;
-    protected Callback<List<VegetablePlant>> vegetableSeedChanged;
-    protected Callback<List<SoilPackage>> soilPackagesChanged;
-    protected Callback<List<FlowerFertilizer>> flowerFertilizerChanged;
-    protected Callback<List<VegetableFertilizer>> vegetableFertilizerChanged;
+    private Callback<List<FlowerPlant>> flowerSeedsChanged;
+    private Callback<List<VegetablePlant>> vegetableSeedChanged;
+    private Callback<List<SoilPackage>> soilPackagesChanged;
+    private Callback<List<FlowerFertilizer>> flowerFertilizerChanged;
+    private Callback<List<VegetableFertilizer>> vegetableFertilizerChanged;
 
+    protected void notifyFlowerSeedsChanged(List<FlowerPlant> list) {
+        if(flowerSeedsChanged != null) {
+            flowerSeedsChanged.handle(list);
+        }
+    }
 
+    protected void notifyVegetableSeedsChanged(List<VegetablePlant> list) {
+        if(vegetableSeedChanged != null) {
+            vegetableSeedChanged.handle(list);
+        }
+    }
+
+    protected void notifySoilPackagesChanged(List<SoilPackage> list) {
+        if(soilPackagesChanged != null) {
+            soilPackagesChanged.handle(list);
+        }
+    }
+
+    protected void notifyFlowerFertilizerChanged(List<FlowerFertilizer> list) {
+        if(flowerFertilizerChanged != null) {
+            flowerFertilizerChanged.handle(list);
+        }
+    }
+
+    protected void notifyVegetableFertilizerChanged(List<VegetableFertilizer> list) {
+        if(vegetableFertilizerChanged != null) {
+            vegetableFertilizerChanged.handle(list);
+        }
+    }
 
     public void onFlowerSeedChanged(Callback<List<FlowerPlant>> seedsChanged) {
         this.flowerSeedsChanged = seedsChanged;
@@ -170,6 +198,11 @@ public abstract class StorageService {
      */
     public boolean tryGetExactAmountOfSoil(int amount, Transaction transaction) {
         List<SoilPackage> soilPackages = tryGetSoilPackages(amount, transaction);
+
+        if(soilPackages == null) {
+            return false;
+        }
+
         int haveAmount = 0;
         for(SoilPackage soilPackage : soilPackages) {
             haveAmount += soilPackage.getAmount();
@@ -200,7 +233,7 @@ public abstract class StorageService {
 
         List<SoilPackage> allSoilPackages = getAllSoilPackages(transaction);
 
-        if(allSoilPackages.isEmpty()){
+        if(allSoilPackages == null || allSoilPackages.isEmpty()){
             return null;
         }
 

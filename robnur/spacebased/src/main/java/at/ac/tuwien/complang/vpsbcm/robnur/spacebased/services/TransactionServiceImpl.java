@@ -1,12 +1,17 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services;
 
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.Robot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
+import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
 import org.mozartspaces.core.*;
 
 import java.net.URI;
 
 public class TransactionServiceImpl implements TransactionService {
+    final static Logger logger = Logger.getLogger(TransactionService.class);
+    final static Logger loggerTransaction = Logger.getLogger(TransactionImpl.class);
 
     public static TransactionReference getTransactionReference(Transaction transaction) {
         if(transaction != null && transaction instanceof TransactionImpl) {
@@ -17,6 +22,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     class TransactionImpl implements Transaction {
+
         TransactionReference ref;
         Capi capi;
 
@@ -25,8 +31,11 @@ public class TransactionServiceImpl implements TransactionService {
         @Override
         public void commit() {
             try {
+                loggerTransaction.debug(String.format("Trying to commit transaction %s", ref.getId()));
                 capi.commitTransaction(ref);
+                loggerTransaction.debug(String.format("Committed transaction %s", ref.getId()));
             } catch (MzsCoreException e) {
+                logger.debug(String.format("Error committing transaction %s", ref.getId()));
                 e.printStackTrace();
             }
         }
@@ -34,9 +43,14 @@ public class TransactionServiceImpl implements TransactionService {
         @Override
         public void rollback() {
             try {
+                loggerTransaction.debug(String.format("Trying to roll back transaction %s", ref.getId()));
                 capi.rollbackTransaction(ref);
                 rolledBack = true;
+                loggerTransaction.debug(String.format("Rolled back transaction %s", ref.getId()));
+
             } catch (MzsCoreException e) {
+                logger.debug(String.format("Error rolling back transaction %s", ref.getId()));
+
                 e.printStackTrace();
             }
         }
@@ -68,6 +82,9 @@ public class TransactionServiceImpl implements TransactionService {
             TransactionImpl transaction = new TransactionImpl();
             transaction.capi = this.capi;
             transaction.ref = ref;
+
+            logger.debug(String.format("Started transaction %s", ref.getId()));
+
 
             return transaction;
         } catch (MzsCoreException e) {

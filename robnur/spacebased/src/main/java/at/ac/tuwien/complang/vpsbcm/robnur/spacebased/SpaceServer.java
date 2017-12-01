@@ -30,6 +30,10 @@ public class SpaceServer {
 
         ContainerReference waterContainer = CapiUtil.lookupOrCreateContainer("waterContainer", core.getConfig().getSpaceUri(), null,null, capi);
         capi.addContainerAspect(new WaterAspect(), waterContainer, ContainerIPoint.POST_TAKE);
+
+        Water water = new Water();
+        water.setAmount(250);
+        capi.write(new Entry(water), waterContainer);
     }
 
     public static void putInitialFlowerPlantCultivationInformation(ConfigService configService) {
