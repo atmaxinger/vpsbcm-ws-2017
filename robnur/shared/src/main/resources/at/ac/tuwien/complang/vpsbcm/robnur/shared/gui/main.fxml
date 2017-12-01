@@ -23,10 +23,25 @@
         <fx:include source="packing.fxml" />
       </content>
     </Tab>
-      <Tab text="Shop">
-        <content>
-          <fx:include source="market.fxml" />
-        </content>
-      </Tab>
+    <Tab text="Research">
+      <content>
+        <fx:include source="research.fxml" />
+      </content>
+    </Tab>
+    <Tab text="Kompost">
+      <content>
+        <fx:include source="compost.fxml" />
+      </content>
+    </Tab>
+    <Tab text="Pflegehinweise">
+      <content>
+        <fx:include source="config.fxml" />
+      </content>
+    </Tab>
+    <Tab text="Shop">
+      <content>
+        <fx:include source="market.fxml" />
+      </content>
+    </Tab>
   </tabs>
 </TabPane>

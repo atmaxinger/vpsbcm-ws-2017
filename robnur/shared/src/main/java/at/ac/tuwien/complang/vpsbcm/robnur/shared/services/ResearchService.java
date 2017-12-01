@@ -5,17 +5,39 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
 
 import java.util.List;
 
-public interface ResearchService {
+public abstract class ResearchService {
+    private StorageService.Callback<List<Flower>> flowersChanged;
+    private StorageService.Callback<List<Vegetable>> vegetablesChanged;
 
-    void putFlower(Flower flower);
+    protected void notifyFlowersChanged(List<Flower> flowers) {
+        if(flowersChanged != null) {
+            flowersChanged.handle(flowers);
+        }
+    }
 
-    void putVegetable(Vegetable vegetable);
+    protected void notifyVegetablesChanged(List<Vegetable> vegetables) {
+        if(vegetablesChanged != null) {
+            vegetablesChanged.handle(vegetables);
+        }
+    }
 
-    void deleteFlower(Flower flower,Transaction transaction);
+    public void onFlowersChanged(StorageService.Callback<List<Flower>> flowersChanged) {
+        this.flowersChanged = flowersChanged;
+    }
 
-    void deleteVegetable(Vegetable vegetable,Transaction transaction);
+    public void onVegetablesChanged(StorageService.Callback<List<Vegetable>> vegetablesChanged) {
+        this.vegetablesChanged = vegetablesChanged;
+    }
 
-    List<Flower> readAllFlowers(Transaction transaction);
+    public abstract void putFlower(Flower flower);
 
-    List<Vegetable> readAllVegetables(Transaction transaction);
+    public abstract void putVegetable(Vegetable vegetable);
+
+    public abstract void deleteFlower(Flower flower,Transaction transaction);
+
+    public abstract void deleteVegetable(Vegetable vegetable,Transaction transaction);
+
+    public abstract List<Flower> readAllFlowers(Transaction transaction);
+
+    public abstract List<Vegetable> readAllVegetables(Transaction transaction);
 }

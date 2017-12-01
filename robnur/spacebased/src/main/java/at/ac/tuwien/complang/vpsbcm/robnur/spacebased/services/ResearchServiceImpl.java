@@ -16,7 +16,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
-public class ResearchServiceImpl implements ResearchService {
+public class ResearchServiceImpl extends ResearchService {
 
     Capi capi;
 
@@ -35,7 +35,13 @@ public class ResearchServiceImpl implements ResearchService {
         try {
             flowerContainer = CapiUtil.lookupOrCreateContainer("flowerContainer",spaceUri,coordinators,null,capi);
             vegetableContainer = CapiUtil.lookupOrCreateContainer("vegetableContainer",spaceUri,coordinators,null,capi);
-        } catch (MzsCoreException e) {
+
+            notificationManager.createNotification(flowerContainer, (notification, operation, list) -> notifyFlowersChanged(readAllFlowers(null)), Operation.WRITE, Operation.DELETE, Operation.TAKE);
+            notificationManager.createNotification(vegetableContainer, (notification, operation, list) -> notifyVegetablesChanged(readAllVegetables(null)), Operation.WRITE, Operation.DELETE, Operation.TAKE);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        catch (MzsCoreException e) {
             e.printStackTrace();
         }
     }

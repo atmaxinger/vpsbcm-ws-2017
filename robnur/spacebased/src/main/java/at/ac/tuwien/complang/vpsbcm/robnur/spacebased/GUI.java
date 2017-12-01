@@ -18,13 +18,17 @@ public class GUI {
         GreenhouseService greenhouseService = new GreenhouseServiceImpl(uri);
         MarketService marketService = new MarketServiceImpl(uri);
         PackingService packingService = new PackingServiceImpl(uri);
+        ResearchService researchService = new ResearchServiceImpl(uri);
+        CompostService compostService = new CompostServiceImpl(uri);
+        ConfigService configService = new ConfigServiceImpl(uri);
 
         RobNurGUI.storageService = storageService;
         RobNurGUI.greenhouseService = greenhouseService;
         RobNurGUI.marketService = marketService;
         RobNurGUI.packingService = packingService;
-
-        RobNurGUI.configService = new ConfigServiceImpl(uri);
+        RobNurGUI.researchService = researchService;
+        RobNurGUI.compostService = compostService;
+        RobNurGUI.configService = configService;
 
         RobNurGUI robNurGUI = new RobNurGUI();
         robNurGUI.execute(args);
