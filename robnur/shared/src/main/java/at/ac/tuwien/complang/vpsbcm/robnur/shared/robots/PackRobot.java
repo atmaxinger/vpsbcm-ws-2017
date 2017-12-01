@@ -25,11 +25,12 @@ public class PackRobot extends Robot {
     }
 
     public void tryCreateBouquet(){
-        Transaction transaction = transactionService.beginTransaction(1000000);
+        Transaction transaction = transactionService.beginTransaction(1000000); // TODO change timeout
 
         List<Flower> flowers = packingService.readAllFlowers(transaction);
         List<Flower> flowersForBouquet = new ArrayList<>();
 
+        // check if there are already enough bouquets in the market
         if(marketService.getAmountOfBouquets() >= 5){
 
             // put flowers from packing-queue to the research department
@@ -50,14 +51,14 @@ public class PackRobot extends Robot {
                 flowersForBouquet.add(flowers.get(2));
                 switch (getNumberOfDistinctFlowerTypes(flowersForBouquet)){
                     case 1:
-                        flowersForBouquet.add(getDistinctFlower(flowersForBouquet));
-                        flowersForBouquet.add(getDistinctFlower(flowersForBouquet));
+                        flowersForBouquet.add(getDistinctFlower(flowers));
+                        flowersForBouquet.add(getDistinctFlower(flowers));
                         break;
                     case 2:
                         flowersForBouquet.add(flowers.get(3));
-                        switch (getNumberOfDistinctFlowerTypes(flowersForBouquet)){
+                        switch (getNumberOfDistinctFlowerTypes(flowers)){
                             case 2:
-                                flowersForBouquet.add(getDistinctFlower(flowersForBouquet));
+                                flowersForBouquet.add(getDistinctFlower(flowers));
                                 break;
                             case 3:
                                 flowersForBouquet.add(flowers.get(4));
@@ -73,16 +74,16 @@ public class PackRobot extends Robot {
             else if (flowers.size() >= 4) {
                 flowersForBouquet.add(flowers.get(0));
                 flowersForBouquet.add(flowers.get(1));
-                switch (getNumberOfDistinctFlowerTypes(flowersForBouquet)) {
+                switch (getNumberOfDistinctFlowerTypes(flowers)) {
                     case 1:
-                        flowersForBouquet.add(getDistinctFlower(flowersForBouquet));
-                        flowersForBouquet.add(getDistinctFlower(flowersForBouquet));
+                        flowersForBouquet.add(getDistinctFlower(flowers));
+                        flowersForBouquet.add(getDistinctFlower(flowers));
                         break;
                     case 2:
                         flowersForBouquet.add(flowers.get(2));
-                        switch (getNumberOfDistinctFlowerTypes(flowersForBouquet)) {
+                        switch (getNumberOfDistinctFlowerTypes(flowers)) {
                             case 2:
-                                flowersForBouquet.add(getDistinctFlower(flowersForBouquet));
+                                flowersForBouquet.add(getDistinctFlower(flowers));
                                 break;
                             case 3:
                                 flowersForBouquet.add(flowers.get(3));
@@ -198,11 +199,11 @@ public class PackRobot extends Robot {
         return vegetablesOfSameType;
     }
 
-    private Flower getDistinctFlower(List<Flower> flowersForBouquet) {
+    private Flower getDistinctFlower(List<Flower> flowers) {
 
-        List<FlowerType> distinctFlowerTypes = getDistinctFlowerTypes(flowersForBouquet);
+        List<FlowerType> distinctFlowerTypes = getDistinctFlowerTypes(flowers);
 
-        for (Flower f:flowersForBouquet) {
+        for (Flower f:flowers) {
             if(!distinctFlowerTypes.contains(f.getParentFlowerPlant().getCultivationInformation().getFlowerType())){
                 return f;
             }
