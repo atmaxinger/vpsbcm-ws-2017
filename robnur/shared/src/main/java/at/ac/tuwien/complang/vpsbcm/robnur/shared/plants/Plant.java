@@ -27,4 +27,6 @@ public abstract class Plant extends Idable implements Serializable {
     }
 
     public abstract String getTypeName();
+
+    public abstract CultivationInformation getCultivationInformation();
 }

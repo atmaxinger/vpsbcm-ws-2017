@@ -1,6 +1,7 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services;
 
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlant;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.FlowerFertilizer;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.SoilPackage;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.VegetableFertilizer;
@@ -8,9 +9,10 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.Water;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PlantAndHarvestRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.StorageService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
-
 import org.apache.log4j.Logger;
-import org.mozartspaces.capi3.*;
+import org.mozartspaces.capi3.AnyCoordinator;
+import org.mozartspaces.capi3.FifoCoordinator;
+import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.core.*;
 import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
@@ -45,13 +47,13 @@ public class StorageServiceImpl extends StorageService {
 
         List<FifoCoordinator> coords = null;
 
-        flowerSeedContainer = CapiUtil.lookupOrCreateContainer("flowerSeedContainer",spaceUri, Arrays.asList(new AnyCoordinator(), new QueryCoordinator()),null,capi);
-        vegetableSeedContainer = CapiUtil.lookupOrCreateContainer("vegetableSeedContainer",spaceUri, Arrays.asList(new AnyCoordinator(), new QueryCoordinator()),null,capi);
+        flowerSeedContainer = CapiUtil.lookupOrCreateContainer("flowerSeedContainer", spaceUri, Arrays.asList(new AnyCoordinator(), new QueryCoordinator()), null, capi);
+        vegetableSeedContainer = CapiUtil.lookupOrCreateContainer("vegetableSeedContainer", spaceUri, Arrays.asList(new AnyCoordinator(), new QueryCoordinator()), null, capi);
 
-        soilContainer = CapiUtil.lookupOrCreateContainer("soilContainer",spaceUri,coords,null,capi);
-        flowerFertilizerContainer = CapiUtil.lookupOrCreateContainer("flowerFertilizerContainer",spaceUri,coords,null,capi);
-        vegetableFertilizerContainer = CapiUtil.lookupOrCreateContainer("vegetableFertilizerContainer",spaceUri,coords,null,capi);
-        waterContainer = CapiUtil.lookupOrCreateContainer("waterContainer",spaceUri,coords,null,capi);
+        soilContainer = CapiUtil.lookupOrCreateContainer("soilContainer", spaceUri, coords, null, capi);
+        flowerFertilizerContainer = CapiUtil.lookupOrCreateContainer("flowerFertilizerContainer", spaceUri, coords, null, capi);
+        vegetableFertilizerContainer = CapiUtil.lookupOrCreateContainer("vegetableFertilizerContainer", spaceUri, coords, null, capi);
+        waterContainer = CapiUtil.lookupOrCreateContainer("waterContainer", spaceUri, coords, null, capi);
 
         try {
             notificationManager.createNotification(flowerSeedContainer, (notification, operation, list) -> notifyFlowerSeedsChanged(readAllFlowerSeeds()), Operation.DELETE, Operation.TAKE, Operation.WRITE);
@@ -68,34 +70,34 @@ public class StorageServiceImpl extends StorageService {
     public void registerPlantAndHarvestRobot(PlantAndHarvestRobot robot) {
         try {
             notificationManager.createNotification(flowerSeedContainer, (notification, operation, list) -> {
-                    logger.debug("robot notify - got notification on flowerSeedContainer");
-                    robot.tryHarvestPlant("notify flowerSeedContainer write");
-                    robot.tryPlant();
-                }, Operation.WRITE);
+                logger.debug("robot notify - got notification on flowerSeedContainer");
+                robot.tryHarvestPlant();
+                robot.tryPlant();
+            }, Operation.WRITE);
 
             notificationManager.createNotification(vegetableSeedContainer, (notification, operation, list) -> {
-                    logger.debug("robot notify - got notification on vegetableSeedContainer");
-                    robot.tryHarvestPlant("notify vegetableSeedContainer write");
-                    robot.tryPlant();
-                }, Operation.WRITE);
+                logger.debug("robot notify - got notification on vegetableSeedContainer");
+                robot.tryHarvestPlant();
+                robot.tryPlant();
+            }, Operation.WRITE);
 
             notificationManager.createNotification(soilContainer, (notification, operation, list) -> {
-                    logger.debug("robot notify - got notification on soilContainer");
-                    robot.tryHarvestPlant("notify soilContainer write");
-                    robot.tryPlant();
-                }, Operation.WRITE);
+                logger.debug("robot notify - got notification on soilContainer");
+                robot.tryHarvestPlant();
+                robot.tryPlant();
+            }, Operation.WRITE);
 
             notificationManager.createNotification(flowerFertilizerContainer, (notification, operation, list) -> {
-                    logger.debug("robot notify - got notification on flowerFertilizerContainer");
-                    robot.tryHarvestPlant("notify flowerFertilizerContainer write");
-                    robot.tryPlant();
-                }, Operation.WRITE);
+                logger.debug("robot notify - got notification on flowerFertilizerContainer");
+                robot.tryHarvestPlant();
+                robot.tryPlant();
+            }, Operation.WRITE);
 
             notificationManager.createNotification(vegetableFertilizerContainer, (notification, operation, list) -> {
-                    logger.debug("robot notify - got notification on vegetableFertilizerContainer");
-                    robot.tryHarvestPlant("notify vegetableFertilizerContainer write");
-                    robot.tryPlant();
-                },  Operation.WRITE);
+                logger.debug("robot notify - got notification on vegetableFertilizerContainer");
+                robot.tryHarvestPlant();
+                robot.tryPlant();
+            }, Operation.WRITE);
         } catch (MzsCoreException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -141,7 +143,7 @@ public class StorageServiceImpl extends StorageService {
         List<FlowerPlant> plants = null;
 
         try {
-            plants = capi.read(flowerSeedContainer, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), MzsConstants.RequestTimeout.ZERO,tref);
+            plants = capi.read(flowerSeedContainer, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), MzsConstants.RequestTimeout.ZERO, tref);
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -155,7 +157,7 @@ public class StorageServiceImpl extends StorageService {
         List<VegetablePlant> plants = null;
 
         try {
-            plants = capi.read(vegetableSeedContainer, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), MzsConstants.RequestTimeout.ZERO,tref);
+            plants = capi.read(vegetableSeedContainer, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), MzsConstants.RequestTimeout.ZERO, tref);
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -170,7 +172,7 @@ public class StorageServiceImpl extends StorageService {
         ArrayList<SoilPackage> soilPackages = null;
 
         try {
-            soilPackages = capi.take(soilContainer,AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX),100,tref);
+            soilPackages = capi.take(soilContainer, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), 100, tref);
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -210,7 +212,7 @@ public class StorageServiceImpl extends StorageService {
         ArrayList<FlowerFertilizer> flowerFertilizers = null;
 
         try {
-             flowerFertilizers = capi.take(flowerFertilizerContainer, AnyCoordinator.newSelector(amount),MzsConstants.RequestTimeout.INFINITE,tref);
+            flowerFertilizers = capi.take(flowerFertilizerContainer, AnyCoordinator.newSelector(amount), MzsConstants.RequestTimeout.INFINITE, tref);
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -234,7 +236,7 @@ public class StorageServiceImpl extends StorageService {
         List<FlowerFertilizer> flowerFertilizers = null;
 
         try {
-            flowerFertilizers = capi.read(flowerFertilizerContainer,AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX),MzsConstants.RequestTimeout.ZERO,tref);
+            flowerFertilizers = capi.read(flowerFertilizerContainer, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), MzsConstants.RequestTimeout.ZERO, tref);
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -248,7 +250,7 @@ public class StorageServiceImpl extends StorageService {
         ArrayList<VegetableFertilizer> vegetableFertilizers = null;
 
         try {
-            vegetableFertilizers = capi.take(vegetableFertilizerContainer, AnyCoordinator.newSelector(amount), 100,tref);
+            vegetableFertilizers = capi.take(vegetableFertilizerContainer, AnyCoordinator.newSelector(amount), 100, tref);
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -259,7 +261,7 @@ public class StorageServiceImpl extends StorageService {
     @Override
     public void putVegetableFertilizer(VegetableFertilizer vegetableFertilizer) {
         try {
-            capi.write(vegetableFertilizerContainer,new Entry(vegetableFertilizer));
+            capi.write(vegetableFertilizerContainer, new Entry(vegetableFertilizer));
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -271,7 +273,7 @@ public class StorageServiceImpl extends StorageService {
         List<VegetableFertilizer> vegetableFertilizers = null;
 
         try {
-            vegetableFertilizers = capi.read(vegetableFertilizerContainer,AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX),MzsConstants.RequestTimeout.ZERO,tref);
+            vegetableFertilizers = capi.read(vegetableFertilizerContainer, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), MzsConstants.RequestTimeout.ZERO, tref);
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -279,9 +281,9 @@ public class StorageServiceImpl extends StorageService {
         return vegetableFertilizers;
     }
 
-    public void putWater(Water water){
+    public void putWater(Water water) {
         try {
-            capi.write(waterContainer,new Entry(water));
+            capi.write(waterContainer, new Entry(water));
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -291,7 +293,7 @@ public class StorageServiceImpl extends StorageService {
         ArrayList<Water> waterArrayList = null;
 
         try {
-            waterArrayList = capi.take(waterContainer,AnyCoordinator.newSelector(),MzsConstants.RequestTimeout.INFINITE,null);
+            waterArrayList = capi.take(waterContainer, AnyCoordinator.newSelector(), MzsConstants.RequestTimeout.INFINITE, null);
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
