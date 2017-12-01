@@ -14,9 +14,10 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
-public class ConfigServiceImpl implements ConfigService {
+public class ConfigServiceImpl extends ConfigService {
 
     Capi capi;
+    private NotificationManager notificationManager;
 
     ContainerReference flowerPlantCultivationInformationContainer;
     ContainerReference vegetablePlantCultivationInformationContainer;
@@ -24,13 +25,19 @@ public class ConfigServiceImpl implements ConfigService {
     public ConfigServiceImpl(URI spaceUri) {
         MzsCore core = DefaultMzsCore.newInstanceWithoutSpace();
         capi = new Capi(core);
+        notificationManager = new NotificationManager(core);
 
         List<Coordinator> coordinators = Arrays.asList(new AnyCoordinator(), new QueryCoordinator());
 
         try {
             flowerPlantCultivationInformationContainer = CapiUtil.lookupOrCreateContainer("flowerPlantCultivationInformationContainer", spaceUri, coordinators, null, capi);
             vegetablePlantCultivationInformationContainer = CapiUtil.lookupOrCreateContainer("vegetablePlantCultivationInformationContainer", spaceUri, coordinators, null, capi);
+
+            notificationManager.createNotification(flowerPlantCultivationInformationContainer, (notification, operation, list) -> notifyFlowerCultivationInformationChanged(readAllFlowerPlantCultivationInformation(null)), Operation.WRITE);
+            notificationManager.createNotification(vegetablePlantCultivationInformationContainer, (notification, operation, list) -> notifyVegetableCultivationInformationChanged(readAllVegetablePlantCultivationInformation(null)), Operation.WRITE);
         } catch (MzsCoreException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }

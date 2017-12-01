@@ -7,14 +7,17 @@ import org.mozartspaces.capi3.Coordinator;
 import org.mozartspaces.capi3.LabelCoordinator;
 import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.core.*;
+import org.mozartspaces.notifications.NotificationManager;
+import org.mozartspaces.notifications.Operation;
 
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
-public class CompostServiceImpl implements CompostService {
+public class CompostServiceImpl extends CompostService {
 
     Capi capi;
+    private NotificationManager notificationManager;
 
     ContainerReference flowerPlantContainer;
     ContainerReference flowerContainer;
@@ -24,6 +27,7 @@ public class CompostServiceImpl implements CompostService {
     public CompostServiceImpl(URI spaceUri) {
 
         MzsCore core = DefaultMzsCore.newInstanceWithoutSpace();
+        notificationManager = new NotificationManager(core);
         capi = new Capi(core);
 
         List<Coordinator> coordinators = Arrays.asList(new AnyCoordinator());
@@ -33,7 +37,14 @@ public class CompostServiceImpl implements CompostService {
             flowerContainer = CapiUtil.lookupOrCreateContainer("flowerContainer",spaceUri,coordinators,null,capi);
             vegetablePlantContainer = CapiUtil.lookupOrCreateContainer("vegetablePlantContainer",spaceUri,coordinators,null,capi);
             vegetableContainer = CapiUtil.lookupOrCreateContainer("vegetableContainer",spaceUri,coordinators,null,capi);
+
+            notificationManager.createNotification(flowerPlantContainer, (notification, operation, list) -> notifyFlowerPlantsChanged(readAllFlowerPlants()), Operation.WRITE, Operation.TAKE, Operation.DELETE);
+            notificationManager.createNotification(flowerContainer, (notification, operation, list) -> notifyFlowersChanged(readAllFlowers()), Operation.WRITE, Operation.TAKE, Operation.DELETE);
+            notificationManager.createNotification(vegetablePlantContainer, (notification, operation, list) -> notifyVegetablePlantsChanged(readAllVegetablePlants()), Operation.WRITE, Operation.TAKE, Operation.DELETE);
+            notificationManager.createNotification(vegetableContainer, (notification, operation, list) -> notifyVegetablesChanged(readAllVegetables()), Operation.WRITE, Operation.TAKE, Operation.DELETE);
         } catch (MzsCoreException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
