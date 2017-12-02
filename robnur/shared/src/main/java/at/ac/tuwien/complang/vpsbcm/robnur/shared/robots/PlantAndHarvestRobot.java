@@ -18,10 +18,15 @@ public class PlantAndHarvestRobot extends Robot {
     private TransactionService transactionService;
     private PackingService packingService;
 
-    public PlantAndHarvestRobot(String id, StorageService storageService, GreenhouseService greenhouseService, TransactionService transactionService, PackingService packingService) {
+    private int plantTransactionTimeout = 60*1000;
+    private int harvestTransactionTimeout = 1000;
+
+    public PlantAndHarvestRobot(String id, int plantTransactionTimeout, int harvestTransactionTimeout, StorageService storageService, GreenhouseService greenhouseService, TransactionService transactionService, PackingService packingService) {
         logger.debug("PlantAndHarvestRobot constructor");
 
         this.setId(id);
+        this.plantTransactionTimeout = plantTransactionTimeout;
+        this.harvestTransactionTimeout = harvestTransactionTimeout;
 
         this.storageService = storageService;
         this.greenhouseService = greenhouseService;
@@ -94,7 +99,7 @@ public class PlantAndHarvestRobot extends Robot {
     private void tryHarvestVegetable() {
         logger.log(Priority.DEBUG, "tryHarvestVegetable");
 
-        Transaction t = transactionService.beginTransaction(1000);
+        Transaction t = transactionService.beginTransaction(harvestTransactionTimeout);
         List<Vegetable> harvested = greenhouseService.tryHarvestVegetablePlant(t);
 
         if (harvested != null && harvested.size() > 0) {
@@ -121,7 +126,7 @@ public class PlantAndHarvestRobot extends Robot {
     private void tryHarvestFlower() {
         logger.log(Priority.DEBUG, "tryHarvestFlower");
 
-        Transaction t = transactionService.beginTransaction(1000);
+        Transaction t = transactionService.beginTransaction(harvestTransactionTimeout);
         List<Flower> harvested = greenhouseService.tryHarvestFlowerPlant(t);
         if (harvested != null && harvested.size() > 0) {
             logger.debug("harvested flower");
@@ -223,7 +228,7 @@ public class PlantAndHarvestRobot extends Robot {
      */
     private <P extends Plant, E extends Enum<E>> boolean tryPlantPlant(List<P> planted, E[] types) {
         logger.debug("tryPlantPlant");
-        Transaction t = transactionService.beginTransaction(60 * 1000);
+        Transaction t = transactionService.beginTransaction(plantTransactionTimeout);
 
         // Step 1: First of all, try to get a seed
         P nextSeed = tryToGetNextSeed(planted, types, t);
