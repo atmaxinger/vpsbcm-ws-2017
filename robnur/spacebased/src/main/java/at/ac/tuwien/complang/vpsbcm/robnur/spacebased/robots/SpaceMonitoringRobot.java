@@ -13,7 +13,12 @@ import java.net.URISyntaxException;
 public class SpaceMonitoringRobot {
 
     public static void main(String[] args) throws URISyntaxException, MzsCoreException, InterruptedException {
-        URI uri = new URI("xvsm://localhost:9876");
+        if(args.length != 1) {
+            System.err.println("You need to specify the space uri");
+            System.exit(1);
+        }
+
+        URI uri = new URI(args[0]);
         GreenhouseService greenhouseService = new GreenhouseServiceImpl(uri);
         TransactionService transactionService = new TransactionServiceImpl(uri);
 

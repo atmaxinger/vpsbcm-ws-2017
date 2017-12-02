@@ -11,7 +11,12 @@ import java.net.URISyntaxException;
 public class SpacePackRobot {
 
     public static void main(String[] args) throws URISyntaxException, MzsCoreException {
-        URI uri = new URI("xvsm://localhost:9876");
+        if(args.length != 2) {
+            System.err.println("You need to specify an Id and a space uri");
+            System.exit(1);
+        }
+
+        URI uri = new URI(args[1]);
 
         PackingServiceImpl packingService = new PackingServiceImpl(uri);
         MarketServiceImpl marketService = new MarketServiceImpl(uri);
@@ -19,7 +24,7 @@ public class SpacePackRobot {
         TransactionService transactionService = new TransactionServiceImpl(uri);
 
         PackRobot packRobot = new PackRobot(packingService,marketService,researchService,transactionService);
-        packRobot.setId("p1");
+        packRobot.setId(args[0]);
         packingService.registerPackRobot(packRobot);
     }
 }
