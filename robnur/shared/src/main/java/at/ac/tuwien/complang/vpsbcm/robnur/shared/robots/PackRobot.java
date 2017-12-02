@@ -14,7 +14,9 @@ public class PackRobot extends Robot {
     private ResearchService researchService;
     private TransactionService transactionService;
 
-    public PackRobot(PackingService packingService, MarketService marketService, ResearchService researchService, TransactionService transactionService) {
+    public PackRobot(String id, PackingService packingService, MarketService marketService, ResearchService researchService, TransactionService transactionService) {
+        this.setId(id);
+
         this.packingService = packingService;
         this.marketService = marketService;
         this.researchService = researchService;

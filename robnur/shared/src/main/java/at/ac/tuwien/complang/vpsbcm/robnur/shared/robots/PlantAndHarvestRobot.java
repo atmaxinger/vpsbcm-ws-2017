@@ -18,8 +18,10 @@ public class PlantAndHarvestRobot extends Robot {
     private TransactionService transactionService;
     private PackingService packingService;
 
-    public PlantAndHarvestRobot(StorageService storageService, GreenhouseService greenhouseService, TransactionService transactionService, PackingService packingService) {
+    public PlantAndHarvestRobot(String id, StorageService storageService, GreenhouseService greenhouseService, TransactionService transactionService, PackingService packingService) {
         logger.debug("PlantAndHarvestRobot constructor");
+
+        this.setId(id);
 
         this.storageService = storageService;
         this.greenhouseService = greenhouseService;

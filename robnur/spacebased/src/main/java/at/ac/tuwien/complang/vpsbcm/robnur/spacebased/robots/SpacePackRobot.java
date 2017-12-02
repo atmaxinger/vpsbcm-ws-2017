@@ -23,8 +23,7 @@ public class SpacePackRobot {
         ResearchService researchService = null; // TODO add impl
         TransactionService transactionService = new TransactionServiceImpl(uri);
 
-        PackRobot packRobot = new PackRobot(packingService,marketService,researchService,transactionService);
-        packRobot.setId(args[0]);
+        PackRobot packRobot = new PackRobot(args[0], packingService,marketService,researchService,transactionService);
         packingService.registerPackRobot(packRobot);
     }
 }

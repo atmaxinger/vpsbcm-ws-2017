@@ -28,8 +28,7 @@ public class SpaceResearchRobot {
         ConfigService configService = new ConfigServiceImpl(uri);
         TransactionService transactionService = new TransactionServiceImpl(uri);
 
-        ResearchRobot researchRobot = new ResearchRobot(researchService,compostService,configService,transactionService);
-        researchRobot.setId(args[0]);
+        ResearchRobot researchRobot = new ResearchRobot(args[0], researchService,compostService,configService,transactionService);
         researchService.registerResearchRobot(researchRobot);
     }
 }

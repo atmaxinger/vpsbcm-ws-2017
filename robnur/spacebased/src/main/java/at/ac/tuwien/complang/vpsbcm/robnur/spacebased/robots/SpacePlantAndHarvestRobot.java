@@ -29,8 +29,7 @@ public class SpacePlantAndHarvestRobot {
         TransactionService transactionService = new TransactionServiceImpl(uri);
 
 
-        PlantAndHarvestRobot robot = new PlantAndHarvestRobot(storageService, greenhouseService, transactionService, packingService);
-        robot.setId(args[0]);
+        PlantAndHarvestRobot robot = new PlantAndHarvestRobot(args[0], storageService, greenhouseService, transactionService, packingService);
 
         greenhouseService.registerPlantAndHarvestRobot(robot);
         storageService.registerPlantAndHarvestRobot(robot);

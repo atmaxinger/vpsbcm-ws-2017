@@ -13,7 +13,9 @@ public class ResearchRobot extends Robot {
     private ConfigService configService;
     private TransactionService transactionService;
 
-    public ResearchRobot(ResearchService researchService, CompostService compostService, ConfigService configService, TransactionService transactionService) {
+    public ResearchRobot(String id, ResearchService researchService, CompostService compostService, ConfigService configService, TransactionService transactionService) {
+        this.setId(id);
+
         this.researchService = researchService;
         this.compostService = compostService;
         this.configService = configService;
