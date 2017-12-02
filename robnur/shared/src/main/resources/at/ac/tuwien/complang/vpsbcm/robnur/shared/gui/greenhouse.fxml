@@ -15,5 +15,6 @@
         <TableColumn fx:id="tcPlant" text="Pflanze" />
         <TableColumn fx:id="tcGrowth" prefWidth="83.0" text="Entwicklung (%)" />
         <TableColumn fx:id="tcRemainingHarvets" text="Verbleibende Ernten" />
+        <TableColumn fx:id="tcPlantedBy" text="Pflanz Roboter" />
     </columns>
 </TableView>

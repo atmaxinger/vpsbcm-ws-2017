@@ -22,6 +22,7 @@ public class GreenhouseController {
     public TableColumn<Plant, Integer> tcGrowth;
     public TableColumn<Plant, String> tcRemainingHarvets;
     public TableColumn<Plant, String> tcPlantId;
+    public TableColumn<Plant, String> tcPlantedBy;
 
     private GreenhouseService greenhouseService = RobNurGUI.greenhouseService;
 
@@ -44,6 +45,8 @@ public class GreenhouseController {
         tcPlant.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getTypeName()));
 
         tcGrowth.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue().getGrowth()));
+
+        tcPlantedBy.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getPlantRobot()));
 
         tcRemainingHarvets.setCellValueFactory(param -> {
             String rem = "-";

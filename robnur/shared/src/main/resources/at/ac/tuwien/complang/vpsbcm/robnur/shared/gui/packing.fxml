@@ -14,6 +14,8 @@
                 <TableColumn fx:id="tcVegetablesId" prefWidth="86.0" text="Id" />
                 <TableColumn fx:id="tcVegetablesType" prefWidth="86.0" text="Typ" />
                 <TableColumn fx:id="tcVegetablesParent" text="Pflanzen Id" />
+                <TableColumn fx:id="tcVegetablesPlantedBy" text="Pflanz Roboter" />
+                <TableColumn fx:id="tcVegetablesHarvestedBy" text="Ernte Roboter" />
             </columns>
         </TableView>
 
@@ -22,6 +24,8 @@
                 <TableColumn fx:id="tcFlowersId" prefWidth="125.0" text="Id" />
                 <TableColumn fx:id="tcFlowersType" prefWidth="86.0" text="Typ" />
                 <TableColumn fx:id="tcFlowerParent" text="Pflanzen Id"/>
+                <TableColumn fx:id="tcFlowersPlantedBy" text="Pflanz Roboter" />
+                <TableColumn fx:id="tcFlowersHarvestedBy" text="Ernte Roboter" />
             </columns>
         </TableView>
     </items>
