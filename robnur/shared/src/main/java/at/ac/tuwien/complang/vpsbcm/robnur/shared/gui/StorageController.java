@@ -155,13 +155,15 @@ public class StorageController {
                 @Override
                 void buyAction(int amount) {
                     Transaction t = transactionService.beginTransaction(-1);
+                    List<FlowerPlant> flowerSeeds = new LinkedList<>();
                     for(int i=0;i<amount; i++) {
                         FlowerPlant fp = new FlowerPlant();
                         fp.setCultivationInformation(fcpi);
                         fp.setGrowth(-1);
 
-                        storageService.putSeed(fp, t);
+                        flowerSeeds.add(fp);
                     }
+                    storageService.putFlowerSeeds(flowerSeeds, t);
                     t.commit();
                 }
             };
@@ -181,13 +183,16 @@ public class StorageController {
                 @Override
                 void buyAction(int amount) {
                     Transaction t = transactionService.beginTransaction(-1);
+                    List<VegetablePlant> vegetableSeeds = new LinkedList<>();
                     for(int i=0; i<amount; i++) {
                         VegetablePlant vp = new VegetablePlant();
                         vp.setCultivationInformation(vpci);
                         vp.setGrowth(-1);
 
-                        storageService.putSeed(vp, t);
+                        vegetableSeeds.add(vp);
                     }
+
+                    storageService.putVegetableSeeds(vegetableSeeds, t);
                     t.commit();
                 }
             };
@@ -262,10 +267,13 @@ public class StorageController {
             @Override
             void buyAction(int amount) {
                 Transaction t = transactionService.beginTransaction(-1);
+                List<SoilPackage> soilPackages = new LinkedList<>();
                 for(int i=0; i< amount; i++) {
                     SoilPackage sp = new SoilPackage();
-                    storageService.putSoilPackage(sp, t);
+                    soilPackages.add(sp);
                 }
+
+                storageService.putSoilPackages(soilPackages, t);
                 t.commit();
             }
         };
@@ -288,10 +296,13 @@ public class StorageController {
         ResourceTableDataModel flowerFertilizer = new ResourceTableDataModel() {
             @Override
             void buyAction(int amount) {
+                List<FlowerFertilizer> flowerFertilizers = new LinkedList<>();
                 for(int i=0; i<amount; i++) {
                     FlowerFertilizer ff = new FlowerFertilizer();
-                    storageService.putFlowerFertilizer(ff);
+                    flowerFertilizers.add(ff);
                 }
+
+                storageService.putFlowerFertilizers(flowerFertilizers);
             }
         };
         flowerFertilizer.resource = "Blumen Dünger";
@@ -306,10 +317,13 @@ public class StorageController {
         ResourceTableDataModel vegFert = new ResourceTableDataModel() {
             @Override
             void buyAction(int amount) {
+                List<VegetableFertilizer> vegetableFertilizers = new LinkedList<>();
                 for(int i=0; i<amount; i++) {
                     VegetableFertilizer vf = new VegetableFertilizer();
-                    storageService.putVegetableFertilizer(vf);
+                    vegetableFertilizers.add(vf);
                 }
+
+                storageService.putVegetableFertilizers(vegetableFertilizers);
             }
         };
         vegFert.resource = "Gemüse Dünger";

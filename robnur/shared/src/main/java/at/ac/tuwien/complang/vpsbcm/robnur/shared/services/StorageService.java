@@ -7,7 +7,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.VegetableFertilizer;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.Water;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 public abstract class StorageService {
@@ -83,7 +83,7 @@ public abstract class StorageService {
      * @return seed that can be planted or null
      */
     public VegetablePlant tryGetSeed(VegetableType type, Transaction transaction) {
-        List<VegetablePlant> availiableSeeds = readAllVegetableSeeds(transaction);
+        List<VegetablePlant> availiableSeeds = getSeeds(type, transaction);
         int numberOfFertilizers = readAllVegetableFertilizer(transaction).size();
         int soilAmount = availableSoilAmount(transaction);
 
@@ -91,7 +91,9 @@ public abstract class StorageService {
             if(plant.getCultivationInformation().getVegetableType() == type) {
                 if(numberOfFertilizers >= plant.getCultivationInformation().getFertilizerAmount()) {
                     if(soilAmount >= plant.getCultivationInformation().getSoilAmount()) {
-                        deleteSeed(plant, transaction);
+                        availiableSeeds.remove(plant);
+                        // Put remaining seeds back
+                        putVegetableSeeds(availiableSeeds, transaction);
                         return plant;
                     }
                 }
@@ -110,7 +112,7 @@ public abstract class StorageService {
      * @return seed that can be planted or null
      */
     public FlowerPlant tryGetSeed(FlowerType type, Transaction transaction) {
-        List<FlowerPlant> availiableSeeds = readAllFlowerSeeds(transaction);
+        List<FlowerPlant> availiableSeeds = getSeeds(type, transaction);
         int numberOfFertilizers = readAllFlowerFertilizer(transaction).size();
         int soilAmount = availableSoilAmount(transaction);
 
@@ -118,7 +120,9 @@ public abstract class StorageService {
             if (plant.getCultivationInformation().getFlowerType() == type) {
                 if (numberOfFertilizers >= plant.getCultivationInformation().getFertilizerAmount()) {
                     if (soilAmount >= plant.getCultivationInformation().getSoilAmount()) {
-                        deleteSeed(plant, transaction);
+                        availiableSeeds.remove(plant);
+                        // Put remaining seeds back
+                        putFlowerSeeds(availiableSeeds, transaction);
                         return plant;
                     }
                 }
@@ -128,12 +132,15 @@ public abstract class StorageService {
         return null;
     }
 
-    protected abstract void deleteSeed(VegetablePlant plant, Transaction transaction);
-    protected abstract void deleteSeed(FlowerPlant plant, Transaction transaction);
-
+    protected abstract List<FlowerPlant> getSeeds(FlowerType type, Transaction transaction);
+    protected abstract List<VegetablePlant> getSeeds(VegetableType type, Transaction transaction);
 
     public abstract void putSeed(FlowerPlant plant, Transaction transaction);
     public abstract void putSeed(VegetablePlant plant, Transaction transaction);
+
+    public abstract void putFlowerSeeds(List<FlowerPlant> plants, Transaction transaction);
+    public abstract void putVegetableSeeds(List<VegetablePlant> plants, Transaction transaction);
+
 
     public List<FlowerPlant> readAllFlowerSeeds() {
         return readAllFlowerSeeds(null);
@@ -147,10 +154,11 @@ public abstract class StorageService {
     protected abstract List<SoilPackage> getAllSoilPackages(Transaction transaction);
 
     public abstract void putSoilPackage(SoilPackage soilPackage, Transaction transaction);
+    public abstract void putSoilPackages(List<SoilPackage> soilPackage, Transaction transaction);
 
 
     public int availableSoilAmount(Transaction t) {
-        List<SoilPackage> soilPackages = readAllSoilPackage(t);
+        List<SoilPackage> soilPackages = readAllSoilPackage(null);
         int available = 0;
 
         for(SoilPackage soilPackage : soilPackages) {
@@ -167,6 +175,7 @@ public abstract class StorageService {
     public abstract List<FlowerFertilizer> getFlowerFertilizer(int amount, Transaction transaction);
 
     public abstract void putFlowerFertilizer(FlowerFertilizer flowerFertilizer);
+    public abstract void putFlowerFertilizers(List<FlowerFertilizer> flowerFertilizers);
 
 
     public List<FlowerFertilizer> readAllFlowerFertilizer() {
@@ -177,6 +186,7 @@ public abstract class StorageService {
     public abstract List<VegetableFertilizer> getVegetableFertilizer(int amount, Transaction transaction);
 
     public abstract void putVegetableFertilizer(VegetableFertilizer vegetableFertilizer);
+    public abstract void putVegetableFertilizers(List<VegetableFertilizer> vegetableFertilizers);
 
 
     public List<VegetableFertilizer> readAllVegetableFertilizer() {
@@ -255,12 +265,15 @@ public abstract class StorageService {
             index ++;
         }
 
+
         // put back all soil packages that are not needed
+        List<SoilPackage> unused = new LinkedList<>();
         while (index < allSoilPackages.size())
         {
-            putSoilPackage(allSoilPackages.get(index), transaction);
+            unused.add(allSoilPackages.get(index));
             index++;
         }
+        putSoilPackages(unused, transaction);
 
         return selectedSoilPackages;
     }

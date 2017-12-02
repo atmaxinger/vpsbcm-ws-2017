@@ -1,7 +1,9 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlant;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.FlowerFertilizer;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.SoilPackage;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.VegetableFertilizer;
@@ -10,18 +12,14 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PlantAndHarvestRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.StorageService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import org.apache.log4j.Logger;
-import org.mozartspaces.capi3.AnyCoordinator;
-import org.mozartspaces.capi3.FifoCoordinator;
-import org.mozartspaces.capi3.QueryCoordinator;
+import org.mozartspaces.capi3.*;
 import org.mozartspaces.core.*;
 import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class StorageServiceImpl extends StorageService {
 
@@ -47,8 +45,8 @@ public class StorageServiceImpl extends StorageService {
 
         List<FifoCoordinator> coords = null;
 
-        flowerSeedContainer = CapiUtil.lookupOrCreateContainer("flowerSeedContainer", spaceUri, Arrays.asList(new AnyCoordinator(), new QueryCoordinator()), null, capi);
-        vegetableSeedContainer = CapiUtil.lookupOrCreateContainer("vegetableSeedContainer", spaceUri, Arrays.asList(new AnyCoordinator(), new QueryCoordinator()), null, capi);
+        flowerSeedContainer = CapiUtil.lookupOrCreateContainer("flowerSeedContainer", spaceUri, Arrays.asList(new AnyCoordinator(), new QueryCoordinator(), new LabelCoordinator()), null, capi);
+        vegetableSeedContainer = CapiUtil.lookupOrCreateContainer("vegetableSeedContainer", spaceUri, Arrays.asList(new AnyCoordinator(), new QueryCoordinator(), new LabelCoordinator()), null, capi);
 
         soilContainer = CapiUtil.lookupOrCreateContainer("soilContainer", spaceUri, coords, null, capi);
         flowerFertilizerContainer = CapiUtil.lookupOrCreateContainer("flowerFertilizerContainer", spaceUri, coords, null, capi);
@@ -107,34 +105,70 @@ public class StorageServiceImpl extends StorageService {
 
     @Override
     public void putSeed(VegetablePlant plant, Transaction transaction) {
+        putVegetableSeeds(Collections.singletonList(plant), transaction);
+    }
+
+    @Override
+    public void putVegetableSeeds(List<VegetablePlant> plants, Transaction transaction) {
         TransactionReference tref = TransactionServiceImpl.getTransactionReference(transaction);
 
         try {
-            capi.write(vegetableSeedContainer, MzsConstants.RequestTimeout.INFINITE, tref, new Entry(plant));
+            List<Entry> entries = new LinkedList<>();
+            for(VegetablePlant plant : plants) {
+                entries.add(new Entry(plant, LabelCoordinator.newCoordinationData(plant.getTypeName())));
+            }
+            capi.write(entries, vegetableSeedContainer, MzsConstants.RequestTimeout.INFINITE, tref);
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    protected void deleteSeed(VegetablePlant plant, Transaction transaction) {
-        ServiceUtil.deleteItemById(plant.getId(), vegetableSeedContainer, transaction, capi);
+    public void putFlowerSeeds(List<FlowerPlant> plants, Transaction transaction) {
+        TransactionReference tref = TransactionServiceImpl.getTransactionReference(transaction);
+
+        try {
+            List<Entry> entries = new LinkedList<>();
+            for(FlowerPlant plant : plants) {
+                entries.add(new Entry(plant, LabelCoordinator.newCoordinationData(plant.getTypeName())));
+            }
+            capi.write(entries, flowerSeedContainer, MzsConstants.RequestTimeout.INFINITE, tref);
+        } catch (MzsCoreException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
-    protected void deleteSeed(FlowerPlant plant, Transaction transaction) {
-        ServiceUtil.deleteItemById(plant.getId(), flowerSeedContainer, transaction, capi);
+    protected List<FlowerPlant> getSeeds(FlowerType type, Transaction transaction) {
+        TransactionReference tref = TransactionServiceImpl.getTransactionReference(transaction);
+        List<FlowerPlant> plants = null;
+
+        try {
+            plants = capi.take(flowerSeedContainer, Collections.singletonList(LabelCoordinator.newSelector(type.name(), MzsConstants.Selecting.COUNT_MAX)), MzsConstants.RequestTimeout.INFINITE, tref);
+        } catch (MzsCoreException e) {
+            e.printStackTrace();
+        }
+
+        return plants;
+    }
+
+    @Override
+    protected List<VegetablePlant> getSeeds(VegetableType type, Transaction transaction) {
+        TransactionReference tref = TransactionServiceImpl.getTransactionReference(transaction);
+        List<VegetablePlant> plants = null;
+
+        try {
+            plants = capi.take(vegetableSeedContainer, Collections.singletonList(LabelCoordinator.newSelector(type.name(), MzsConstants.Selecting.COUNT_MAX)), MzsConstants.RequestTimeout.INFINITE, tref);
+        } catch (MzsCoreException e) {
+            e.printStackTrace();
+        }
+
+        return plants;
     }
 
     @Override
     public void putSeed(FlowerPlant plant, Transaction transaction) {
-        TransactionReference tref = TransactionServiceImpl.getTransactionReference(transaction);
-
-        try {
-            capi.write(flowerSeedContainer, MzsConstants.RequestTimeout.INFINITE, tref, new Entry(plant));
-        } catch (MzsCoreException e) {
-            e.printStackTrace();
-        }
+        putFlowerSeeds(Collections.singletonList(plant), transaction);
     }
 
     @Override
@@ -172,7 +206,7 @@ public class StorageServiceImpl extends StorageService {
         ArrayList<SoilPackage> soilPackages = null;
 
         try {
-            soilPackages = capi.take(soilContainer, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), 100, tref);
+            soilPackages = capi.take(soilContainer, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), 1000, tref);
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -182,10 +216,20 @@ public class StorageServiceImpl extends StorageService {
 
     @Override
     public void putSoilPackage(SoilPackage soilPackage, Transaction transaction) {
+        putSoilPackages(Collections.singletonList(soilPackage), transaction);
+    }
+
+    @Override
+    public void putSoilPackages(List<SoilPackage> soilPackages, Transaction transaction) {
         TransactionReference tref = TransactionServiceImpl.getTransactionReference(transaction);
 
         try {
-            capi.write(soilContainer, MzsConstants.RequestTimeout.DEFAULT, tref, new Entry(soilPackage));
+            List<Entry> entries = new LinkedList<>();
+            for(SoilPackage p : soilPackages) {
+                entries.add(new Entry(p));
+            }
+
+            capi.write(entries, soilContainer, MzsConstants.RequestTimeout.DEFAULT, tref);
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -223,8 +267,18 @@ public class StorageServiceImpl extends StorageService {
 
     @Override
     public void putFlowerFertilizer(FlowerFertilizer flowerFertilizer) {
+        putFlowerFertilizers(Collections.singletonList(flowerFertilizer));
+    }
+
+    @Override
+    public void putFlowerFertilizers(List<FlowerFertilizer> flowerFertilizers) {
         try {
-            capi.write(flowerFertilizerContainer, new Entry(flowerFertilizer));
+            List<Entry> entries = new LinkedList<>();
+            for(FlowerFertilizer flowerFertilizer : flowerFertilizers) {
+                entries.add(new Entry(flowerFertilizer));
+            }
+
+            capi.write(entries, flowerFertilizerContainer);
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -250,7 +304,7 @@ public class StorageServiceImpl extends StorageService {
         ArrayList<VegetableFertilizer> vegetableFertilizers = null;
 
         try {
-            vegetableFertilizers = capi.take(vegetableFertilizerContainer, AnyCoordinator.newSelector(amount), 100, tref);
+            vegetableFertilizers = capi.take(vegetableFertilizerContainer, AnyCoordinator.newSelector(amount), 1000, tref);
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -260,8 +314,18 @@ public class StorageServiceImpl extends StorageService {
 
     @Override
     public void putVegetableFertilizer(VegetableFertilizer vegetableFertilizer) {
+        putVegetableFertilizers(Collections.singletonList(vegetableFertilizer));
+    }
+
+    @Override
+    public void putVegetableFertilizers(List<VegetableFertilizer> vegetableFertilizers) {
         try {
-            capi.write(vegetableFertilizerContainer, new Entry(vegetableFertilizer));
+            List<Entry> entries = new LinkedList<>();
+            for(VegetableFertilizer fertilizer : vegetableFertilizers) {
+                entries.add(new Entry(fertilizer));
+            }
+
+            capi.write(entries, vegetableFertilizerContainer);
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
