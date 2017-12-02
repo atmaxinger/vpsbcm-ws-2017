@@ -6,6 +6,8 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.SoilPackage;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.VegetableFertilizer;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ConfigService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.StorageService;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ChangeListener;
@@ -27,6 +29,7 @@ public class StorageController {
 
     private StorageService storageService = RobNurGUI.storageService;
     private ConfigService configService = RobNurGUI.configService;
+    private TransactionService transactionService = RobNurGUI.transactionService;
 
     public TableView<SeedsTableDataModel> tvSeeds;
     public TableColumn<SeedsTableDataModel, String> tcSeedType;
@@ -151,13 +154,15 @@ public class StorageController {
             SeedsTableDataModel dataModel = new SeedsTableDataModel() {
                 @Override
                 void buyAction(int amount) {
+                    Transaction t = transactionService.beginTransaction(-1);
                     for(int i=0;i<amount; i++) {
                         FlowerPlant fp = new FlowerPlant();
                         fp.setCultivationInformation(fcpi);
                         fp.setGrowth(-1);
 
-                        storageService.putSeed(fp, null);
+                        storageService.putSeed(fp, t);
                     }
+                    t.commit();
                 }
             };
             dataModel.amount =  getCountOfFlowerSeed(allSeeds, fcpi.getFlowerType());
@@ -175,13 +180,15 @@ public class StorageController {
             SeedsTableDataModel dataModel = new SeedsTableDataModel() {
                 @Override
                 void buyAction(int amount) {
+                    Transaction t = transactionService.beginTransaction(-1);
                     for(int i=0; i<amount; i++) {
                         VegetablePlant vp = new VegetablePlant();
                         vp.setCultivationInformation(vpci);
                         vp.setGrowth(-1);
 
-                        storageService.putSeed(vp, null);
+                        storageService.putSeed(vp, t);
                     }
+                    t.commit();
                 }
             };
             dataModel.isFlower = false;
@@ -254,16 +261,25 @@ public class StorageController {
         ResourceTableDataModel soil = new ResourceTableDataModel() {
             @Override
             void buyAction(int amount) {
+                Transaction t = transactionService.beginTransaction(-1);
                 for(int i=0; i< amount; i++) {
                     SoilPackage sp = new SoilPackage();
-                    storageService.putSoilPackage(sp, null);
+                    storageService.putSoilPackage(sp, t);
                 }
+                t.commit();
             }
         };
         soil.resource = "Erde";
-        List tmp = storageService.readAllSoilPackage();
-        if(tmp != null) {
-            soil.amount = "" + tmp.size();
+        List<SoilPackage> soilPackages = storageService.readAllSoilPackage();
+        if(soilPackages != null) {
+            soil.amount = "" + soilPackages.size();
+
+            // count liters
+            int liters=0;
+            for(SoilPackage sp : soilPackages) {
+                liters += sp.getAmount();
+            }
+            soil.amount += String.format(" (%d Liter)", liters);
         } else {
             soil.amount = "0";
         }
@@ -279,7 +295,7 @@ public class StorageController {
             }
         };
         flowerFertilizer.resource = "Blumen Dünger";
-        tmp = storageService.readAllFlowerFertilizer();
+        List tmp = storageService.readAllFlowerFertilizer();
         if(tmp != null) {
             flowerFertilizer.amount = "" + tmp.size();
         } else {

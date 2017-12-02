@@ -21,6 +21,7 @@ public class GUI {
         ResearchService researchService = new ResearchServiceImpl(uri);
         CompostService compostService = new CompostServiceImpl(uri);
         ConfigService configService = new ConfigServiceImpl(uri);
+        TransactionService transactionService = new TransactionServiceImpl(uri);
 
         RobNurGUI.storageService = storageService;
         RobNurGUI.greenhouseService = greenhouseService;
@@ -29,6 +30,7 @@ public class GUI {
         RobNurGUI.researchService = researchService;
         RobNurGUI.compostService = compostService;
         RobNurGUI.configService = configService;
+        RobNurGUI.transactionService = transactionService;
 
         RobNurGUI robNurGUI = new RobNurGUI();
         robNurGUI.execute(args);
