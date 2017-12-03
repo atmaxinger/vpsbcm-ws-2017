@@ -1,8 +1,9 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.plants;
 
+import java.io.Serializable;
 import java.util.List;
 
-public abstract class EndProduct extends Idable {
+public abstract class EndProduct extends Idable implements Serializable{
     private String packingRobotId;
 
     public String getPackingRobotId() {

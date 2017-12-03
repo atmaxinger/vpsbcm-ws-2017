@@ -4,5 +4,5 @@ public interface Transaction {
     void commit();
     void rollback();
 
-    boolean hasBeenRolledBack();
+    boolean hasBeenRolledBack();    // TODO: never used
 }

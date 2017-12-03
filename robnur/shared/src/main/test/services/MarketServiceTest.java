@@ -21,9 +21,12 @@ public abstract class MarketServiceTest{
 
         FlowerPlantCultivationInformation flowerPlantCultivationInformation1 = new FlowerPlantCultivationInformation();
         flowerPlantCultivationInformation1.setFlowerType(FlowerType.ROSE);
+        flowerPlantCultivationInformation1.setGrowthRate(0.2f);
 
         FlowerPlantCultivationInformation flowerPlantCultivationInformation2 = new FlowerPlantCultivationInformation();
         flowerPlantCultivationInformation2.setFlowerType(FlowerType.TULIP);
+        flowerPlantCultivationInformation2.setGrowthRate(0.2f);
+
 
         FlowerPlant flowerPlant1 = new FlowerPlant();
         flowerPlant1.setCultivationInformation(flowerPlantCultivationInformation1);
@@ -47,9 +50,11 @@ public abstract class MarketServiceTest{
 
         VegetablePlantCultivationInformation vegetablePlantCultivationInformation1 = new VegetablePlantCultivationInformation();
         vegetablePlantCultivationInformation1.setVegetableType(VegetableType.CARROT);
+        vegetablePlantCultivationInformation1.setGrowthRate(0.2f);
 
         VegetablePlantCultivationInformation vegetablePlantCultivationInformation2 = new VegetablePlantCultivationInformation();
         vegetablePlantCultivationInformation2.setVegetableType(VegetableType.SALAD);
+        vegetablePlantCultivationInformation2.setGrowthRate(0.2f);
 
         VegetablePlant vegetablePlant1 = new VegetablePlant();
         vegetablePlant1.setCultivationInformation(vegetablePlantCultivationInformation1);

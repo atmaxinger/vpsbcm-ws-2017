@@ -3,9 +3,13 @@ package services;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.CompostService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.MarketService;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.tools.javac.comp.Flow;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 public abstract class CompostServiceTest {
@@ -20,9 +24,11 @@ public abstract class CompostServiceTest {
     public void init(){
         FlowerPlantCultivationInformation flowerPlantCultivationInformation1 = new FlowerPlantCultivationInformation();
         flowerPlantCultivationInformation1.setFlowerType(FlowerType.ROSE);
+        flowerPlantCultivationInformation1.setGrowthRate(0.2f);
 
         FlowerPlantCultivationInformation flowerPlantCultivationInformation2 = new FlowerPlantCultivationInformation();
         flowerPlantCultivationInformation2.setFlowerType(FlowerType.TULIP);
+        flowerPlantCultivationInformation2.setGrowthRate(0.2f);
 
         flowerPlant1 = new FlowerPlant();
         flowerPlant1.setCultivationInformation(flowerPlantCultivationInformation1);
@@ -38,9 +44,12 @@ public abstract class CompostServiceTest {
 
         VegetablePlantCultivationInformation vegetablePlantCultivationInformation1 = new VegetablePlantCultivationInformation();
         vegetablePlantCultivationInformation1.setVegetableType(VegetableType.CARROT);
+        vegetablePlantCultivationInformation1.setGrowthRate(0.2f);
 
         VegetablePlantCultivationInformation vegetablePlantCultivationInformation2 = new VegetablePlantCultivationInformation();
         vegetablePlantCultivationInformation2.setVegetableType(VegetableType.SALAD);
+        vegetablePlantCultivationInformation2.setGrowthRate(0.2f);
+
 
         vegetablePlant1 = new VegetablePlant();
         vegetablePlant1.setCultivationInformation(vegetablePlantCultivationInformation1);
