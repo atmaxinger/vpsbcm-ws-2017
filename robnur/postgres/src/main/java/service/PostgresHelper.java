@@ -5,8 +5,10 @@ import com.impossibl.postgres.api.jdbc.PGNotificationListener;
 import com.impossibl.postgres.jdbc.PGDataSource;
 
 import javax.sql.DataSource;
+import java.io.*;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
 
 public class PostgresHelper {
 
@@ -19,15 +21,32 @@ public class PostgresHelper {
     public static final String RESEARCH_TABLE = "RESEARCH";
     public static final String STORE_TABLE = "STORE";
 
+    private static String readProperty(String property) {
+        Properties prop = new Properties();
+        try {
+            InputStream input = ClassLoader.getSystemResourceAsStream("postgres.properties");
+            prop.load(input);
+
+            return prop.getProperty(property);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+
     public static PGConnection getConnection(){
 
         if(connection == null){
             PGDataSource dataSource = new PGDataSource();
-            dataSource.setHost("localhost");
-            dataSource.setPort(5432);
-            dataSource.setDatabase("robnur");
-            dataSource.setUser("postgres");
-            dataSource.setPassword("123");
+            dataSource.setHost(readProperty("db.server"));
+            dataSource.setPort(Integer.parseInt(readProperty("db.port")));
+            dataSource.setDatabase(readProperty("db.database"));
+            dataSource.setUser(readProperty("db.user"));
+            dataSource.setPassword(readProperty("db.password"));
 
             try {
                 connection = (PGConnection) dataSource.getConnection();
