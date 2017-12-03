@@ -9,7 +9,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.CompostService;
 import java.util.Arrays;
 import java.util.List;
 
-public class CompostServiceImpl implements CompostService {
+public class CompostServiceImpl extends CompostService {
 
     private static final String COMPOST_FLOWER_PLANT_TABLE = "COMPOST_FLOWER_PLANT_TABLE";
     private static final String COMPOST_VEGETABLE_PLANT_TABLE = "COMPOST_VEGETABLE_PLANT_TABLE";

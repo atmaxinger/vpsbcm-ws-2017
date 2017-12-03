@@ -16,13 +16,16 @@ import java.util.Scanner;
 
 public class PostgresResearchRobot {
     public static void main(String[] args) throws URISyntaxException {
+        if(args.length != 1) {
+            System.err.println("You need to specify the id!");
+        }
 
         ResearchServiceImpl researchService = new ResearchServiceImpl();
         CompostService compostService = new CompostServiceImpl();
         ConfigService configService = new ConfigServiceImpl();
         TransactionService transactionService = new TransactionServiceImpl(PostgresHelper.getConnection());
 
-        ResearchRobot researchRobot = new ResearchRobot(researchService,compostService,configService,transactionService);
+        ResearchRobot researchRobot = new ResearchRobot(args[0], researchService, compostService, configService, transactionService);
         researchService.registerResearchRobot(researchRobot);
 
         Scanner scanner = new Scanner(System.in);

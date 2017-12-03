@@ -8,7 +8,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import java.util.Arrays;
 import java.util.List;
 
-public class ConfigServiceImpl implements ConfigService {
+public class ConfigServiceImpl extends ConfigService {
 
     private static final String CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE = "CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE";
     private static final String CONFIG_VEGETABLE_PLANT_CULTIVATION_INFORMATION_TABLE = "CONFIG_VEGETABLE_PLANT_CULTIVATION_INFORMATION_TABLE";
