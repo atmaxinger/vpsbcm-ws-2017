@@ -1,0 +1,10 @@
+# TODO:
+#   - insert your username, password
+#   - check port, server, database name
+#   - rename to "postgres.properties"
+
+db.server=localhost
+db.port=5432
+db.database=robnur
+db.user=YOURUSERNAME
+db.password=YOURPASSWORD
