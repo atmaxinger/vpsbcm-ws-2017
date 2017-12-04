@@ -19,6 +19,10 @@ public class ServiceUtil {
 
     public static <T extends Serializable> void writeItem(T item, String table, Transaction transaction) {
 
+        if(transaction == null){
+            transaction = getDefaultTransaction();
+        }
+
         try {
             Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
 
@@ -35,12 +39,16 @@ public class ServiceUtil {
     }
 
     public static <T extends Serializable> void writeItem(T item, String table) {
-        writeItem(item, table, new TransactionImpl(PostgresHelper.getConnection()));
+        writeItem(item, table, null);
     }
 
 
     public static <T extends Serializable> List<T> readAllItems(String table, Class<T> resultClass, Transaction transaction) {
         List<T> result = new ArrayList<T>();
+
+        if(transaction == null){
+            transaction = getDefaultTransaction();
+        }
 
         try {
             ObjectMapper mapper = new ObjectMapper()
@@ -71,12 +79,16 @@ public class ServiceUtil {
     }
 
     public static <T extends Serializable> List<T> readAllItems(String table, Class<T> resultClass) {
-        return readAllItems(table, resultClass, new TransactionImpl(PostgresHelper.getConnection()));
+        return readAllItems(table, resultClass,null);
     }
 
-    public static <T extends Serializable> T getItemById(String id, String table, Class<T> resultClass, Transaction transaction) {
+    public static <T extends Serializable> T getItemByParameter(String parameterName, String parameterValue, String table, Class<T> resultClass, Transaction transaction) {
 
         T result = null;
+
+        if(transaction == null){
+            transaction = getDefaultTransaction();
+        }
 
         try {
 
@@ -85,13 +97,13 @@ public class ServiceUtil {
 
             Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
 
-            ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE data ->> 'id' = '%s'", table,id));
+            ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE data ->> %s = '%s'", table,parameterName,parameterValue));
 
             rs.next();
             String data = rs.getString("data");
             result = mapper.readValue(data, resultClass);
 
-            deleteItemById(id,table,transaction);
+            deleteItemByParameter(parameterName,parameterValue,table,transaction);
 
             statement.close();
 
@@ -106,21 +118,79 @@ public class ServiceUtil {
         }
 
         return result;
-
     }
 
-    public static void deleteItemById(String id, String table, Transaction transaction) {
+    public static <T extends Serializable> List<T> getItemsById(String id, String table, Class<T> resultClass, Transaction transaction) {
+        return getItemsByParameter("'id'",id,table,resultClass,transaction);
+    }
+
+    public static <T extends Serializable> List<T> getItemsByParameter(String parameterName, String parameterValue, String table, Class<T> resultClass, Transaction transaction) {
+
+        List<T> result = new ArrayList<>();
+
+        if(transaction == null){
+            transaction = getDefaultTransaction();
+        }
+
+        try {
+
+            ObjectMapper mapper = new ObjectMapper()
+                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+            Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
+
+            ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE data ->> %s = '%s'", table,parameterName,parameterValue));
+
+            while (rs.next()) {
+                String data = rs.getString("data");
+                result.add(mapper.readValue(data, resultClass));
+
+                deleteItemByParameter(parameterName, parameterValue, table, transaction);
+            }
+
+            statement.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (JsonParseException e) {
+            e.printStackTrace();
+        } catch (JsonMappingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+    public static <T extends Serializable> T getItemById(String id, String table, Class<T> resultClass, Transaction transaction) {
+        return getItemByParameter("'id'",id,table,resultClass,transaction);
+    }
+
+    public static void deleteItemByParameter(String parameterName, String parameterValue, String table, Transaction transaction) {
+
+        if(transaction == null){
+            transaction = getDefaultTransaction();
+        }
 
         try {
             Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
-            statement.execute(String.format("DELETE FROM %s WHERE data ->> 'id' = '%s'", table, id));
+            statement.execute(String.format("DELETE FROM %s WHERE data ->> %s = '%s'", table, parameterName,parameterValue));
             statement.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
+    public static void deleteItemById(String id, String table, Transaction transaction) {
+        deleteItemByParameter("'id'",id,table,transaction);
+    }
+
     public static void deleteItemById(String id, String table) {
-        deleteItemById(id,table, new TransactionImpl(PostgresHelper.getConnection()));
+        deleteItemById(id,table, null);
+    }
+
+    private static Transaction getDefaultTransaction() {
+        return new TransactionImpl(PostgresHelper.getConnection());
     }
 }
