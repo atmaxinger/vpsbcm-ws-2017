@@ -8,7 +8,7 @@ public class PostgresResearchServiceTest extends ResearchServiceTest {
     public void setup(){
 
         researchService = new ResearchServiceImpl();
-        //TestHelper.createAllTables(ResearchServiceImpl.getTables());
+        TestHelper.createAllTables(ResearchServiceImpl.getTables());
         init();
     }
 }

@@ -7,46 +7,36 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ConfigService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.impossibl.postgres.api.jdbc.PGConnection;
+import com.impossibl.postgres.api.jdbc.PGNotificationListener;
+import com.impossibl.postgres.jdbc.PGDataSource;
 import service.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Scanner;
 
+import static com.sun.xml.internal.fastinfoset.alphabet.BuiltInRestrictedAlphabets.table;
+
 public class PostgresResearchRobot {
-    public static void main(String[] args) throws URISyntaxException {
+    public static void main(String[] args) throws URISyntaxException, SQLException {
+        // TODO jsut for testing (do not forget id below)
+        /*
         if(args.length != 1) {
             System.err.println("You need to specify the id!");
-        }
+        }*/
 
         ResearchServiceImpl researchService = new ResearchServiceImpl();
         CompostService compostService = new CompostServiceImpl();
         ConfigService configService = new ConfigServiceImpl();
         TransactionService transactionService = new TransactionServiceImpl(PostgresHelper.getConnection());
 
-        ResearchRobot researchRobot = new ResearchRobot(args[0], researchService, compostService, configService, transactionService);
+        ResearchRobot researchRobot = new ResearchRobot("0", researchService, compostService, configService, transactionService);
         researchService.registerResearchRobot(researchRobot);
 
         Scanner scanner = new Scanner(System.in);
-
-        while (!scanner.next().equals("exit")){
-
-        }
-
-        try {
-            Flower flower = new Flower();
-            ObjectMapper objectMapper = new ObjectMapper();
-            String json = objectMapper.writeValueAsString(flower);
-            PostgresHelper.getConnection().createStatement().execute(String.format("INSERT INTO RESEARCH_FLOWER_TABLE (data) VALUES (%s)",json));
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-
-        while (!scanner.next().equals("exit")){
-
-        }
+        scanner.next();
     }
 }

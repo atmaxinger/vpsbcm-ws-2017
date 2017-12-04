@@ -20,7 +20,7 @@ public class SpacePackRobot {
 
         PackingServiceImpl packingService = new PackingServiceImpl(uri);
         MarketServiceImpl marketService = new MarketServiceImpl(uri);
-        ResearchService researchService = null; // TODO add impl
+        ResearchService researchService = new ResearchServiceImpl(uri);
         TransactionService transactionService = new TransactionServiceImpl(uri);
 
         PackRobot packRobot = new PackRobot(args[0], packingService,marketService,researchService,transactionService);

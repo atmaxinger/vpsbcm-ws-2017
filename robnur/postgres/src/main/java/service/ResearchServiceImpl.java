@@ -5,17 +5,21 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.ResearchRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ResearchService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
+import com.impossibl.postgres.api.jdbc.PGConnection;
 import com.impossibl.postgres.api.jdbc.PGNotificationListener;
+import com.impossibl.postgres.jdbc.PGDataSource;
 
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class ResearchServiceImpl extends ResearchService {
 
-    private static final String RESEARCH_FLOWER_TABLE = "RESEARCH_FLOWER_TABLE";
-    private static final String RESEARCH_VEGETABLE_TABLE = "RESEARCH_VEGETABLE_TABLE";
+    private static final String RESEARCH_FLOWER_TABLE = "rf";
+    private static final String RESEARCH_VEGETABLE_TABLE = "rv";
 
     public void putFlower(Flower flower) {
         ServiceUtil.writeItem(flower,RESEARCH_FLOWER_TABLE);
@@ -45,22 +49,29 @@ public class ResearchServiceImpl extends ResearchService {
         return Arrays.asList(RESEARCH_FLOWER_TABLE,RESEARCH_VEGETABLE_TABLE);
     }
 
-    public void registerResearchRobot(final ResearchRobot researchRobot) {
+    public void registerResearchRobot(ResearchRobot researchRobot) {
 
-        PGNotificationListener flowerNotificationListener = new PGNotificationListener() {
-            public void notification(int i, String s, String s1) {
+        PGNotificationListener flowerListener = new PGNotificationListener() {
+            @Override
+            public void notification(int processId, String channelName, String payload) {
+                // Add event and payload to the queue
+                System.out.println("/channels/" + channelName + " " + payload);
                 researchRobot.tryUpgradeFlowerPlant();
             }
         };
 
-        PostgresHelper.setUpNotification(flowerNotificationListener,RESEARCH_FLOWER_TABLE);
+        PostgresHelper.setUpNotification(flowerListener,RESEARCH_FLOWER_TABLE);
 
-        PGNotificationListener vegetableNotificationListener = new PGNotificationListener() {
-            public void notification(int i, String s, String s1) {
-                researchRobot.tryUpgradeVegetablePlant();
+        /*
+        PGNotificationListener vegetableListener = new PGNotificationListener() {
+            @Override
+            public void notification(int processId, String channelName, String payload) {
+                // Add event and payload to the queue
+                System.out.println("--/channels/" + channelName + " " + payload);
             }
         };
 
-        PostgresHelper.setUpNotification(vegetableNotificationListener,RESEARCH_FLOWER_TABLE);
+        PostgresHelper.setUpNotification(vegetableListener,RESEARCH_VEGETABLE_TABLE);
+        */
     }
 }

@@ -16,6 +16,11 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     public Transaction beginTransaction(long timeoutMillis) {
+        try {
+            connection.setAutoCommit(false);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return new TransactionImpl(connection);
     }
 
@@ -30,6 +35,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         public void commit() {
             try {
+                connection.setAutoCommit(false);
                 connection.commit();
             } catch (SQLException e) {
                 e.printStackTrace();

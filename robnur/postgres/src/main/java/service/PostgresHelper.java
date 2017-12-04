@@ -13,13 +13,6 @@ import java.util.Properties;
 public class PostgresHelper {
 
     private static PGConnection connection;
-    public static final String COMPOST_TABLE = "COMPOST";
-    public static final String CONFIG_TABLE = "CONFIG";
-    public static final String GREENHOUSE_TABLE = "GREENHOUSE";
-    public static final String MARKET_TABLE = "MARKET";
-    public static final String PACKING_TABLE = "PACKING";
-    public static final String RESEARCH_TABLE = "RESEARCH";
-    public static final String STORE_TABLE = "STORE";
 
     private static String readProperty(String property) {
         Properties prop = new Properties();
@@ -59,12 +52,12 @@ public class PostgresHelper {
     }
 
     public static void setUpNotification(PGNotificationListener notificationListener, String table) {
-        getConnection().addNotificationListener(notificationListener);
 
-        Statement statement = null;
+        PostgresHelper.getConnection().addNotificationListener(notificationListener);
+
         try {
-            statement = getConnection().createStatement();
-            statement.execute(String.format("LISTEN %s_notify",table));
+            Statement statement = PostgresHelper.getConnection().createStatement();
+            statement.execute(String.format("LISTEN %s_notify", table));
             statement.close();
         } catch (SQLException e) {
             e.printStackTrace();
