@@ -6,10 +6,14 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.CompostService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ConfigService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ResearchService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
+import com.impossibl.postgres.api.jdbc.PGConnection;
+import com.impossibl.postgres.api.jdbc.PGNotificationListener;
+import com.impossibl.postgres.jdbc.PGDataSource;
 import service.*;
 
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Scanner;
 
 public class PostgresPackRobot {
@@ -24,7 +28,7 @@ public class PostgresPackRobot {
         PackingServiceImpl packingService = new PackingServiceImpl();
         MarketServiceImpl marketService = new MarketServiceImpl();
         ResearchService researchService = new ResearchServiceImpl();
-        TransactionService transactionService = new TransactionServiceImpl(PostgresHelper.getConnection());
+        TransactionService transactionService = new TransactionServiceImpl();
 
         PackRobot packRobot = new PackRobot("0", packingService,marketService,researchService,transactionService);
         packingService.registerPackRobot(packRobot);

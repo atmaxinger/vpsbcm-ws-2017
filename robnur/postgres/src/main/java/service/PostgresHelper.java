@@ -51,9 +51,25 @@ public class PostgresHelper {
         return connection;
     }
 
-    public static void setUpNotification(PGNotificationListener notificationListener, String table) {
+    public static PGConnection getNewConnection(){
 
-        PostgresHelper.getConnection().addNotificationListener(notificationListener);
+        PGDataSource dataSource = new PGDataSource();
+        dataSource.setHost(readProperty("db.server"));
+        dataSource.setPort(Integer.parseInt(readProperty("db.port")));
+        dataSource.setDatabase(readProperty("db.database"));
+        dataSource.setUser(readProperty("db.user"));
+        dataSource.setPassword(readProperty("db.password"));
+
+        PGConnection pgConnection = null;
+        try {
+            pgConnection = (PGConnection) dataSource.getConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return pgConnection;
+    }
+
+    public static void setUpListen(String table) {
 
         try {
             Statement statement = PostgresHelper.getConnection().createStatement();

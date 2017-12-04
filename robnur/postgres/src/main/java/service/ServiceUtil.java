@@ -19,20 +19,14 @@ public class ServiceUtil {
 
     public static <T extends Serializable> void writeItem(T item, String table, Transaction transaction) {
 
-        Statement statement = null;
-
-        setAutoCommit(transaction);
-
         try {
-            statement = PostgresHelper.getConnection().createStatement();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+            Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
 
-        ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper();
 
-        try {
             statement.execute(String.format("INSERT INTO %s (DATA) VALUES ('%s')", table, mapper.writeValueAsString(item)));
+
+            statement.close();
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (JsonProcessingException e) {
@@ -41,27 +35,28 @@ public class ServiceUtil {
     }
 
     public static <T extends Serializable> void writeItem(T item, String table) {
-        writeItem(item, table, null);
+        writeItem(item, table, new TransactionImpl(PostgresHelper.getConnection()));
     }
 
 
     public static <T extends Serializable> List<T> readAllItems(String table, Class<T> resultClass, Transaction transaction) {
         List<T> result = new ArrayList<T>();
 
-        setAutoCommit(transaction);
-
         try {
             ObjectMapper mapper = new ObjectMapper()
                     .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
+            Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
 
-            ResultSet rs = PostgresHelper.getConnection().createStatement().executeQuery("SELECT * FROM " + table);
+            ResultSet rs = statement.executeQuery("SELECT * FROM " + table);
 
             while (rs.next()) {
                 String data = rs.getString("data");
                 T t = mapper.readValue(data, resultClass);
                 result.add(t);
             }
+
+            statement.close();
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (JsonParseException e) {
@@ -76,44 +71,29 @@ public class ServiceUtil {
     }
 
     public static <T extends Serializable> List<T> readAllItems(String table, Class<T> resultClass) {
-        return readAllItems(table, resultClass, null);
-    }
-
-    private static void setAutoCommit(Transaction transaction) {
-        if (transaction == null) {
-            try {
-                PostgresHelper.getConnection().setAutoCommit(true);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        } else {
-            try {
-                PostgresHelper.getConnection().setAutoCommit(false);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+        return readAllItems(table, resultClass, new TransactionImpl(PostgresHelper.getConnection()));
     }
 
     public static <T extends Serializable> T getItemById(String id, String table, Class<T> resultClass, Transaction transaction) {
 
         T result = null;
 
-        setAutoCommit(transaction);
-
         try {
 
             ObjectMapper mapper = new ObjectMapper()
                     .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-            ResultSet rs = PostgresHelper.getConnection().createStatement().
-                    executeQuery(String.format("SELECT * FROM %s WHERE data ->> 'id' = '%s'", table,id));
+            Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
+
+            ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE data ->> 'id' = '%s'", table,id));
 
             rs.next();
             String data = rs.getString("data");
             result = mapper.readValue(data, resultClass);
 
             deleteItemById(id,table,transaction);
+
+            statement.close();
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -131,17 +111,16 @@ public class ServiceUtil {
 
     public static void deleteItemById(String id, String table, Transaction transaction) {
 
-        setAutoCommit(transaction);
-
         try {
-            PostgresHelper.getConnection().createStatement().
-                    execute(String.format("DELETE FROM %s WHERE data ->> 'id' = '%s'", table, id));
+            Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
+            statement.execute(String.format("DELETE FROM %s WHERE data ->> 'id' = '%s'", table, id));
+            statement.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     public static void deleteItemById(String id, String table) {
-        deleteItemById(id,table,null);
+        deleteItemById(id,table, new TransactionImpl(PostgresHelper.getConnection()));
     }
 }

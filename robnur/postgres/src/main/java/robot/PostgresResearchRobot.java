@@ -31,7 +31,7 @@ public class PostgresResearchRobot {
         ResearchServiceImpl researchService = new ResearchServiceImpl();
         CompostService compostService = new CompostServiceImpl();
         ConfigService configService = new ConfigServiceImpl();
-        TransactionService transactionService = new TransactionServiceImpl(PostgresHelper.getConnection());
+        TransactionService transactionService = new TransactionServiceImpl();
 
         ResearchRobot researchRobot = new ResearchRobot("0", researchService, compostService, configService, transactionService);
         researchService.registerResearchRobot(researchRobot);

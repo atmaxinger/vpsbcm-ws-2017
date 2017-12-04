@@ -2,6 +2,8 @@ package service;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
+import com.impossibl.postgres.api.jdbc.PGConnection;
+import javafx.geometry.Pos;
 import org.apache.log4j.Logger;
 
 import java.sql.Connection;
@@ -11,48 +13,13 @@ public class TransactionServiceImpl implements TransactionService {
 
     private Connection connection;
 
-    public TransactionServiceImpl(Connection connection) {
-        this.connection = connection;
-    }
-
     public Transaction beginTransaction(long timeoutMillis) {
         try {
+            connection = PostgresHelper.getNewConnection();
             connection.setAutoCommit(false);
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return new TransactionImpl(connection);
-    }
-
-    class TransactionImpl implements Transaction {
-
-        private Connection connection;
-        private boolean rolledBack = false;
-
-        public TransactionImpl(Connection connection) {
-            this.connection = connection;
-        }
-
-        public void commit() {
-            try {
-                connection.setAutoCommit(false);
-                connection.commit();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
-        public void rollback() {
-            try {
-                connection.rollback();
-                rolledBack = true;
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
-        public boolean hasBeenRolledBack() {
-            return rolledBack;
-        }
     }
 }

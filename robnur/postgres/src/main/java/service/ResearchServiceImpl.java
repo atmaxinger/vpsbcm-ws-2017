@@ -51,27 +51,25 @@ public class ResearchServiceImpl extends ResearchService {
 
     public void registerResearchRobot(ResearchRobot researchRobot) {
 
-        PGNotificationListener flowerListener = new PGNotificationListener() {
+        PGNotificationListener listener = new PGNotificationListener() {
             @Override
-            public void notification(int processId, String channelName, String payload) {
-                // Add event and payload to the queue
-                System.out.println("/channels/" + channelName + " " + payload);
-                researchRobot.tryUpgradeFlowerPlant();
+            public void notification(int processId, String channelName, String table) {
+                System.out.println("/channels/" + channelName + " " + table);
+
+                switch (table){
+                    case RESEARCH_FLOWER_TABLE:
+                        researchRobot.tryUpgradeFlowerPlant();
+                        break;
+                    case RESEARCH_VEGETABLE_TABLE:
+                        researchRobot.tryUpgradeVegetablePlant();
+                        break;
+                }
             }
         };
 
-        PostgresHelper.setUpNotification(flowerListener,RESEARCH_FLOWER_TABLE);
+        PostgresHelper.getConnection().addNotificationListener(listener);
 
-        /*
-        PGNotificationListener vegetableListener = new PGNotificationListener() {
-            @Override
-            public void notification(int processId, String channelName, String payload) {
-                // Add event and payload to the queue
-                System.out.println("--/channels/" + channelName + " " + payload);
-            }
-        };
-
-        PostgresHelper.setUpNotification(vegetableListener,RESEARCH_VEGETABLE_TABLE);
-        */
+        PostgresHelper.setUpListen(RESEARCH_FLOWER_TABLE);
+        PostgresHelper.setUpListen(RESEARCH_VEGETABLE_TABLE);
     }
 }

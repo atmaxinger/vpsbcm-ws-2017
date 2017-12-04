@@ -10,64 +10,54 @@ import java.util.List;
 public class DbServer {
     public static void main(String args[]) {
 
-        try
-        {
-            PGConnection connection = PostgresHelper.getConnection();
-            Statement statement = connection.createStatement();
+        createTables(CompostServiceImpl.getTables());
+        //createNotifyFunction(CompostServiceImpl.getTables());
 
-            createTables(CompostServiceImpl.getTables(),statement);
-            //createNotifyFunction(CompostServiceImpl.getTables(),statement);
+        createTables(ConfigServiceImpl.getTables());
+        //createNotifyFunction(ConfigServiceImpl.getTables());
 
-            createTables(ConfigServiceImpl.getTables(),statement);
-            //createNotifyFunction(ConfigServiceImpl.getTables(),statement);
+        createTables(MarketServiceImpl.getTables());
+        //createNotifyFunction(MarketServiceImpl.getTables());
 
-            createTables(MarketServiceImpl.getTables(),statement);
-            //createNotifyFunction(MarketServiceImpl.getTables(),statement);
+        createTables(PackingServiceImpl.getTables());
+        createNotifyFunction(PackingServiceImpl.getTables());
 
-            createTables(PackingServiceImpl.getTables(),statement);
-            //createNotifyFunction(PackingServiceImpl.getTables(),statement);
-
-            createTables(ResearchServiceImpl.getTables(),statement);
-            createNotifyFunction(ResearchServiceImpl.getTables(),statement);
-        }
-        catch (SQLException e)
-        {
-            e.printStackTrace();
-        }
+        createTables(ResearchServiceImpl.getTables());
+        createNotifyFunction(ResearchServiceImpl.getTables());
     }
 
-    private static void createTables(List<String> tables, Statement statement){
+    private static void createTables(List<String> tables){
+
+        PGConnection connection = PostgresHelper.getConnection();
 
         for (String t:tables) {
             try {
+                Statement statement = connection.createStatement();
                 statement.execute("DROP TABLE IF EXISTS " + t);
                 statement.execute("CREATE TABLE " + t + "(ID BIGSERIAL PRIMARY KEY, DATA JSON NOT NULL)");
+                statement.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private static void createNotifyFunction(List<String> tables, Statement statement) {
+    private static void createNotifyFunction(List<String> tables) {
+
+        PGConnection connection = PostgresHelper.getConnection();
 
         for (String table : tables) {
 
             try {
 
-                PostgresHelper.getConnection().createStatement().execute(
+                Statement statement = connection.createStatement();
+
+                statement.execute(
                         String.format(
                                 "CREATE OR REPLACE FUNCTION %s_function() RETURNS TRIGGER AS $$" +
-                                        "        DECLARE" +
-                                        "        data json;" +
-                                        "        notification json;" +
                                         "        BEGIN" +
                                         "        IF (TG_OP = 'INSERT') THEN" +
-                                        "           data = row_to_json(NEW);" +
-                                        "           notification = json_build_object(" +
-                                        "                'table',TG_TABLE_NAME," +
-                                        "                'action', TG_OP," +
-                                        "                'data', data);" +
-                                        "           PERFORM pg_notify('%s_notify',notification::text);" +
+                                        "           PERFORM pg_notify('%s_notify',TG_TABLE_NAME);" +
                                         "        END IF;" +
                                         "        RETURN NULL;" +
                                         "        END; " +
@@ -75,7 +65,8 @@ public class DbServer {
                                 , table, table)
                 );
 
-                PostgresHelper.getConnection().createStatement().execute(String.format(
+                statement.execute(
+                        String.format(
                         "CREATE TRIGGER %s_trigger " +
                                 "AFTER INSERT ON %s " +
                                 "FOR EACH ROW EXECUTE PROCEDURE %s_function();"

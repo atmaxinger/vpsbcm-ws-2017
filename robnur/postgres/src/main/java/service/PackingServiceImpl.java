@@ -8,6 +8,8 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import com.impossibl.postgres.api.jdbc.PGNotificationListener;
 
 import java.io.Serializable;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
 
@@ -45,15 +47,27 @@ public class PackingServiceImpl extends PackingService {
     }
 
     public void registerPackRobot(PackRobot packRobot) {
-        PGNotificationListener flowerListener = new PGNotificationListener() {
+
+        PGNotificationListener listener = new PGNotificationListener() {
             @Override
-            public void notification(int processId, String channelName, String payload) {
-                // Add event and payload to the queue
-                System.out.println("/channels/" + channelName + " " + payload);
-                packRobot.tryCreateBouquet();
+            public void notification(int processId, String channelName, String table) {
+
+                System.out.println("/channels/" + channelName + " " + table);
+
+                switch (table){
+                    case PACKING_FLOWER_TABLE:
+                        System.out.println("PACKING_FLOWER_TABLE");
+                        break;
+                    case PACKING_VEGETABLE_TABLE:
+                        System.out.println("PACKING_VEGETABLE_TABLE");
+                        break;
+                }
             }
         };
 
-        PostgresHelper.setUpNotification(flowerListener,"rf");
+        PostgresHelper.getConnection().addNotificationListener(listener);
+
+        PostgresHelper.setUpListen(PACKING_FLOWER_TABLE);
+        PostgresHelper.setUpListen(PACKING_VEGETABLE_TABLE);
     }
 }
