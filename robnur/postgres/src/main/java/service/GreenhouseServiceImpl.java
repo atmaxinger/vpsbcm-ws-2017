@@ -2,17 +2,20 @@ package service;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PlantAndHarvestRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.GreenhouseService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.impossibl.postgres.api.jdbc.PGNotificationListener;
 
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.List;
 
 public class GreenhouseServiceImpl extends GreenhouseService {
@@ -134,5 +137,31 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         }
 
         return result;
+    }
+
+    public void registerPlantAndHarvestRobot(PlantAndHarvestRobot robot) {
+
+        PGNotificationListener listener = new PGNotificationListener() {
+            @Override
+            public void notification(int processId, String channelName, String table) {
+
+                switch (table){
+                    case GREENHOUSE_FLOWER_PLANT_TABLE:
+                    case GREENHOUSE_VEGETABLE_PLANT_TABLE:
+                        robot.tryHarvestPlant();
+                        robot.tryPlant();
+                        break;
+                }
+            }
+        };
+
+        PostgresHelper.getConnection().addNotificationListener(listener);
+
+        PostgresHelper.setUpListen(GREENHOUSE_FLOWER_PLANT_TABLE);
+        PostgresHelper.setUpListen(GREENHOUSE_VEGETABLE_PLANT_TABLE);
+    }
+
+    public static List<String> getTables() {
+        return Arrays.asList(GREENHOUSE_FLOWER_PLANT_TABLE,GREENHOUSE_VEGETABLE_PLANT_TABLE);
     }
 }

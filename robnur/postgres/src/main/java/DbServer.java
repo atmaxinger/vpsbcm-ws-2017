@@ -11,18 +11,24 @@ public class DbServer {
     public static void main(String args[]) {
 
         createTables(CompostServiceImpl.getTables());
-        //createNotifyFunction(CompostServiceImpl.getTables());
+        createNotifyFunction(CompostServiceImpl.getTables());
 
         createTables(ConfigServiceImpl.getTables());
-        //createNotifyFunction(ConfigServiceImpl.getTables());
+        createNotifyFunction(ConfigServiceImpl.getTables());
 
         createTables(MarketServiceImpl.getTables());
-        //createNotifyFunction(MarketServiceImpl.getTables());
+        createNotifyFunction(MarketServiceImpl.getTables());
 
         createTables(PackingServiceImpl.getTables());
         createNotifyFunction(PackingServiceImpl.getTables());
 
         createTables(ResearchServiceImpl.getTables());
+        createNotifyFunction(ResearchServiceImpl.getTables());
+
+        createTables(GreenhouseServiceImpl.getTables());
+        createNotifyFunction(ResearchServiceImpl.getTables());
+
+        createTables(StorageServiceImpl.getTables());
         createNotifyFunction(ResearchServiceImpl.getTables());
     }
 

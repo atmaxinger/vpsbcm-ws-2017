@@ -10,8 +10,8 @@ import java.util.List;
 
 public class ConfigServiceImpl extends ConfigService {
 
-    private static final String CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE = "CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE";
-    private static final String CONFIG_VEGETABLE_PLANT_CULTIVATION_INFORMATION_TABLE = "CONFIG_VEGETABLE_PLANT_CULTIVATION_INFORMATION_TABLE";
+    private static final String CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE = "cfpci";
+    private static final String CONFIG_VEGETABLE_PLANT_CULTIVATION_INFORMATION_TABLE = "cvpci";
 
     public FlowerPlantCultivationInformation getFlowerPlantCultivationInformation(String id, Transaction transaction) {
         return ServiceUtil.getItemById(id,CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE,FlowerPlantCultivationInformation.class,transaction);

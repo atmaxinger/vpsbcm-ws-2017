@@ -8,10 +8,13 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.FlowerFertilizer;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.SoilPackage;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.VegetableFertilizer;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.Water;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PlantAndHarvestRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.StorageService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
+import com.impossibl.postgres.api.jdbc.PGNotificationListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class StorageServiceImpl extends StorageService {
@@ -21,7 +24,7 @@ public class StorageServiceImpl extends StorageService {
     private static final String STORAGE_SOIL_TABLE = "ss";
     private static final String STORAGE_FLOWER_FERTILIZER_TABLE = "sff";
     private static final String STORAGE_VEGETABLE_FERTILIZER_TABLE = "svf";
-    private static final String STORAGE_WATER_TABLE = "svf";
+    private static final String STORAGE_WATER_TABLE = "sw";
 
     @Override
     protected List<FlowerPlant> getSeeds(FlowerType type, Transaction transaction) {
@@ -181,5 +184,39 @@ public class StorageServiceImpl extends StorageService {
     @Override
     public void putWater(Water water) {
         ServiceUtil.writeItem(water,STORAGE_WATER_TABLE);
+    }
+
+    public void registerPlantAndHarvestRobot(PlantAndHarvestRobot robot) {
+
+        PGNotificationListener listener = new PGNotificationListener() {
+            @Override
+            public void notification(int processId, String channelName, String table) {
+
+                switch (table){
+                    case STORAGE_FLOWER_SEED_TABLE:
+                    case STORAGE_VEGETABLE_SEED_TABLE:
+                    case STORAGE_SOIL_TABLE:
+                    case STORAGE_FLOWER_FERTILIZER_TABLE:
+                    case STORAGE_VEGETABLE_FERTILIZER_TABLE:
+                    case STORAGE_WATER_TABLE:
+                        robot.tryHarvestPlant();
+                        robot.tryPlant();
+                        break;
+                }
+            }
+        };
+
+        PostgresHelper.getConnection().addNotificationListener(listener);
+
+        PostgresHelper.setUpListen(STORAGE_FLOWER_SEED_TABLE);
+        PostgresHelper.setUpListen(STORAGE_VEGETABLE_SEED_TABLE);
+        PostgresHelper.setUpListen(STORAGE_SOIL_TABLE);
+        PostgresHelper.setUpListen(STORAGE_FLOWER_FERTILIZER_TABLE);
+        PostgresHelper.setUpListen(STORAGE_VEGETABLE_FERTILIZER_TABLE);
+        PostgresHelper.setUpListen(STORAGE_WATER_TABLE);
+    }
+
+    public static List<String> getTables() {
+        return Arrays.asList(STORAGE_FLOWER_SEED_TABLE,STORAGE_VEGETABLE_SEED_TABLE,STORAGE_SOIL_TABLE,STORAGE_FLOWER_FERTILIZER_TABLE,STORAGE_VEGETABLE_FERTILIZER_TABLE,STORAGE_WATER_TABLE);
     }
 }

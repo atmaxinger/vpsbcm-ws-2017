@@ -11,10 +11,10 @@ import java.util.List;
 
 public class CompostServiceImpl extends CompostService {
 
-    private static final String COMPOST_FLOWER_PLANT_TABLE = "COMPOST_FLOWER_PLANT_TABLE";
-    private static final String COMPOST_VEGETABLE_PLANT_TABLE = "COMPOST_VEGETABLE_PLANT_TABLE";
-    private static final String COMPOST_FLOWER_TABLE = "COMPOST_FLOWER_TABLE";
-    private static final String COMPOST_VEGETABLE_TABLE = "COMPOST_VEGETABLE_TABLE";
+    private static final String COMPOST_FLOWER_PLANT_TABLE = "cfp";
+    private static final String COMPOST_VEGETABLE_PLANT_TABLE = "cvp";
+    private static final String COMPOST_FLOWER_TABLE = "cf";
+    private static final String COMPOST_VEGETABLE_TABLE = "cv";
 
 
     public void putFlowerPlant(FlowerPlant flowerPlant) {

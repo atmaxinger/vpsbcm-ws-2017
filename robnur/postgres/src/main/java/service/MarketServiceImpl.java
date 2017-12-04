@@ -9,8 +9,8 @@ import java.util.List;
 
 public class MarketServiceImpl extends MarketService {
 
-    private static final String MARKET_BOUQUET_TABLE = "MARKET_BOUQUET_TABLE";
-    private static final String MARKET_VEGETABLE_BASKET_TABLE = "MARKET_VEGETABLE_BASKET_TABLE";
+    private static final String MARKET_BOUQUET_TABLE = "mbt";
+    private static final String MARKET_VEGETABLE_BASKET_TABLE = "mvb";
 
     public void putBouquet(Bouquet bouquet) {
         ServiceUtil.writeItem(bouquet,MARKET_BOUQUET_TABLE);
