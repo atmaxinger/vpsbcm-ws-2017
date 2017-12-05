@@ -194,10 +194,15 @@ public class StorageServiceImpl extends StorageService {
 
                 switch (table){
                     case STORAGE_FLOWER_SEED_TABLE:
+                        notifyFlowerSeedsChanged(readAllFlowerSeeds());
                     case STORAGE_VEGETABLE_SEED_TABLE:
+                        notifyVegetableSeedsChanged(readAllVegetableSeeds());
                     case STORAGE_SOIL_TABLE:
+                        notifySoilPackagesChanged(readAllSoilPackage());
                     case STORAGE_FLOWER_FERTILIZER_TABLE:
+                        notifyFlowerFertilizerChanged(readAllFlowerFertilizer());
                     case STORAGE_VEGETABLE_FERTILIZER_TABLE:
+                        notifyVegetableFertilizerChanged(readAllVegetableFertilizer());
                     case STORAGE_WATER_TABLE:
                         robot.tryHarvestPlant();
                         robot.tryPlant();
