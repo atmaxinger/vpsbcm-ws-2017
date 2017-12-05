@@ -40,7 +40,7 @@ public class ServiceUtil {
 
     public static <T extends Serializable> void writeItem(T item, String table) {
         Transaction t = newTransaction();
-        writeItem(item, table, null);
+        writeItem(item, table, t);
         t.commit();
     }
 
@@ -176,6 +176,12 @@ public class ServiceUtil {
     }
 
     public static void deleteItemById(String id, String table) {
-        deleteItemById(id,table, null);
+        Transaction t = newTransaction();
+        deleteItemById(id,table, t);
+        t.commit();
+    }
+
+    public static String getTableName(String channel, String payload) {
+        return channel.substring(channel.indexOf("_"));
     }
 }
