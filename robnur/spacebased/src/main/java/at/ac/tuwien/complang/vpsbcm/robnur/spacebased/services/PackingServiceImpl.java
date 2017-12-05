@@ -7,12 +7,9 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.PackingService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import org.mozartspaces.capi3.*;
 import org.mozartspaces.core.*;
-import org.mozartspaces.notifications.Notification;
-import org.mozartspaces.notifications.NotificationListener;
 import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.net.URI;
@@ -58,17 +55,17 @@ public class PackingServiceImpl extends PackingService {
     }
 
     @Override
-    public Flower getFlower(String id, Transaction transaction) {
+    public Flower getFlower(String id, at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction transaction) {
         return ServiceUtil.getItemById(id,flowerContainer,transaction,capi);
     }
 
     @Override
-    public Vegetable getVegetable(String id, Transaction transaction) {
+    public Vegetable getVegetable(String id, at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction transaction) {
         return ServiceUtil.getItemById(id,vegetableContainer,transaction,capi);
     }
 
     @Override
-    public List<Flower> readAllFlowers(Transaction transaction) {
+    public List<Flower> readAllFlowers(at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction transaction) {
         Selector selector = FifoCoordinator.newSelector(FifoCoordinator.FifoSelector.COUNT_MAX);
         return ServiceUtil.readAllItems(flowerContainer,selector,transaction,capi);
     }

@@ -1,6 +1,7 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.services;
 
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Bouquet;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableBasket;
 
 import java.util.List;
 

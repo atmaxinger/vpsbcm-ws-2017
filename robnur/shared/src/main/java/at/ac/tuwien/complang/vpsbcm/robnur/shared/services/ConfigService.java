@@ -1,8 +1,8 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.services;
 
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlantCultivationInformation;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlantCultivationInformation;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public abstract class ConfigService {

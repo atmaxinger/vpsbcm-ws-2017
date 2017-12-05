@@ -5,7 +5,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.mozartspaces.core.DefaultMzsCore;
 import org.mozartspaces.core.MzsCore;
-import services.CompostServiceTest;
+import at.ac.tuwien.complang.services.CompostServiceTest;
 
 public class CompostServiceSpaceBasedTest extends CompostServiceTest{
     MzsCore core;

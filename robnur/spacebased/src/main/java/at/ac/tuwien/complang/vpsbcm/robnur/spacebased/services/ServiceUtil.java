@@ -1,13 +1,10 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services;
 
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlantCultivationInformation;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import org.mozartspaces.capi3.*;
 import org.mozartspaces.core.*;
 
-import java.awt.*;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 

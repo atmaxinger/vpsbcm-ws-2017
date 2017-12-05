@@ -1,6 +1,7 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.gui;
 
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.EndProduct;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Harvestable;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.scene.control.*;
 

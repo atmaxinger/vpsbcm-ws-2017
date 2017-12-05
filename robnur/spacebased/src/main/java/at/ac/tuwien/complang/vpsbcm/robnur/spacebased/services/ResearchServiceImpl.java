@@ -2,7 +2,6 @@ package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Flower;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PackRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.ResearchRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ResearchService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;

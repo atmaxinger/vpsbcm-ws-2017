@@ -1,10 +1,8 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services;
 
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.Robot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
 import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
 import org.mozartspaces.core.*;
 
 import java.net.URI;

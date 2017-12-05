@@ -1,6 +1,8 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services;
 
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlant;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Plant;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PlantAndHarvestRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.GreenhouseService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
@@ -65,7 +67,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
     public void registerPlantAndHarvestRobot(PlantAndHarvestRobot robot) {
         try {
             notificationManager.createNotification(greenhouseContainer, (notification, operation, list) -> {
-                logger.debug("notify robot - greenhouseContainer " + operation.name());
+                logger.debug("notify at.ac.tuwien.complang.vpsbcm.robnur.postgres.robot - greenhouseContainer " + operation.name());
                 robot.tryHarvestPlant();
                 robot.tryPlant();
             }, Operation.WRITE, Operation.TAKE, Operation.DELETE);

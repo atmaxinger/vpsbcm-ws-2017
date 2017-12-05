@@ -1,14 +1,13 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.robots;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.ResearchRobot;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.CompostService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ConfigService;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ResearchService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.CompostServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.ConfigServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.ResearchServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.TransactionServiceImpl;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.CompostService;
 
 import java.net.URI;
 import java.net.URISyntaxException;

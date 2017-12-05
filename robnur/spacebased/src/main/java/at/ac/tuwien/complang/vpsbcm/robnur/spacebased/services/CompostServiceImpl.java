@@ -1,11 +1,12 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services;
 
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Flower;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlant;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.CompostService;
 import org.mozartspaces.capi3.AnyCoordinator;
 import org.mozartspaces.capi3.Coordinator;
-import org.mozartspaces.capi3.LabelCoordinator;
-import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.core.*;
 import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;

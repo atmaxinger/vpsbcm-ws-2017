@@ -1,12 +1,12 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services;
 
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.FlowerFertilizer;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.VegetableFertilizer;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerType;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableType;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.FlowerFertilizer;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.SoilPackage;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.VegetableFertilizer;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.Water;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PlantAndHarvestRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.StorageService;
@@ -68,31 +68,31 @@ public class StorageServiceImpl extends StorageService {
     public void registerPlantAndHarvestRobot(PlantAndHarvestRobot robot) {
         try {
             notificationManager.createNotification(flowerSeedContainer, (notification, operation, list) -> {
-                logger.debug("robot notify - got notification on flowerSeedContainer");
+                logger.debug("at.ac.tuwien.complang.vpsbcm.robnur.postgres.robot notify - got notification on flowerSeedContainer");
                 robot.tryHarvestPlant();
                 robot.tryPlant();
             }, Operation.WRITE);
 
             notificationManager.createNotification(vegetableSeedContainer, (notification, operation, list) -> {
-                logger.debug("robot notify - got notification on vegetableSeedContainer");
+                logger.debug("at.ac.tuwien.complang.vpsbcm.robnur.postgres.robot notify - got notification on vegetableSeedContainer");
                 robot.tryHarvestPlant();
                 robot.tryPlant();
             }, Operation.WRITE);
 
             notificationManager.createNotification(soilContainer, (notification, operation, list) -> {
-                logger.debug("robot notify - got notification on soilContainer");
+                logger.debug("at.ac.tuwien.complang.vpsbcm.robnur.postgres.robot notify - got notification on soilContainer");
                 robot.tryHarvestPlant();
                 robot.tryPlant();
             }, Operation.WRITE);
 
             notificationManager.createNotification(flowerFertilizerContainer, (notification, operation, list) -> {
-                logger.debug("robot notify - got notification on flowerFertilizerContainer");
+                logger.debug("at.ac.tuwien.complang.vpsbcm.robnur.postgres.robot notify - got notification on flowerFertilizerContainer");
                 robot.tryHarvestPlant();
                 robot.tryPlant();
             }, Operation.WRITE);
 
             notificationManager.createNotification(vegetableFertilizerContainer, (notification, operation, list) -> {
-                logger.debug("robot notify - got notification on vegetableFertilizerContainer");
+                logger.debug("at.ac.tuwien.complang.vpsbcm.robnur.postgres.robot notify - got notification on vegetableFertilizerContainer");
                 robot.tryHarvestPlant();
                 robot.tryPlant();
             }, Operation.WRITE);

@@ -1,7 +1,9 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.services;
 
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
-import jdk.nashorn.internal.codegen.CompilerConstants;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Flower;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlant;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
 
 import java.util.List;
 

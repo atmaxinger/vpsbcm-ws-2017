@@ -1,8 +1,12 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.robots;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PackRobot;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.*;
-import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.*;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ResearchService;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
+import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.MarketServiceImpl;
+import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.PackingServiceImpl;
+import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.ResearchServiceImpl;
+import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.TransactionServiceImpl;
 import org.mozartspaces.core.MzsCoreException;
 
 import java.net.URI;

@@ -1,9 +1,12 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.services;
 
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlant;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerType;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.FlowerFertilizer;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.SoilPackage;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.VegetableFertilizer;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.SoilPackage;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.Water;
 
 import java.util.ArrayList;

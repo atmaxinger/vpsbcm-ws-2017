@@ -1,19 +1,14 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased;
 
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.FlowerFertilizer;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.SoilPackage;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlantCultivationInformation;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerType;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlantCultivationInformation;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableType;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ConfigService;
+import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.ConfigServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.Water;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.*;
-import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.robots.SpacePackRobot;
-import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.*;
-import org.mozartspaces.capi3.AnyCoordinator;
-import org.mozartspaces.capi3.ContainerFullException;
 import org.mozartspaces.core.*;
 import org.mozartspaces.core.aspects.ContainerIPoint;
-
-import java.net.URISyntaxException;
-import java.util.List;
 
 public class SpaceServer {
 

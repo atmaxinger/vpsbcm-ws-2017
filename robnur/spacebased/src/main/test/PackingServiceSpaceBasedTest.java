@@ -4,7 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.mozartspaces.core.DefaultMzsCore;
 import org.mozartspaces.core.MzsCore;
-import services.PackingServiceTest;
+import at.ac.tuwien.complang.services.PackingServiceTest;
 
 public class PackingServiceSpaceBasedTest extends PackingServiceTest {
 

@@ -10,7 +10,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 import java.util.List;
-import java.util.Observable;
 
 public class ResearchController {
 

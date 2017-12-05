@@ -1,10 +1,8 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.gui;
 
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Plant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.GreenhouseService;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.StorageService;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ObservableList;
