@@ -1,5 +1,7 @@
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.Water;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.CompostService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ConfigService;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.StorageService;
 import com.impossibl.postgres.api.jdbc.PGConnection;
 import service.*;
 
@@ -30,6 +32,11 @@ public class DbServer {
 
         createTables(StorageServiceImpl.getTables());
         createNotifyFunction(StorageServiceImpl.getTables());
+
+        StorageService storageService = new StorageServiceImpl();
+        storageService.putWater(new Water());
+
+        createWaterTrigger("sw");
     }
 
     private static void createTables(List<String> tables){
@@ -81,6 +88,36 @@ public class DbServer {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private static void createWaterTrigger(String waterTable) {
+        PGConnection connection = PostgresHelper.getConnection();
+
+        Statement statement = null;
+        try {
+            statement = connection.createStatement();
+
+            statement.execute(
+                    String.format("CREATE OR REPLACE FUNCTION put_back_water() RETURNS TRIGGER AS $$" +
+                            " BEGIN " +
+                            " PERFORM pg_sleep(1); " +
+                            " INSERT INTO %s(data) VALUES('{\"amount\":0,\"id\":\"49c660b6-b9e9-4a47-9922-2bfeefaef67c\"}'); " +
+                            " RETURN NULL; " +
+                            " END; " +
+                            " $$ LANGUAGE plpgsql;",
+                            waterTable
+                    )
+            );
+
+            statement.execute(
+                    String.format(
+                            "CREATE TRIGGER water_trigger " +
+                                    "AFTER DELETE ON %s " +
+                                    "EXECUTE PROCEDURE put_back_water();"
+                            , waterTable));
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }
