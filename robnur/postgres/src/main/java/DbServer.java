@@ -34,7 +34,9 @@ public class DbServer {
         createNotifyFunction(StorageServiceImpl.getTables());
 
         StorageService storageService = new StorageServiceImpl();
-        storageService.putWater(new Water());
+        Water water = new Water();
+        water.setAmount(250);
+        storageService.putWater(water);
 
         createWaterTrigger("sw");
     }
@@ -102,7 +104,7 @@ public class DbServer {
                     String.format("CREATE OR REPLACE FUNCTION put_back_water() RETURNS TRIGGER AS $$" +
                             " BEGIN " +
                             " PERFORM pg_sleep(1); " +
-                            " INSERT INTO %s(data) VALUES('{\"amount\":0,\"id\":\"49c660b6-b9e9-4a47-9922-2bfeefaef67c\"}'); " +
+                            " INSERT INTO %s(data) VALUES('{\"amount\":250,\"id\":\"49c660b6-b9e9-4a47-9922-2bfeefaef67c\"}'); " +
                             " RETURN NULL; " +
                             " END; " +
                             " $$ LANGUAGE plpgsql;",
