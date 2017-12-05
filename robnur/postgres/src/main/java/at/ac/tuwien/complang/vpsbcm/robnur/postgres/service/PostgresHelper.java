@@ -16,8 +16,13 @@ public class PostgresHelper {
     private static String readProperty(String property) {
         Properties prop = new Properties();
         try {
-            InputStream input = ClassLoader.getSystemResourceAsStream("postgres.properties");
-            prop.load(input);
+            String home = System.getProperty("user.home");
+            File f = new File(home + "/robnur/postgres.properties");
+
+            //InputStream input = ClassLoader.getSystemResourceAsStream("postgres.properties");
+            //prop.load(input);
+
+            prop.load(new FileReader(f));
 
             return prop.getProperty(property);
         } catch (FileNotFoundException e) {

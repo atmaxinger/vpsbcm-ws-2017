@@ -1,3 +1,2 @@
-
-$Host.UI.RawUI.WindowTitle = "Space Server"
-mvn compile exec:java -D"exec.mainClass"="InitDb"
+$Host.UI.RawUI.WindowTitle = "Postgres Init"
+mvn compile exec:java -D"exec.mainClass"="at.ac.tuwien.complang.vpsbcm.robnur.postgres.InitDb"

@@ -1,4 +1,4 @@
-package at.ac.tuwien.complang.vpsbcm.robnur.postgres.robot;
+package at.ac.tuwien.complang.vpsbcm.robnur.postgres.robots;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.StorageServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.GreenhouseServiceImpl;
@@ -15,6 +15,18 @@ public class PostgresPlantAndHarvestRobot {
     public static void main(String[] args) throws URISyntaxException, InterruptedException {
         int plantTransactionTimeout = 60*1000;
         int harvestTransactionTimeout = 1000;
+
+        if(args.length == 0) {
+            System.err.println("You need to specify the id");
+            System.exit(1);
+        }
+        else if(args.length == 2) {
+            plantTransactionTimeout = Integer.parseInt(args[1]);
+        }
+        else if(args.length == 3) {
+            plantTransactionTimeout = Integer.parseInt(args[1]);
+            harvestTransactionTimeout = Integer.parseInt(args[2]);
+        }
 
         StorageServiceImpl storageService = new StorageServiceImpl();
         PackingService packingService = new PackingServiceImpl();

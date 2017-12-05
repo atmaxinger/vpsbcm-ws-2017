@@ -1,4 +1,4 @@
-package at.ac.tuwien.complang.vpsbcm.robnur.postgres.robot;
+package at.ac.tuwien.complang.vpsbcm.robnur.postgres.robots;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.GreenhouseServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.TransactionServiceImpl;

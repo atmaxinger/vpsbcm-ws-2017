@@ -1,4 +1,4 @@
-package at.ac.tuwien.complang.vpsbcm.robnur.postgres.robot;
+package at.ac.tuwien.complang.vpsbcm.robnur.postgres.robots;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.ConfigServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.ResearchServiceImpl;
@@ -15,18 +15,16 @@ import java.util.Scanner;
 
 public class PostgresResearchRobot {
     public static void main(String[] args) throws URISyntaxException, SQLException {
-        // TODO jsut for testing (do not forget id below)
-        /*
         if(args.length != 1) {
             System.err.println("You need to specify the id!");
-        }*/
+        }
 
         ResearchServiceImpl researchService = new ResearchServiceImpl();
         CompostService compostService = new CompostServiceImpl();
         ConfigService configService = new ConfigServiceImpl();
         TransactionService transactionService = new TransactionServiceImpl();
 
-        ResearchRobot researchRobot = new ResearchRobot("0", researchService, compostService, configService, transactionService);
+        ResearchRobot researchRobot = new ResearchRobot(args[0], researchService, compostService, configService, transactionService);
         researchService.registerResearchRobot(researchRobot);
 
         Scanner scanner = new Scanner(System.in);
