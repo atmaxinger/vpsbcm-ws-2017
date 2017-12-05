@@ -272,13 +272,20 @@ public class StorageServiceImpl extends StorageService {
 
     @Override
     public void putFlowerFertilizers(List<FlowerFertilizer> flowerFertilizers) {
+        putFlowerFertilizers(flowerFertilizers, null);
+    }
+
+    @Override
+    public void putFlowerFertilizers(List<FlowerFertilizer> flowerFertilizers, Transaction t) {
+        TransactionReference tref = TransactionServiceImpl.getTransactionReference(t);
+
         try {
             List<Entry> entries = new LinkedList<>();
             for(FlowerFertilizer flowerFertilizer : flowerFertilizers) {
                 entries.add(new Entry(flowerFertilizer));
             }
 
-            capi.write(entries, flowerFertilizerContainer);
+            capi.write(entries, flowerFertilizerContainer, MzsConstants.RequestTimeout.INFINITE, tref);
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -319,13 +326,20 @@ public class StorageServiceImpl extends StorageService {
 
     @Override
     public void putVegetableFertilizers(List<VegetableFertilizer> vegetableFertilizers) {
+        putVegetableFertilizers(vegetableFertilizers, null);
+    }
+
+    @Override
+    public void putVegetableFertilizers(List<VegetableFertilizer> vegetableFertilizers, Transaction t) {
+        TransactionReference tref = TransactionServiceImpl.getTransactionReference(t);
+
         try {
             List<Entry> entries = new LinkedList<>();
             for(VegetableFertilizer fertilizer : vegetableFertilizers) {
                 entries.add(new Entry(fertilizer));
             }
 
-            capi.write(entries, vegetableFertilizerContainer);
+            capi.write(entries, vegetableFertilizerContainer, MzsConstants.RequestTimeout.INFINITE, tref);
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
