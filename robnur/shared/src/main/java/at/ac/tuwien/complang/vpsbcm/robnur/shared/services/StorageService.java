@@ -12,7 +12,6 @@ import java.util.List;
 
 public abstract class StorageService {
 
-
     public interface Callback<T> {
         void handle(T data);
     }
@@ -176,6 +175,7 @@ public abstract class StorageService {
 
     public abstract void putFlowerFertilizer(FlowerFertilizer flowerFertilizer);
     public abstract void putFlowerFertilizers(List<FlowerFertilizer> flowerFertilizers);
+    public abstract void putFlowerFertilizers(List<FlowerFertilizer> flowerFertilizers, Transaction t);
 
 
     public List<FlowerFertilizer> readAllFlowerFertilizer() {
@@ -187,6 +187,7 @@ public abstract class StorageService {
 
     public abstract void putVegetableFertilizer(VegetableFertilizer vegetableFertilizer);
     public abstract void putVegetableFertilizers(List<VegetableFertilizer> vegetableFertilizers);
+    public abstract void putVegetableFertilizers(List<VegetableFertilizer> vegetableFertilizers, Transaction t);
 
 
     public List<VegetableFertilizer> readAllVegetableFertilizer() {

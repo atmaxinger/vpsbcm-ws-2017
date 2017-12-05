@@ -296,13 +296,16 @@ public class StorageController {
         ResourceTableDataModel flowerFertilizer = new ResourceTableDataModel() {
             @Override
             void buyAction(int amount) {
+                Transaction t = transactionService.beginTransaction(-1);
+
                 List<FlowerFertilizer> flowerFertilizers = new LinkedList<>();
                 for(int i=0; i<amount; i++) {
                     FlowerFertilizer ff = new FlowerFertilizer();
                     flowerFertilizers.add(ff);
                 }
 
-                storageService.putFlowerFertilizers(flowerFertilizers);
+                storageService.putFlowerFertilizers(flowerFertilizers, t);
+                t.commit();
             }
         };
         flowerFertilizer.resource = "Blumen Dünger";
@@ -317,13 +320,16 @@ public class StorageController {
         ResourceTableDataModel vegFert = new ResourceTableDataModel() {
             @Override
             void buyAction(int amount) {
+                Transaction t = transactionService.beginTransaction(-1);
+
                 List<VegetableFertilizer> vegetableFertilizers = new LinkedList<>();
                 for(int i=0; i<amount; i++) {
                     VegetableFertilizer vf = new VegetableFertilizer();
                     vegetableFertilizers.add(vf);
                 }
 
-                storageService.putVegetableFertilizers(vegetableFertilizers);
+                storageService.putVegetableFertilizers(vegetableFertilizers, t);
+                t.commit();
             }
         };
         vegFert.resource = "Gemüse Dünger";

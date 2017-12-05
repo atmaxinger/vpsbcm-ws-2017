@@ -26,6 +26,46 @@ public class StorageServiceImpl extends StorageService {
     private static final String STORAGE_VEGETABLE_FERTILIZER_TABLE = "svf";
     private static final String STORAGE_WATER_TABLE = "sw";
 
+
+    public StorageServiceImpl() {
+        PGNotificationListener listener = new PGNotificationListener() {
+            @Override
+            public void notification(int processId, String channelName, String table) {
+                System.out.println("RECEIVED NOTIFICATION");
+
+                switch (table){
+                    case STORAGE_FLOWER_SEED_TABLE:
+                        notifyFlowerSeedsChanged(readAllFlowerSeeds());
+                        break;
+                    case STORAGE_VEGETABLE_SEED_TABLE:
+                        notifyVegetableSeedsChanged(readAllVegetableSeeds());
+                        break;
+                    case STORAGE_SOIL_TABLE:
+                        notifySoilPackagesChanged(readAllSoilPackage());
+                        break;
+                    case STORAGE_FLOWER_FERTILIZER_TABLE:
+                        notifyFlowerFertilizerChanged(readAllFlowerFertilizer());
+                        break;
+                    case STORAGE_VEGETABLE_FERTILIZER_TABLE:
+                        notifyVegetableFertilizerChanged(readAllVegetableFertilizer());
+                        break;
+                    case STORAGE_WATER_TABLE:
+                        break;
+                }
+            }
+        };
+
+        PostgresHelper.getConnection().addNotificationListener(listener);
+
+        PostgresHelper.setUpListen(STORAGE_FLOWER_SEED_TABLE);
+        PostgresHelper.setUpListen(STORAGE_VEGETABLE_SEED_TABLE);
+        PostgresHelper.setUpListen(STORAGE_SOIL_TABLE);
+        PostgresHelper.setUpListen(STORAGE_FLOWER_FERTILIZER_TABLE);
+        PostgresHelper.setUpListen(STORAGE_VEGETABLE_FERTILIZER_TABLE);
+        PostgresHelper.setUpListen(STORAGE_WATER_TABLE);
+    }
+
+
     @Override
     protected List<FlowerPlant> getSeeds(FlowerType type, Transaction transaction) {
         return ServiceUtil.getItemsByParameter("'cultivationInformation'->'flowerType'",type.name(),STORAGE_FLOWER_SEED_TABLE,FlowerPlant.class,transaction);
@@ -63,11 +103,19 @@ public class StorageServiceImpl extends StorageService {
 
     @Override
     public List<FlowerPlant> readAllFlowerSeeds(Transaction transaction) {
+        if(transaction == null) {
+            return ServiceUtil.readAllItems(STORAGE_FLOWER_SEED_TABLE, FlowerPlant.class);
+        }
+
         return ServiceUtil.readAllItems(STORAGE_FLOWER_SEED_TABLE,FlowerPlant.class,transaction);
     }
 
     @Override
     public List<VegetablePlant> readAllVegetableSeeds(Transaction transaction) {
+        if(transaction == null) {
+            return ServiceUtil.readAllItems(STORAGE_VEGETABLE_SEED_TABLE, VegetablePlant.class);
+        }
+
         return ServiceUtil.readAllItems(STORAGE_VEGETABLE_SEED_TABLE,VegetablePlant.class,transaction);
     }
 
@@ -94,6 +142,9 @@ public class StorageServiceImpl extends StorageService {
 
     @Override
     public List<SoilPackage> readAllSoilPackage(Transaction transaction) {
+        if(transaction == null) {
+            return ServiceUtil.readAllItems(STORAGE_SOIL_TABLE,SoilPackage.class);
+        }
         return ServiceUtil.readAllItems(STORAGE_SOIL_TABLE,SoilPackage.class,transaction);
     }
 
@@ -129,8 +180,18 @@ public class StorageServiceImpl extends StorageService {
     }
 
     @Override
+    public void putFlowerFertilizers(List<FlowerFertilizer> flowerFertilizers, Transaction t) {
+        for(FlowerFertilizer ff : flowerFertilizers) {
+            ServiceUtil.writeItem(ff, STORAGE_FLOWER_FERTILIZER_TABLE, t);
+        }
+    }
+
+    @Override
     public List<FlowerFertilizer> readAllFlowerFertilizer(Transaction transaction) {
-        return ServiceUtil.readAllItems(STORAGE_FLOWER_FERTILIZER_TABLE,FlowerFertilizer.class);
+        if(transaction == null) {
+            return ServiceUtil.readAllItems(STORAGE_FLOWER_FERTILIZER_TABLE,FlowerFertilizer.class);
+        }
+        return ServiceUtil.readAllItems(STORAGE_FLOWER_FERTILIZER_TABLE,FlowerFertilizer.class, transaction);
     }
 
     @Override
@@ -164,7 +225,17 @@ public class StorageServiceImpl extends StorageService {
     }
 
     @Override
+    public void putVegetableFertilizers(List<VegetableFertilizer> vegetableFertilizers, Transaction t) {
+        for(VegetableFertilizer vf : vegetableFertilizers) {
+            ServiceUtil.writeItem(vf, STORAGE_VEGETABLE_FERTILIZER_TABLE, t);
+        }
+    }
+
+    @Override
     public List<VegetableFertilizer> readAllVegetableFertilizer(Transaction transaction) {
+        if(transaction == null) {
+            return ServiceUtil.readAllItems(STORAGE_VEGETABLE_FERTILIZER_TABLE,VegetableFertilizer.class);
+        }
         return ServiceUtil.readAllItems(STORAGE_VEGETABLE_FERTILIZER_TABLE,VegetableFertilizer.class,transaction);
     }
 
@@ -192,17 +263,14 @@ public class StorageServiceImpl extends StorageService {
             @Override
             public void notification(int processId, String channelName, String table) {
 
+                System.out.println("RECEIVED NOTIFICATION FOR ROBOT");
+
                 switch (table){
                     case STORAGE_FLOWER_SEED_TABLE:
-                        notifyFlowerSeedsChanged(readAllFlowerSeeds());
                     case STORAGE_VEGETABLE_SEED_TABLE:
-                        notifyVegetableSeedsChanged(readAllVegetableSeeds());
                     case STORAGE_SOIL_TABLE:
-                        notifySoilPackagesChanged(readAllSoilPackage());
                     case STORAGE_FLOWER_FERTILIZER_TABLE:
-                        notifyFlowerFertilizerChanged(readAllFlowerFertilizer());
                     case STORAGE_VEGETABLE_FERTILIZER_TABLE:
-                        notifyVegetableFertilizerChanged(readAllVegetableFertilizer());
                     case STORAGE_WATER_TABLE:
                         robot.tryHarvestPlant();
                         robot.tryPlant();
@@ -213,12 +281,6 @@ public class StorageServiceImpl extends StorageService {
 
         PostgresHelper.getConnection().addNotificationListener(listener);
 
-        PostgresHelper.setUpListen(STORAGE_FLOWER_SEED_TABLE);
-        PostgresHelper.setUpListen(STORAGE_VEGETABLE_SEED_TABLE);
-        PostgresHelper.setUpListen(STORAGE_SOIL_TABLE);
-        PostgresHelper.setUpListen(STORAGE_FLOWER_FERTILIZER_TABLE);
-        PostgresHelper.setUpListen(STORAGE_VEGETABLE_FERTILIZER_TABLE);
-        PostgresHelper.setUpListen(STORAGE_WATER_TABLE);
     }
 
     public static List<String> getTables() {

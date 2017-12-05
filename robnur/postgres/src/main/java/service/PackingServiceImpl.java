@@ -35,10 +35,16 @@ public class PackingServiceImpl extends PackingService {
     }
 
     public List<Flower> readAllFlowers(Transaction transaction) {
+        if(transaction == null) {
+            return ServiceUtil.readAllItems(PACKING_FLOWER_TABLE,Flower.class);
+        }
         return ServiceUtil.readAllItems(PACKING_FLOWER_TABLE,Flower.class,transaction);
     }
 
     public List<Vegetable> readAllVegetables(Transaction transaction) {
+        if(transaction == null) {
+            return ServiceUtil.readAllItems(PACKING_VEGETABLE_TABLE,Vegetable.class);
+        }
         return ServiceUtil.readAllItems(PACKING_VEGETABLE_TABLE,Vegetable.class,transaction);
     }
 

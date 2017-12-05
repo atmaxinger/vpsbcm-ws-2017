@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.istack.internal.NotNull;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -17,12 +18,11 @@ import java.util.List;
 
 public class ServiceUtil {
 
+    private static Transaction newTransaction() {
+        return (new TransactionServiceImpl()).beginTransaction(-1);
+    }
+
     public static <T extends Serializable> void writeItem(T item, String table, Transaction transaction) {
-
-        if(transaction == null){
-            transaction = getDefaultTransaction();
-        }
-
         try {
             Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
 
@@ -39,16 +39,14 @@ public class ServiceUtil {
     }
 
     public static <T extends Serializable> void writeItem(T item, String table) {
+        Transaction t = newTransaction();
         writeItem(item, table, null);
+        t.commit();
     }
 
 
     public static <T extends Serializable> List<T> readAllItems(String table, Class<T> resultClass, Transaction transaction) {
         List<T> result = new ArrayList<T>();
-
-        if(transaction == null){
-            transaction = getDefaultTransaction();
-        }
 
         try {
             ObjectMapper mapper = new ObjectMapper()
@@ -79,16 +77,16 @@ public class ServiceUtil {
     }
 
     public static <T extends Serializable> List<T> readAllItems(String table, Class<T> resultClass) {
-        return readAllItems(table, resultClass,null);
+        Transaction t = newTransaction();
+        List<T> l = readAllItems(table, resultClass,t);
+        t.commit();
+
+        return l;
     }
 
-    public static <T extends Serializable> T getItemByParameter(String parameterName, String parameterValue, String table, Class<T> resultClass, Transaction transaction) {
+    public static <T extends Serializable> T getItemByParameter(String parameterName, String parameterValue, String table, Class<T> resultClass, @NotNull Transaction transaction) {
 
         T result = null;
-
-        if(transaction == null){
-            transaction = getDefaultTransaction();
-        }
 
         try {
 
@@ -120,17 +118,13 @@ public class ServiceUtil {
         return result;
     }
 
-    public static <T extends Serializable> List<T> getItemsById(String id, String table, Class<T> resultClass, Transaction transaction) {
+    public static <T extends Serializable> List<T> getItemsById(String id, String table, Class<T> resultClass, @NotNull Transaction transaction) {
         return getItemsByParameter("'id'",id,table,resultClass,transaction);
     }
 
-    public static <T extends Serializable> List<T> getItemsByParameter(String parameterName, String parameterValue, String table, Class<T> resultClass, Transaction transaction) {
+    public static <T extends Serializable> List<T> getItemsByParameter(String parameterName, String parameterValue, String table, Class<T> resultClass, @NotNull Transaction transaction) {
 
         List<T> result = new ArrayList<>();
-
-        if(transaction == null){
-            transaction = getDefaultTransaction();
-        }
 
         try {
 
@@ -167,12 +161,7 @@ public class ServiceUtil {
         return getItemByParameter("'id'",id,table,resultClass,transaction);
     }
 
-    public static void deleteItemByParameter(String parameterName, String parameterValue, String table, Transaction transaction) {
-
-        if(transaction == null){
-            transaction = getDefaultTransaction();
-        }
-
+    public static void deleteItemByParameter(String parameterName, String parameterValue, String table, @NotNull Transaction transaction) {
         try {
             Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
             statement.execute(String.format("DELETE FROM %s WHERE data ->> %s = '%s'", table, parameterName,parameterValue));
@@ -188,9 +177,5 @@ public class ServiceUtil {
 
     public static void deleteItemById(String id, String table) {
         deleteItemById(id,table, null);
-    }
-
-    private static Transaction getDefaultTransaction() {
-        return new TransactionImpl(PostgresHelper.getConnection());
     }
 }
