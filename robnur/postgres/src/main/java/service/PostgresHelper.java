@@ -13,6 +13,7 @@ import java.util.Properties;
 public class PostgresHelper {
 
     private static PGConnection connection;
+    private static PGDataSource dataSource = null;
 
     private static String readProperty(String property) {
         Properties prop = new Properties();
@@ -30,17 +31,21 @@ public class PostgresHelper {
         return null;
     }
 
-
-    public static PGConnection getConnection(){
-
-        if(connection == null){
-            PGDataSource dataSource = new PGDataSource();
+    private static void initDataSource() {
+        if(dataSource == null) {
+            dataSource = new PGDataSource();
             dataSource.setHost(readProperty("db.server"));
             dataSource.setPort(Integer.parseInt(readProperty("db.port")));
             dataSource.setDatabase(readProperty("db.database"));
             dataSource.setUser(readProperty("db.user"));
             dataSource.setPassword(readProperty("db.password"));
+        }
+    }
 
+    public static PGConnection getConnection(){
+
+        if(connection == null){
+            initDataSource();
             try {
                 connection = (PGConnection) dataSource.getConnection();
             } catch (SQLException e) {
@@ -51,15 +56,9 @@ public class PostgresHelper {
         return connection;
     }
 
+
     public static PGConnection getNewConnection(){
-
-        PGDataSource dataSource = new PGDataSource();
-        dataSource.setHost(readProperty("db.server"));
-        dataSource.setPort(Integer.parseInt(readProperty("db.port")));
-        dataSource.setDatabase(readProperty("db.database"));
-        dataSource.setUser(readProperty("db.user"));
-        dataSource.setPassword(readProperty("db.password"));
-
+        initDataSource();
         PGConnection pgConnection = null;
         try {
             pgConnection = (PGConnection) dataSource.getConnection();
