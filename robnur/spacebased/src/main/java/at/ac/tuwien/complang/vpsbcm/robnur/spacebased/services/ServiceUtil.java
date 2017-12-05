@@ -22,11 +22,12 @@ public class ServiceUtil {
 
         try {
             result = capi.take(containerReference,selectors,MzsConstants.RequestTimeout.DEFAULT,transactionReference);
+            return result.get(0);
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
 
-        return result.get(0);
+        return null;
     }
 
     public static <T extends Serializable> void writeItem(T item, ContainerReference containerReference, Transaction transaction, Capi capi){

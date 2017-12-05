@@ -28,25 +28,39 @@ public class PackRobot extends Robot {
         tryCreateBouquet();
     }
 
+
+    private void tryPutFlowersIntoResearch() {
+        Transaction transaction = transactionService.beginTransaction(TRANSACTION_TIMEOUT); // TODO change timeout
+        List<Flower> flowers = packingService.readAllFlowers(transaction);
+
+        int put = 0;
+        for(int i=0; i<Math.min(flowers.size(), 10); i++) {
+            Flower flower = packingService.getFlower(flowers.get(i).getId(),transaction);
+            researchService.putFlower(flower);
+            logger.info(String.format("Forward flower (id = %s) to research department.",flower.getId()));
+
+            put++;
+        }
+
+        transaction.commit();
+
+        // If we have packed 10 into research, chances are good there are more...
+        if(put == 10) {
+            tryPutFlowersIntoResearch();
+        }
+    }
     public void tryCreateBouquet(){
+        
+        // check if there are already enough bouquets in the market
+        if(marketService.getAmountOfBouquets() >= 5){
+            tryPutFlowersIntoResearch();
+            return;
+        }
+
         Transaction transaction = transactionService.beginTransaction(TRANSACTION_TIMEOUT); // TODO change timeout
 
         List<Flower> flowers = packingService.readAllFlowers(transaction);
         List<Flower> flowersForBouquet = new ArrayList<>();
-
-        // check if there are already enough bouquets in the market
-        if(marketService.getAmountOfBouquets() >= 5){
-
-            // put flowers from packing-queue to the research department
-            for (Flower f: flowers) {
-                researchService.putFlower(packingService.getFlower(f.getId(),transaction));
-                logger.info(String.format("Forward flower (id = %s) to research department.",f.getId()));
-            }
-
-            transaction.commit();
-
-            return;
-        }
 
         if(getNumberOfDistinctFlowerTypes(flowers) >= 3){
 
@@ -130,21 +144,36 @@ public class PackRobot extends Robot {
         }
     }
 
-    public void tryCreateVegetableBasket(){
+    private void tryPutVegetablesIntoResearch() {
         Transaction transaction = transactionService.beginTransaction(TRANSACTION_TIMEOUT);
-
         List<Vegetable> vegetables = packingService.readAllVegetables(transaction);
 
+        int put = 0;
+        for(int i=0; i<Math.min(vegetables.size(), 10); i++) {
+            Vegetable vegetable = packingService.getVegetable(vegetables.get(i).getId(),transaction);
+            researchService.putVegetable(vegetable);
+            logger.info(String.format("Forward vegetable (id = %s) to research department.", vegetable.getId()));
+
+            put++;
+        }
+
+        transaction.commit();
+
+        // If we have packed 10 into research, chances are good there are more...
+        if(put == 10) {
+            tryPutVegetablesIntoResearch();
+        }
+    }
+
+    public void tryCreateVegetableBasket(){
         if(marketService.getAmountOfVegetableBaskets() >= 3)
         {
-            for (Vegetable v:vegetables) {
-                researchService.putVegetable(packingService.getVegetable(v.getId(),transaction));
-                logger.info(String.format("Forward vegetable (id = %s) to research department.",v.getId()));
-            }
-
-            transaction.commit();
+            tryPutVegetablesIntoResearch();
             return;
         }
+
+        Transaction transaction = transactionService.beginTransaction(TRANSACTION_TIMEOUT);
+        List<Vegetable> vegetables = packingService.readAllVegetables(transaction);
 
         if(vegetables.size() <= 5){
             logger.debug(String.format("Not enough vegetables available (%d)", vegetables.size()));
