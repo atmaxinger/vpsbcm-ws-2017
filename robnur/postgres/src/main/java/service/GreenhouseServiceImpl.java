@@ -143,14 +143,16 @@ public class GreenhouseServiceImpl extends GreenhouseService {
 
         PGNotificationListener listener = new PGNotificationListener() {
             @Override
-            public void notification(int processId, String channelName, String table) {
-
-                switch (table){
-                    case GREENHOUSE_FLOWER_PLANT_TABLE:
-                    case GREENHOUSE_VEGETABLE_PLANT_TABLE:
-                        robot.tryHarvestPlant();
-                        robot.tryPlant();
-                        break;
+            public void notification(int processId, String channelName, String payload) {
+                String table = ServiceUtil.getTableName(channelName, payload);
+                if(ServiceUtil.getOperation(channelName, payload) == ServiceUtil.DBOPERATION.INSERT) {
+                    switch (table) {
+                        case GREENHOUSE_FLOWER_PLANT_TABLE:
+                        case GREENHOUSE_VEGETABLE_PLANT_TABLE:
+                            robot.tryHarvestPlant();
+                            robot.tryPlant();
+                            break;
+                    }
                 }
             }
         };

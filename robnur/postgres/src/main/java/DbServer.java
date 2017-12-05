@@ -6,6 +6,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.Water;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.CompostService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ConfigService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.StorageService;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import com.impossibl.postgres.api.jdbc.PGConnection;
 import service.*;
 import sun.security.krb5.Config;
@@ -80,9 +81,7 @@ public class DbServer {
                         String.format(
                                 "CREATE OR REPLACE FUNCTION %s_function() RETURNS TRIGGER AS $$" +
                                         "        BEGIN" +
-                                        "        IF (TG_OP = 'INSERT') THEN" +
-                                        "           PERFORM pg_notify('%s_notify',TG_TABLE_NAME);" +
-                                        "        END IF;" +
+                                        "        PERFORM pg_notify('%s_notify', TG_OP);" +
                                         "        RETURN NULL;" +
                                         "        END; " +
                                         "$$ LANGUAGE plpgsql;"
@@ -92,7 +91,7 @@ public class DbServer {
                 statement.execute(
                         String.format(
                         "CREATE TRIGGER %s_trigger " +
-                                "AFTER INSERT ON %s " +
+                                "AFTER INSERT OR DELETE ON %s " +
                                 "FOR EACH ROW EXECUTE PROCEDURE %s_function();"
                         , table, table, table));
 
@@ -134,8 +133,9 @@ public class DbServer {
 
 
     public static void putInitialFlowerPlantCultivationInformation(ConfigService configService) {
+        Transaction transaction = ((new TransactionServiceImpl())).beginTransaction(-1);
 
-        if (configService.readAllFlowerPlantCultivationInformation(null).size() == 0) {
+        if (configService.readAllFlowerPlantCultivationInformation(transaction).size() == 0) {
 
             FlowerPlantCultivationInformation flowerPlantCultivationInformation = new FlowerPlantCultivationInformation();
             flowerPlantCultivationInformation.setFlowerType(FlowerType.ROSE);
@@ -146,7 +146,7 @@ public class DbServer {
             flowerPlantCultivationInformation.setHarvest(4);
             flowerPlantCultivationInformation.setUpgradeLevel(0);
 
-            configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, null);
+            configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, transaction);
 
             flowerPlantCultivationInformation = new FlowerPlantCultivationInformation();
             flowerPlantCultivationInformation.setFlowerType(FlowerType.TULIP);
@@ -157,7 +157,7 @@ public class DbServer {
             flowerPlantCultivationInformation.setHarvest(2);
             flowerPlantCultivationInformation.setUpgradeLevel(0);
 
-            configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, null);
+            configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, transaction);
 
             flowerPlantCultivationInformation = new FlowerPlantCultivationInformation();
             flowerPlantCultivationInformation.setFlowerType(FlowerType.DAISY);
@@ -168,7 +168,7 @@ public class DbServer {
             flowerPlantCultivationInformation.setHarvest(4);
             flowerPlantCultivationInformation.setUpgradeLevel(0);
 
-            configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, null);
+            configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, transaction);
 
             flowerPlantCultivationInformation = new FlowerPlantCultivationInformation();
             flowerPlantCultivationInformation.setFlowerType(FlowerType.VIOLET);
@@ -179,13 +179,16 @@ public class DbServer {
             flowerPlantCultivationInformation.setHarvest(4);
             flowerPlantCultivationInformation.setUpgradeLevel(0);
 
-            configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, null);
+            configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, transaction);
         }
+
+        transaction.commit();
     }
 
     public static void putInitialVegetablePlantCultivationInformation(ConfigService configService) {
+        Transaction transaction = ((new TransactionServiceImpl())).beginTransaction(-1);
 
-        if (configService.readAllVegetablePlantCultivationInformation(null).size() == 0) {
+        if (configService.readAllVegetablePlantCultivationInformation(transaction).size() == 0) {
 
             VegetablePlantCultivationInformation vegetablePlantCultivationInformation = new VegetablePlantCultivationInformation();
             vegetablePlantCultivationInformation.setVegetableType(VegetableType.PEPPER);
@@ -197,7 +200,7 @@ public class DbServer {
             vegetablePlantCultivationInformation.setRemainingNumberOfHarvests(2);
             vegetablePlantCultivationInformation.setUpgradeLevel(0);
 
-            configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation, null);
+            configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation, transaction);
 
             vegetablePlantCultivationInformation = new VegetablePlantCultivationInformation();
             vegetablePlantCultivationInformation.setVegetableType(VegetableType.TOMATO);
@@ -209,7 +212,7 @@ public class DbServer {
             vegetablePlantCultivationInformation.setRemainingNumberOfHarvests(3);
             vegetablePlantCultivationInformation.setUpgradeLevel(0);
 
-            configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation, null);
+            configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation, transaction);
 
             vegetablePlantCultivationInformation = new VegetablePlantCultivationInformation();
             vegetablePlantCultivationInformation.setVegetableType(VegetableType.CARROT);
@@ -221,7 +224,7 @@ public class DbServer {
             vegetablePlantCultivationInformation.setRemainingNumberOfHarvests(2);
             vegetablePlantCultivationInformation.setUpgradeLevel(0);
 
-            configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation, null);
+            configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation, transaction);
 
             vegetablePlantCultivationInformation = new VegetablePlantCultivationInformation();
             vegetablePlantCultivationInformation.setVegetableType(VegetableType.SALAD);
@@ -233,7 +236,9 @@ public class DbServer {
             vegetablePlantCultivationInformation.setRemainingNumberOfHarvests(1);
             vegetablePlantCultivationInformation.setUpgradeLevel(0);
 
-            configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation, null);
+            configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation, transaction);
         }
+
+        transaction.commit();
     }
 }

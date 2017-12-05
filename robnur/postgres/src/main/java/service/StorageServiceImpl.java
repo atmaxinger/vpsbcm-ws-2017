@@ -30,8 +30,9 @@ public class StorageServiceImpl extends StorageService {
     public StorageServiceImpl() {
         PGNotificationListener listener = new PGNotificationListener() {
             @Override
-            public void notification(int processId, String channelName, String table) {
-                System.out.println("RECEIVED NOTIFICATION");
+            public void notification(int processId, String channelName, String payload) {
+                String table = ServiceUtil.getTableName(channelName, payload);
+                System.out.println("RECEIVED NOTIFICATION ON " + table + " OPERATION: " + ServiceUtil.getOperation(channelName, payload));
 
                 switch (table){
                     case STORAGE_FLOWER_SEED_TABLE:
@@ -261,20 +262,23 @@ public class StorageServiceImpl extends StorageService {
 
         PGNotificationListener listener = new PGNotificationListener() {
             @Override
-            public void notification(int processId, String channelName, String table) {
+            public void notification(int processId, String channelName, String payload) {
 
                 System.out.println("RECEIVED NOTIFICATION FOR ROBOT");
 
-                switch (table){
-                    case STORAGE_FLOWER_SEED_TABLE:
-                    case STORAGE_VEGETABLE_SEED_TABLE:
-                    case STORAGE_SOIL_TABLE:
-                    case STORAGE_FLOWER_FERTILIZER_TABLE:
-                    case STORAGE_VEGETABLE_FERTILIZER_TABLE:
-                    case STORAGE_WATER_TABLE:
-                        robot.tryHarvestPlant();
-                        robot.tryPlant();
-                        break;
+                String table = ServiceUtil.getTableName(channelName, payload);
+                if(ServiceUtil.getOperation(channelName, payload) == ServiceUtil.DBOPERATION.INSERT) {
+                    switch (table) {
+                        case STORAGE_FLOWER_SEED_TABLE:
+                        case STORAGE_VEGETABLE_SEED_TABLE:
+                        case STORAGE_SOIL_TABLE:
+                        case STORAGE_FLOWER_FERTILIZER_TABLE:
+                        case STORAGE_VEGETABLE_FERTILIZER_TABLE:
+                        case STORAGE_WATER_TABLE:
+                            robot.tryHarvestPlant();
+                            robot.tryPlant();
+                            break;
+                    }
                 }
             }
         };

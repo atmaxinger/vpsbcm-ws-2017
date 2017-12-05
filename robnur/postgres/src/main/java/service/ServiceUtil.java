@@ -18,6 +18,12 @@ import java.util.List;
 
 public class ServiceUtil {
 
+    public enum DBOPERATION {
+        UNKNOWN,
+        INSERT,
+        DELETE
+    }
+
     private static Transaction newTransaction() {
         return (new TransactionServiceImpl()).beginTransaction(-1);
     }
@@ -182,6 +188,18 @@ public class ServiceUtil {
     }
 
     public static String getTableName(String channel, String payload) {
-        return channel.substring(channel.indexOf("_"));
+        return channel.substring(0,channel.indexOf("_"));
+    }
+
+    public static DBOPERATION getOperation(String channel, String payload) {
+        if(payload.equals("INSERT")) {
+            return DBOPERATION.INSERT;
+        }
+        else if (payload.equals("DELETE")) {
+            return DBOPERATION.DELETE;
+        }
+
+
+        return DBOPERATION.UNKNOWN;
     }
 }

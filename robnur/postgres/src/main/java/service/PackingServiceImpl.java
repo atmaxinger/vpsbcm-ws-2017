@@ -56,17 +56,19 @@ public class PackingServiceImpl extends PackingService {
 
         PGNotificationListener listener = new PGNotificationListener() {
             @Override
-            public void notification(int processId, String channelName, String table) {
+            public void notification(int processId, String channelName, String payload) {
+                String table = ServiceUtil.getTableName(channelName, payload);
+                if(ServiceUtil.getOperation(channelName, payload) == ServiceUtil.DBOPERATION.INSERT) {
+                    System.out.println("/channels/" + channelName + " " + table);
 
-                System.out.println("/channels/" + channelName + " " + table);
-
-                switch (table){
-                    case PACKING_FLOWER_TABLE:
-                        System.out.println("PACKING_FLOWER_TABLE");
-                        break;
-                    case PACKING_VEGETABLE_TABLE:
-                        System.out.println("PACKING_VEGETABLE_TABLE");
-                        break;
+                    switch (table) {
+                        case PACKING_FLOWER_TABLE:
+                            System.out.println("PACKING_FLOWER_TABLE");
+                            break;
+                        case PACKING_VEGETABLE_TABLE:
+                            System.out.println("PACKING_VEGETABLE_TABLE");
+                            break;
+                    }
                 }
             }
         };

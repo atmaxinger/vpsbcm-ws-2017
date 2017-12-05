@@ -53,16 +53,17 @@ public class ResearchServiceImpl extends ResearchService {
 
         PGNotificationListener listener = new PGNotificationListener() {
             @Override
-            public void notification(int processId, String channelName, String table) {
-                System.out.println("/channels/" + channelName + " " + table);
-
-                switch (table){
-                    case RESEARCH_FLOWER_TABLE:
-                        researchRobot.tryUpgradeFlowerPlant();
-                        break;
-                    case RESEARCH_VEGETABLE_TABLE:
-                        researchRobot.tryUpgradeVegetablePlant();
-                        break;
+            public void notification(int processId, String channelName, String payload) {
+                String table = ServiceUtil.getTableName(channelName, payload);
+                if(ServiceUtil.getOperation(channelName, payload) == ServiceUtil.DBOPERATION.INSERT) {
+                    switch (table) {
+                        case RESEARCH_FLOWER_TABLE:
+                            researchRobot.tryUpgradeFlowerPlant();
+                            break;
+                        case RESEARCH_VEGETABLE_TABLE:
+                            researchRobot.tryUpgradeVegetablePlant();
+                            break;
+                    }
                 }
             }
         };
