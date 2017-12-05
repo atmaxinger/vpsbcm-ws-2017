@@ -18,6 +18,31 @@ public class PackingServiceImpl extends PackingService {
     private static final String PACKING_FLOWER_TABLE = "paf";
     private static final String PACKING_VEGETABLE_TABLE = "pav";
 
+
+    public PackingServiceImpl() {
+
+        PGNotificationListener listener = new PGNotificationListener() {
+            @Override
+            public void notification(int processId, String channelName, String payload) {
+                String table = ServiceUtil.getTableName(channelName, payload);
+
+                switch (table) {
+                    case PACKING_FLOWER_TABLE:
+                        raiseFlowersChanged();
+                    case PACKING_VEGETABLE_TABLE:
+                        raiseVegetablesChanged();
+                        break;
+                }
+
+            }
+        };
+
+        PostgresHelper.getConnection().addNotificationListener(listener);
+
+        PostgresHelper.setUpListen(PACKING_FLOWER_TABLE);
+        PostgresHelper.setUpListen(PACKING_VEGETABLE_TABLE);
+    }
+
     public void putFlower(Flower flower) {
         ServiceUtil.writeItem(flower,PACKING_FLOWER_TABLE);
     }
