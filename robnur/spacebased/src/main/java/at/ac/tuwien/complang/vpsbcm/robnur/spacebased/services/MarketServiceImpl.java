@@ -23,12 +23,6 @@ public class MarketServiceImpl extends MarketService {
     private ContainerReference bouquetContainer;
     private ContainerReference vegetableBasketContainer;
 
-    private void raiseChangedEvent() {
-        if(marketChanged != null) {
-            marketChanged.handle(readAllVegetableBaskets(), readAllBouquets());
-        }
-    }
-
     public MarketServiceImpl(URI spaceUri) {
 
         this.spaceUri = spaceUri;

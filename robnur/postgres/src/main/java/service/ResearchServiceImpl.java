@@ -21,6 +21,30 @@ public class ResearchServiceImpl extends ResearchService {
     private static final String RESEARCH_FLOWER_TABLE = "rf";
     private static final String RESEARCH_VEGETABLE_TABLE = "rv";
 
+    public void ResearchServiceImpl() {
+
+        PGNotificationListener listener = new PGNotificationListener() {
+            @Override
+            public void notification(int processId, String channelName, String payload) {
+                String table = ServiceUtil.getTableName(channelName, payload);
+                switch (table) {
+                    case RESEARCH_FLOWER_TABLE:
+                        notifyFlowersChanged(readAllFlowers(null));
+                        break;
+                    case RESEARCH_VEGETABLE_TABLE:
+                        notifyVegetablesChanged(readAllVegetables(null));
+                        break;
+                }
+
+            }
+        };
+
+        PostgresHelper.getConnection().addNotificationListener(listener);
+
+        PostgresHelper.setUpListen(RESEARCH_FLOWER_TABLE);
+        PostgresHelper.setUpListen(RESEARCH_VEGETABLE_TABLE);
+    }
+
     public void putFlower(Flower flower) {
         ServiceUtil.writeItem(flower,RESEARCH_FLOWER_TABLE);
     }

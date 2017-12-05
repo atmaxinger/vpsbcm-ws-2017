@@ -15,6 +15,12 @@ public abstract class MarketService {
         this.marketChanged = marketChanged;
     }
 
+    protected void raiseChangedEvent() {
+        if(marketChanged != null) {
+            marketChanged.handle(readAllVegetableBaskets(), readAllBouquets());
+        }
+    }
+
     public abstract void putBouquet(Bouquet bouquet);
 
     public abstract int getAmountOfBouquets();
