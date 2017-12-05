@@ -14,6 +14,8 @@ public class PackRobot extends Robot {
     private ResearchService researchService;
     private TransactionService transactionService;
 
+    private final int TRANSACTION_TIMEOUT = 1000;
+
     public PackRobot(String id, PackingService packingService, MarketService marketService, ResearchService researchService, TransactionService transactionService) {
         this.setId(id);
 
@@ -27,7 +29,7 @@ public class PackRobot extends Robot {
     }
 
     public void tryCreateBouquet(){
-        Transaction transaction = transactionService.beginTransaction(1000000); // TODO change timeout
+        Transaction transaction = transactionService.beginTransaction(TRANSACTION_TIMEOUT); // TODO change timeout
 
         List<Flower> flowers = packingService.readAllFlowers(transaction);
         List<Flower> flowersForBouquet = new ArrayList<>();
@@ -129,7 +131,7 @@ public class PackRobot extends Robot {
     }
 
     public void tryCreateVegetableBasket(){
-        Transaction transaction = transactionService.beginTransaction(1000000);
+        Transaction transaction = transactionService.beginTransaction(TRANSACTION_TIMEOUT);
 
         List<Vegetable> vegetables = packingService.readAllVegetables(transaction);
 
@@ -145,10 +147,13 @@ public class PackRobot extends Robot {
         }
 
         if(vegetables.size() <= 5){
+            logger.debug(String.format("Not enough vegetables available (%d)", vegetables.size()));
             // not enough vegetables available
             transaction.commit();
             return;
         }
+
+        logger.debug(String.format("Enough vegetables available!"));
 
         List<VegetableType> checkedVegetableTypes = new ArrayList();    // list of VegetableType to avoid checking a VegetableType twice
 
@@ -169,9 +174,9 @@ public class PackRobot extends Robot {
                     List<Vegetable> vegetablesForVegetableBasket = new ArrayList<>();
 
                     for (int i = 0; i < 5; i++){
-                        packingService.getVegetable(vegetablesOfSameType.get(i).getId(),transaction);
+                        Vegetable vegetable = packingService.getVegetable(vegetablesOfSameType.get(i).getId(),transaction);
                         logger.info(String.format("Remove vegetable (id = %s) from packing-queue.",vegetablesOfSameType.get(i).getId()));
-                        vegetablesForVegetableBasket.add(packingService.getVegetable(vegetablesOfSameType.get(i).getId(),transaction));
+                        vegetablesForVegetableBasket.add(vegetable);
                     }
 
                     vegetableBasket.setVegetables(vegetablesForVegetableBasket);
