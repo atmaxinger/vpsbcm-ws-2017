@@ -12,7 +12,7 @@
         <module>shared</module>
         <module>spacebased</module>
         <module>nonspacebased</module>
-        <module>postgre</module>
+        <module>postgres</module>
     </modules>
 
     <repositories>
