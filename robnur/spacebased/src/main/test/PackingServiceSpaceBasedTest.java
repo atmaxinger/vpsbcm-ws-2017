@@ -1,10 +1,10 @@
+import at.ac.tuwien.complang.vpbscm.robnur.shared.services.PackingServiceTest;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.MarketServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.PackingServiceImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.mozartspaces.core.DefaultMzsCore;
 import org.mozartspaces.core.MzsCore;
-import at.ac.tuwien.complang.services.PackingServiceTest;
 
 public class PackingServiceSpaceBasedTest extends PackingServiceTest {
 

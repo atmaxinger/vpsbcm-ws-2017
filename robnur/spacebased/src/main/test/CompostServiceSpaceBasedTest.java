@@ -1,3 +1,4 @@
+import at.ac.tuwien.complang.vpbscm.robnur.shared.services.CompostServiceTest;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.CompostService;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.CompostServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.MarketServiceImpl;
@@ -5,9 +6,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.mozartspaces.core.DefaultMzsCore;
 import org.mozartspaces.core.MzsCore;
-import at.ac.tuwien.complang.services.CompostServiceTest;
 
-public class CompostServiceSpaceBasedTest extends CompostServiceTest{
+public class CompostServiceSpaceBasedTest extends CompostServiceTest {
     MzsCore core;
 
     @Before

@@ -1,10 +1,10 @@
+import at.ac.tuwien.complang.vpbscm.robnur.shared.services.ResearchServiceTest;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.CompostServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.ResearchServiceImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.mozartspaces.core.DefaultMzsCore;
 import org.mozartspaces.core.MzsCore;
-import at.ac.tuwien.complang.services.ResearchServiceTest;
 
 public class ResearchServiceSpaceBasedTest extends ResearchServiceTest {
 

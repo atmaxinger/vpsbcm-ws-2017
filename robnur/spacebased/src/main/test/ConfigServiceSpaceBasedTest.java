@@ -1,3 +1,4 @@
+import at.ac.tuwien.complang.vpbscm.robnur.shared.services.ConfigServiceTest;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ConfigService;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.CompostServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.ConfigServiceImpl;
@@ -5,9 +6,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.mozartspaces.core.DefaultMzsCore;
 import org.mozartspaces.core.MzsCore;
-import at.ac.tuwien.complang.services.ConfigServiceTest;
 
-public class ConfigServiceSpaceBasedTest extends ConfigServiceTest{
+public class ConfigServiceSpaceBasedTest extends ConfigServiceTest {
     MzsCore core;
 
     @Before
