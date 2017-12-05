@@ -1,6 +1,7 @@
 package service;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlant;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Plant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PlantAndHarvestRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.GreenhouseService;
@@ -16,12 +17,44 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class GreenhouseServiceImpl extends GreenhouseService {
 
     private static final String GREENHOUSE_FLOWER_PLANT_TABLE = "gfp";
     private static final String GREENHOUSE_VEGETABLE_PLANT_TABLE = "gvp";
+
+    public GreenhouseServiceImpl() {
+        PGNotificationListener listener = new PGNotificationListener() {
+            @Override
+            public void notification(int processId, String channelName, String payload) {
+                String table = ServiceUtil.getTableName(channelName, payload);
+                switch (table) {
+                    case GREENHOUSE_FLOWER_PLANT_TABLE:
+                    case GREENHOUSE_VEGETABLE_PLANT_TABLE:
+
+                        if(greenhouseChanged != null) {
+                            List<FlowerPlant> flowerPlants = readAllFlowerPlants();
+                            List<VegetablePlant> vegetablePlants = readAllVegetablePlants();
+                            List<Plant> plants = new LinkedList<>();
+                            plants.addAll(flowerPlants);
+                            plants.addAll(vegetablePlants);
+
+                            greenhouseChanged.handle(plants);
+                        }
+
+                        break;
+                }
+
+            }
+        };
+
+        PostgresHelper.getConnection().addNotificationListener(listener);
+
+        PostgresHelper.setUpListen(GREENHOUSE_FLOWER_PLANT_TABLE);
+        PostgresHelper.setUpListen(GREENHOUSE_VEGETABLE_PLANT_TABLE);
+    }
 
     @Override
     public boolean plant(VegetablePlant vegetablePlant, Transaction transaction) {
@@ -80,7 +113,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
 
             Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
 
-            ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE data ->> 'growth' >= 100", GREENHOUSE_VEGETABLE_PLANT_TABLE));
+            ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE (data ->> 'growth')::numeric >= 100", GREENHOUSE_VEGETABLE_PLANT_TABLE));
 
             if (rs.next()) {
                 String data = rs.getString("data");
@@ -115,7 +148,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
 
             Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
 
-            ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE data ->> 'growth' >= 100", GREENHOUSE_FLOWER_PLANT_TABLE));
+            ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE (data::json->>'growth')::numeric >= 100", GREENHOUSE_FLOWER_PLANT_TABLE));
 
             if (rs.next()) {
                 String data = rs.getString("data");

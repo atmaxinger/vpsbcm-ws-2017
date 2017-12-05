@@ -69,12 +69,12 @@ public class StorageServiceImpl extends StorageService {
 
     @Override
     protected List<FlowerPlant> getSeeds(FlowerType type, Transaction transaction) {
-        return ServiceUtil.getItemsByParameter("'cultivationInformation'->'flowerType'",type.name(),STORAGE_FLOWER_SEED_TABLE,FlowerPlant.class,transaction);
+        return ServiceUtil.getItemsByParameter("'cultivationInformation'->>'flowerType'",type.name(),STORAGE_FLOWER_SEED_TABLE,FlowerPlant.class,transaction);
     }
 
     @Override
     protected List<VegetablePlant> getSeeds(VegetableType type, Transaction transaction) {
-        return ServiceUtil.getItemsByParameter("'cultivationInformation'->'vegetableType'",type.name(),STORAGE_VEGETABLE_SEED_TABLE,VegetablePlant.class,transaction);
+        return ServiceUtil.getItemsByParameter("'cultivationInformation'->>'vegetableType'",type.name(),STORAGE_VEGETABLE_SEED_TABLE,VegetablePlant.class,transaction);
 
     }
 

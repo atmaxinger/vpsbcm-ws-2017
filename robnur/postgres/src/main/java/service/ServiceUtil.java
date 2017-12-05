@@ -28,6 +28,21 @@ public class ServiceUtil {
         return (new TransactionServiceImpl()).beginTransaction(-1);
     }
 
+    /**
+     * Prepares the arrow for the json queries
+     * This is needed because "->" gives you a json object and "->>" gives you the content of a json object.
+     * If the subquery includes a "->" we also need to give a "->".
+     * @param d
+     * @return
+     */
+    private static String prepareArrow(String d) {
+        if(d.contains("->")) {
+            return "->";
+        }
+
+        else return "->>";
+    }
+
     public static <T extends Serializable> void writeItem(T item, String table, Transaction transaction) {
         try {
             Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
@@ -101,7 +116,7 @@ public class ServiceUtil {
 
             Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
 
-            ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE data ->> %s = '%s'", table,parameterName,parameterValue));
+            ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE (data " + prepareArrow(parameterName) + " %s)::text = '%s'", table,parameterName,parameterValue));
 
             rs.next();
             String data = rs.getString("data");
@@ -139,7 +154,7 @@ public class ServiceUtil {
 
             Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
 
-            ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE data ->> %s = '%s'", table,parameterName,parameterValue));
+            ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE (data " + prepareArrow(parameterName) + " %s)::text = '%s'", table,parameterName,parameterValue));
 
             while (rs.next()) {
                 String data = rs.getString("data");
@@ -170,7 +185,7 @@ public class ServiceUtil {
     public static void deleteItemByParameter(String parameterName, String parameterValue, String table, @NotNull Transaction transaction) {
         try {
             Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
-            statement.execute(String.format("DELETE FROM %s WHERE data ->> %s = '%s'", table, parameterName,parameterValue));
+            statement.execute(String.format("DELETE FROM %s WHERE (data " + prepareArrow(parameterName) + " %s)::text = '%s'", table, parameterName,parameterValue));
             statement.close();
         } catch (SQLException e) {
             e.printStackTrace();
