@@ -26,10 +26,10 @@ public class DbServer {
         createNotifyFunction(ResearchServiceImpl.getTables());
 
         createTables(GreenhouseServiceImpl.getTables());
-        createNotifyFunction(ResearchServiceImpl.getTables());
+        createNotifyFunction(GreenhouseServiceImpl.getTables());
 
         createTables(StorageServiceImpl.getTables());
-        createNotifyFunction(ResearchServiceImpl.getTables());
+        createNotifyFunction(StorageServiceImpl.getTables());
     }
 
     private static void createTables(List<String> tables){
