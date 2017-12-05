@@ -61,7 +61,16 @@ public class PostgresHelper {
         initDataSource();
         PGConnection pgConnection = null;
         try {
-            pgConnection = (PGConnection) dataSource.getConnection();
+            // This is a workaround for a bug in the JDBC driver implementation
+            try {
+                pgConnection = (PGConnection) dataSource.getConnection();
+            } catch (SQLException e) {
+                // IGNORE
+            }
+
+            if(pgConnection == null) {
+                pgConnection = (PGConnection) dataSource.getConnection();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
