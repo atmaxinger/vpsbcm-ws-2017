@@ -17,11 +17,12 @@ public class PlantAndHarvestRobot extends Robot {
     private GreenhouseService greenhouseService;
     private TransactionService transactionService;
     private PackingService packingService;
+    private CompostService compostService;
 
     private int plantTransactionTimeout = 60*1000;
     private int harvestTransactionTimeout = 1000;
 
-    public PlantAndHarvestRobot(String id, int plantTransactionTimeout, int harvestTransactionTimeout, StorageService storageService, GreenhouseService greenhouseService, TransactionService transactionService, PackingService packingService) {
+    public PlantAndHarvestRobot(String id, int plantTransactionTimeout, int harvestTransactionTimeout, StorageService storageService, GreenhouseService greenhouseService, TransactionService transactionService, PackingService packingService, CompostService compostService) {
         logger.debug("PlantAndHarvestRobot constructor");
 
         this.setId(id);
@@ -32,6 +33,7 @@ public class PlantAndHarvestRobot extends Robot {
         this.greenhouseService = greenhouseService;
         this.transactionService = transactionService;
         this.packingService = packingService;
+        this.compostService = compostService;
 
         tryHarvestPlant();
         tryPlant();
@@ -91,6 +93,26 @@ public class PlantAndHarvestRobot extends Robot {
         }
     }
 
+
+    private List<Vegetable> tryHarvestVegetablePlant(Transaction transaction) {
+        VegetablePlant plant = greenhouseService.getHarvestableVegetablePlant(transaction);
+
+        if(plant != null) {
+            List<Vegetable> vegetables = Vegetable.harvestVegetablesFormPlant(plant);
+
+            // if this plant can still be harvested then "plant" it again
+            if (plant.getCultivationInformation().getRemainingNumberOfHarvests() > 0) {
+                greenhouseService.plant(plant, transaction);
+            } else {
+                compostService.putVegetablePlant(plant);
+            }
+
+            return vegetables;
+        }
+
+        return null;
+    }
+
     /**
      * try to harvest all harvestable vegetables
      */
@@ -98,7 +120,7 @@ public class PlantAndHarvestRobot extends Robot {
         logger.debug("tryHarvestVegetable");
 
         Transaction t = transactionService.beginTransaction(harvestTransactionTimeout);
-        List<Vegetable> harvested = greenhouseService.tryHarvestVegetablePlant(t);
+        List<Vegetable> harvested = tryHarvestVegetablePlant(t);
 
         if (harvested != null && harvested.size() > 0) {
             logger.debug("harvested vegetable");
@@ -118,6 +140,18 @@ public class PlantAndHarvestRobot extends Robot {
         }
     }
 
+
+    public List<Flower> tryHarvestFlowerPlant(Transaction transaction) {
+        FlowerPlant plant = greenhouseService.getHarvestableFlowerPlant(transaction);
+
+        if(plant != null) {
+            compostService.putFlowerPlant(plant);
+            return Flower.harvestFlowerFromFlowerPlant(plant);
+        }
+
+        return null;
+    }
+
     /**
      * try to harvest all harvestable flowers
      */
@@ -125,7 +159,7 @@ public class PlantAndHarvestRobot extends Robot {
         logger.log(Priority.DEBUG, "tryHarvestFlower");
 
         Transaction t = transactionService.beginTransaction(harvestTransactionTimeout);
-        List<Flower> harvested = greenhouseService.tryHarvestFlowerPlant(t);
+        List<Flower> harvested = tryHarvestFlowerPlant(t);
         if (harvested != null && harvested.size() > 0) {
             logger.debug("harvested flower");
 

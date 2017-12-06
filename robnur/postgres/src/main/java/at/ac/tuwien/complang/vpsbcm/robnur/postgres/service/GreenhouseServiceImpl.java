@@ -103,7 +103,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
     }
 
     @Override
-    protected VegetablePlant getHarvestableVegetablePlant(Transaction transaction) {
+    public VegetablePlant getHarvestableVegetablePlant(Transaction transaction) {
         VegetablePlant result = null;
 
         try {
@@ -138,7 +138,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
     }
 
     @Override
-    protected FlowerPlant getHarvestableFlowerPlant(Transaction transaction) {
+    public FlowerPlant getHarvestableFlowerPlant(Transaction transaction) {
         FlowerPlant result = null;
 
         try {

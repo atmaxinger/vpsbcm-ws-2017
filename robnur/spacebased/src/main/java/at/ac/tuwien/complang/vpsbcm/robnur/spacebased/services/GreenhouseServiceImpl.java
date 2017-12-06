@@ -177,7 +177,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
 
 
     @Override
-    protected VegetablePlant getHarvestableVegetablePlant(Transaction t) {
+    public VegetablePlant getHarvestableVegetablePlant(Transaction t) {
         TransactionReference transactionReference = TransactionServiceImpl.getTransactionReference(t);
 
         try {
@@ -202,7 +202,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
     }
 
     @Override
-    protected FlowerPlant getHarvestableFlowerPlant(Transaction t) {
+    public FlowerPlant getHarvestableFlowerPlant(Transaction t) {
         TransactionReference tref = TransactionServiceImpl.getTransactionReference(t);
 
         try {

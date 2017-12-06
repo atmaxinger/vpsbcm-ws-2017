@@ -1,12 +1,10 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.robots;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PlantAndHarvestRobot;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.CompostService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.PackingService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
-import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.GreenhouseServiceImpl;
-import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.StorageServiceImpl;
-import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.TransactionServiceImpl;
-import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.PackingServiceImpl;
+import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.*;
 import org.mozartspaces.core.MzsCoreException;
 
 import java.net.URI;
@@ -38,9 +36,9 @@ public class SpacePlantAndHarvestRobot {
         PackingService packingService = new PackingServiceImpl(uri);
         GreenhouseServiceImpl greenhouseService = new GreenhouseServiceImpl(uri);
         TransactionService transactionService = new TransactionServiceImpl(uri);
+        CompostService compostService = new CompostServiceImpl(uri);
 
-
-        PlantAndHarvestRobot robot = new PlantAndHarvestRobot(args[0], plantTransactionTimeout, harvestTransactionTimeout, storageService, greenhouseService, transactionService, packingService);
+        PlantAndHarvestRobot robot = new PlantAndHarvestRobot(args[0], plantTransactionTimeout, harvestTransactionTimeout, storageService, greenhouseService, transactionService, packingService, compostService);
 
         greenhouseService.registerPlantAndHarvestRobot(robot);
         storageService.registerPlantAndHarvestRobot(robot);

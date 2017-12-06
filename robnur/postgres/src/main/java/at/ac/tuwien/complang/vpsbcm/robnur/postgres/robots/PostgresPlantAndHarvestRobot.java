@@ -1,10 +1,8 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.postgres.robots;
 
-import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.StorageServiceImpl;
-import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.GreenhouseServiceImpl;
-import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.PackingServiceImpl;
-import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.TransactionServiceImpl;
+import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.*;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PlantAndHarvestRobot;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.CompostService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.PackingService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
 
@@ -32,9 +30,10 @@ public class PostgresPlantAndHarvestRobot {
         PackingService packingService = new PackingServiceImpl();
         GreenhouseServiceImpl greenhouseService = new GreenhouseServiceImpl();
         TransactionService transactionService = new TransactionServiceImpl();
+        CompostService compostService = new CompostServiceImpl();
 
 
-        PlantAndHarvestRobot robot = new PlantAndHarvestRobot(args[0], plantTransactionTimeout, harvestTransactionTimeout, storageService, greenhouseService, transactionService, packingService);
+        PlantAndHarvestRobot robot = new PlantAndHarvestRobot(args[0], plantTransactionTimeout, harvestTransactionTimeout, storageService, greenhouseService, transactionService, packingService, compostService);
 
         greenhouseService.registerPlantAndHarvestRobot(robot);
         storageService.registerPlantAndHarvestRobot(robot);

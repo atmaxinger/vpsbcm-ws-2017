@@ -15,32 +15,6 @@ public abstract class GreenhouseService {
 
     public abstract boolean plant(FlowerPlant flowerPlant, Transaction transaction);
 
-    public List<Vegetable> tryHarvestVegetablePlant(Transaction transaction) {
-        VegetablePlant plant = getHarvestableVegetablePlant(transaction);
-
-        if(plant != null) {
-            List<Vegetable> vegetables = Vegetable.harvestVegetablesFormPlant(plant);
-
-            // if this plant can still be harvested then "plant" it again
-            if (plant.getCultivationInformation().getRemainingNumberOfHarvests() > 0) {
-                this.plant(plant, transaction);
-            }
-
-            return vegetables;
-        }
-
-        return null;
-    }
-
-    public List<Flower> tryHarvestFlowerPlant(Transaction transaction) {
-        FlowerPlant plant = getHarvestableFlowerPlant(transaction);
-
-        if(plant != null) {
-            return Flower.harvestFlowerFromFlowerPlant(plant);
-        }
-
-        return null;
-    }
 
     public abstract List<VegetablePlant> getAllVegetablePlants(Transaction transaction);
     public abstract List<FlowerPlant> getAllFlowerPlants(Transaction transaction);
@@ -58,6 +32,6 @@ public abstract class GreenhouseService {
 
 
 
-    protected abstract VegetablePlant getHarvestableVegetablePlant(Transaction t);
-    protected abstract FlowerPlant getHarvestableFlowerPlant(Transaction t);
+    public abstract VegetablePlant getHarvestableVegetablePlant(Transaction t);
+    public abstract FlowerPlant getHarvestableFlowerPlant(Transaction t);
 }
