@@ -71,6 +71,16 @@ public class MarketController {
 
         tcBuy.setCellValueFactory(column -> {
             Button btn = new Button("Kaufen");
+
+            btn.setOnAction(event -> {
+                EndProduct product = column.getValue();
+                if(product instanceof VegetableBasket) {
+                    marketService.sellVegetableBasket((VegetableBasket) product);
+                } else if(product instanceof Bouquet) {
+                    marketService.sellBouquet((Bouquet) product);
+                }
+            });
+
             return new ReadOnlyObjectWrapper<>(btn);
         });
     }
