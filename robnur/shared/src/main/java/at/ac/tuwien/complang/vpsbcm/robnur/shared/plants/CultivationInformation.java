@@ -12,7 +12,7 @@ public abstract class CultivationInformation extends Idable implements Serializa
 
     private int harvest;  // number of vegetables or flowers which can be harvested
 
-    private int upgradeLevel;
+    private int upgradeLevel = 1;
 
     private int fertilizerAmount;
 
@@ -32,6 +32,7 @@ public abstract class CultivationInformation extends Idable implements Serializa
         fertilizerAmount = cultivationInformation.fertilizerAmount;
         waterAmount = cultivationInformation.waterAmount;
         soilAmount = cultivationInformation.soilAmount;
+        robots = cultivationInformation.robots;
     }
 
     public float getGrowthRate() {
