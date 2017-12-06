@@ -9,6 +9,8 @@
                <columns>
                    <TableColumn fx:id="tcFlowerPlantsId" text="Id" prefWidth="320" />
                    <TableColumn fx:id="tcFlowerPlantsType" text="Blumen Sorte" prefWidth="100" />
+                   <TableColumn fx:id="tcFlowerPlantsPlantRobot" text="Pflanz Roboter" prefWidth="100" />
+                   <TableColumn fx:id="tcFlowerPlantsCompostRobot" text="Kompost Roboter" prefWidth="100" />
                </columns>
            </TableView>
        </TitledPane>
@@ -18,6 +20,9 @@
                    <TableColumn fx:id="tcFlowersId" text="Id" prefWidth="320"/>
                    <TableColumn fx:id="tcFlowersType" text="Blumen Sorte" prefWidth="100"/>
                    <TableColumn fx:id="tcFlowersParent" text="Eltern Pflanze" prefWidth="320"/>
+                   <TableColumn fx:id="tcFlowersPlantRobot" text="Pflanz Roboter" prefWidth="100" />
+                   <TableColumn fx:id="tcFlowersHarvestRobot" text="Ernte Roboter" prefWidth="100" />
+                   <TableColumn fx:id="tcFlowersCompostRobot" text="Kompost Roboter" prefWidth="100" />
                </columns>
            </TableView>
        </TitledPane>
@@ -27,6 +32,8 @@
                <columns>
                    <TableColumn fx:id="tcVegetablePlantsId" text="Id" prefWidth="320"/>
                    <TableColumn fx:id="tcVegetablePlantsType" text="Gemüse Sorte" prefWidth="100"/>
+                   <TableColumn fx:id="tcVegetablePlantsPlantRobot" text="Pflanz Roboter" prefWidth="100" />
+                   <TableColumn fx:id="tcVegetablePlantsCompostRobot" text="Kompost Roboter" prefWidth="100" />
                </columns>
            </TableView>
        </TitledPane>
@@ -36,6 +43,9 @@
                    <TableColumn fx:id="tcVegetablesId" text="Id" prefWidth="320"/>
                    <TableColumn fx:id="tcVegetablesType" text="Gemüse Sorte" prefWidth="100"/>
                    <TableColumn fx:id="tcVegetablesParent" text="Eltern Pflanze" prefWidth="320"/>
+                   <TableColumn fx:id="tcVegetablesPlantRobot" text="Pflanz Roboter" prefWidth="100" />
+                   <TableColumn fx:id="tcVegetablesHarvestRobot" text="Ernte Roboter" prefWidth="100" />
+                   <TableColumn fx:id="tcVegetablesCompostRobot" text="Kompost Roboter" prefWidth="100" />
                </columns>
            </TableView>
        </TitledPane>

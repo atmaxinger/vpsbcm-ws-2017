@@ -1,9 +1,6 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.gui;
 
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Flower;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlant;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.CompostService;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ObservableList;
@@ -18,21 +15,30 @@ public class CompostController {
     public TableView<FlowerPlant> tvFlowerPlants;
     public TableColumn<FlowerPlant, String> tcFlowerPlantsId;
     public TableColumn<FlowerPlant, String> tcFlowerPlantsType;
+    public TableColumn<FlowerPlant, String> tcFlowerPlantsPlantRobot;
+    public TableColumn<FlowerPlant, String> tcFlowerPlantsCompostRobot;
 
     public TableView<Flower> tvFlowers;
     public TableColumn<Flower, String> tcFlowersId;
     public TableColumn<Flower, String> tcFlowersType;
     public TableColumn<Flower, String> tcFlowersParent;
-
+    public TableColumn<Flower, String> tcFlowersPlantRobot;
+    public TableColumn<Flower, String> tcFlowersHarvestRobot;
+    public TableColumn<Flower, String> tcFlowersCompostRobot;
 
     public TableView<VegetablePlant> tvVegetablePlants;
     public TableColumn<VegetablePlant, String> tcVegetablePlantsId;
     public TableColumn<VegetablePlant, String> tcVegetablePlantsType;
+    public TableColumn<VegetablePlant, String> tcVegetablePlantsPlantRobot;
+    public TableColumn<VegetablePlant, String> tcVegetablePlantsCompostRobot;
 
     public TableView<Vegetable> tvVegetables;
     public TableColumn<Vegetable, String> tcVegetablesId;
     public TableColumn<Vegetable, String> tcVegetablesType;
     public TableColumn<Vegetable, String> tcVegetablesParent;
+    public TableColumn<Vegetable, String> tcVegetablesPlantRobot;
+    public TableColumn<Vegetable, String> tcVegetablesHarvestRobot;
+    public TableColumn<Vegetable, String> tcVegetablesCompostRobot;
 
 
     private CompostService compostService = RobNurGUI.compostService;
@@ -56,6 +62,8 @@ public class CompostController {
 
         tcFlowerPlantsId.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getId()));
         tcFlowerPlantsType.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getTypeName()));
+        tcFlowerPlantsPlantRobot.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getPlantRobot()));
+        tcFlowerPlantsCompostRobot.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getCompostRobot()));
     }
 
     private void setFlowersTableData(List<Flower> flowers) {
@@ -70,6 +78,9 @@ public class CompostController {
         tcFlowersId.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getId()));
         tcFlowersType.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getParentPlant().getTypeName()));
         tcFlowersParent.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getParentPlant().getId()));
+        tcFlowersPlantRobot.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getParentPlant().getPlantRobot()));
+        tcFlowersHarvestRobot.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getHarvestRobot()));
+        tcFlowersCompostRobot.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getCompostRobot()));
     }
 
 
@@ -84,6 +95,8 @@ public class CompostController {
 
         tcVegetablePlantsId.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getId()));
         tcVegetablePlantsType.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getTypeName()));
+        tcVegetablePlantsPlantRobot.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getPlantRobot()));
+        tcVegetablePlantsCompostRobot.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getCompostRobot()));
     }
 
     private void setVegetablesTableData(List<Vegetable> Vegetables) {
@@ -98,5 +111,8 @@ public class CompostController {
         tcVegetablesId.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getId()));
         tcVegetablesType.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getParentPlant().getTypeName()));
         tcVegetablesParent.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getParentPlant().getId()));
+        tcVegetablesPlantRobot.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getParentPlant().getPlantRobot()));
+        tcVegetablesHarvestRobot.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getHarvestRobot()));
+        tcVegetablesCompostRobot.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getCompostRobot()));
     }
 }
