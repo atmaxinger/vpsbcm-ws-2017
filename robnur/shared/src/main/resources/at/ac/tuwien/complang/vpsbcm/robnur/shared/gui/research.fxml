@@ -11,17 +11,17 @@
     <items>
         <TableView fx:id="tvVegetables">
             <columns>
-                <TableColumn fx:id="tcVegetablesId" text="Id" />
-                <TableColumn fx:id="tcVegetablesPlantId" text="Pflanzen Id" />
-                <TableColumn fx:id="tcVegetablesType" text="Gemüse Sorte" />
+                <TableColumn fx:id="tcVegetablesId" text="Id" prefWidth="320" />
+                <TableColumn fx:id="tcVegetablesPlantId" text="Pflanzen Id" prefWidth="320" />
+                <TableColumn fx:id="tcVegetablesType" text="Gemüse Sorte" prefWidth="100" />
             </columns>
         </TableView>
 
         <TableView fx:id="tvFlowers">
             <columns>
-                <TableColumn fx:id="tcFlowersId" text="Id" />
-                <TableColumn fx:id="tcFlowersPlantId" text="Pflanzen Id" />
-                <TableColumn fx:id="tcFlowersType" text="Blumensorte" />
+                <TableColumn fx:id="tcFlowersId" text="Id" prefWidth="320"/>
+                <TableColumn fx:id="tcFlowersPlantId" text="Pflanzen Id" prefWidth="320" />
+                <TableColumn fx:id="tcFlowersType" text="Blumensorte" prefWidth="100" />
             </columns>
         </TableView>
     </items>
