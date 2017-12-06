@@ -120,6 +120,7 @@ public class ResearchRobot extends Robot {
 
         cultivationInformationOfFlowerType = (FlowerPlantCultivationInformation) upgradeCultivationInformation(cultivationInformationOfFlowerType);
 
+
         configService.deleteFlowerPlantCultivationInformation(cultivationInformationOfFlowerType.getId(),transaction);
         configService.putFlowerPlantCultivationInformation(cultivationInformationOfFlowerType,transaction);
 
@@ -174,6 +175,8 @@ public class ResearchRobot extends Robot {
                 cultivationInformation.setGrowthRate(cultivationInformation.getGrowthRate() + 0.5f);
                 break;
         }
+
+        cultivationInformation.addResearchRobot(this.getId());
 
         return cultivationInformation;
     }

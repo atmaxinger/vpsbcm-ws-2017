@@ -1,14 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
 
-<SplitPane prefHeight="369.0" prefWidth="504.0" dividerPositions="0.66" orientation="VERTICAL"
-           xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.complang.vpsbcm.robnur.shared.gui.CompostController">
-    <items>
+<Accordion prefHeight="369.0" prefWidth="504.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.complang.vpsbcm.robnur.shared.gui.CompostController">
+   <panes>
+       <TitledPane animated="false" text="Blumen Pflanzen">
+           <TableView fx:id="tvFlowerPlants">
+               <columns>
+                   <TableColumn fx:id="tcFlowerPlantsId" text="Id" prefWidth="320" />
+                   <TableColumn fx:id="tcFlowerPlantsType" text="Blumen Sorte" prefWidth="100" />
+               </columns>
+           </TableView>
+       </TitledPane>
+       <TitledPane animated="false" text="Blumen">
+           <TableView fx:id="tvFlowers">
+               <columns>
+                   <TableColumn fx:id="tcFlowersId" text="Id" prefWidth="320"/>
+                   <TableColumn fx:id="tcFlowersType" text="Blumen Sorte" prefWidth="100"/>
+                   <TableColumn fx:id="tcFlowersParent" text="Eltern Pflanze" prefWidth="320"/>
+               </columns>
+           </TableView>
+       </TitledPane>
 
-    </items>
-</SplitPane>
+       <TitledPane animated="false" text="Gemüse Pflanzen">
+           <TableView fx:id="tvVegetablePlants">
+               <columns>
+                   <TableColumn fx:id="tcVegetablePlantsId" text="Id" prefWidth="320"/>
+                   <TableColumn fx:id="tcVegetablePlantsType" text="Gemüse Sorte" prefWidth="100"/>
+               </columns>
+           </TableView>
+       </TitledPane>
+       <TitledPane animated="false" text="Gemüse">
+           <TableView fx:id="tvVegetables">
+               <columns>
+                   <TableColumn fx:id="tcVegetablesId" text="Id" prefWidth="320"/>
+                   <TableColumn fx:id="tcVegetablesType" text="Gemüse Sorte" prefWidth="100"/>
+                   <TableColumn fx:id="tcVegetablesParent" text="Eltern Pflanze" prefWidth="320"/>
+               </columns>
+           </TableView>
+       </TitledPane>
+   </panes>
+</Accordion>

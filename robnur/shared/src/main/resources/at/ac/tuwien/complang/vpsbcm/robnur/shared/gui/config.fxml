@@ -9,6 +9,45 @@
 <SplitPane prefHeight="369.0" prefWidth="504.0" dividerPositions="0.66" orientation="VERTICAL"
            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.complang.vpsbcm.robnur.shared.gui.ConfigController">
     <items>
+        <TableView fx:id="tvVegetables">
+            <columns>
+                <TableColumn fx:id="tcVegetablesType" text="Gemüse Art" />
+                <TableColumn fx:id="tcVegetablesGrowthRate" text="Wachstumsrate" />
+                <TableColumn fx:id="tcVegetablesUpgradeLevel" text="Upgrade Level" />
 
+                <TableColumn fx:id="tcVegetablesMaxHarvests" text="Anzahl der Ernten" />
+                <TableColumn fx:id="tcVegetablesHarvests" text="Ertrag" />
+
+                <TableColumn text="Benötigte Resourcen">
+                    <columns>
+                        <TableColumn fx:id="tcVegetablesSoil" prefWidth="74.0" text="Erde" />
+                        <TableColumn fx:id="tcVegetablesWater" prefWidth="75.0" text="Wasser" />
+                        <TableColumn fx:id="tcVegetablesFertilizer" prefWidth="75.0" text="Gemüse Dünger" />
+                    </columns>
+                </TableColumn>
+
+                <TableColumn fx:id="tcVegetablesResearchRobots" text="Forschungs Roboter" />
+            </columns>
+        </TableView>
+
+        <TableView fx:id="tvFlowers">
+            <columns>
+                <TableColumn fx:id="tcFlowersType" text="Blumen Art" />
+                <TableColumn fx:id="tcFlowersGrowthRate" text="Wachstumsrate" />
+                <TableColumn fx:id="tcFlowersUpgradeLevel" text="Upgrade Level" />
+
+                <TableColumn fx:id="tcFlowersHarvests" text="Ertrag" />
+
+                <TableColumn text="Benötigte Resourcen">
+                    <columns>
+                        <TableColumn fx:id="tcFlowersSoil" prefWidth="74.0" text="Erde" />
+                        <TableColumn fx:id="tcFlowersWater" prefWidth="75.0" text="Wasser" />
+                        <TableColumn fx:id="tcFlowersFertilizer" prefWidth="75.0" text="Blumen Dünger" />
+                    </columns>
+                </TableColumn>
+
+                <TableColumn fx:id="tcFlowersResearchRobots" text="Forschungs Roboter" />
+            </columns>
+        </TableView>
     </items>
 </SplitPane>

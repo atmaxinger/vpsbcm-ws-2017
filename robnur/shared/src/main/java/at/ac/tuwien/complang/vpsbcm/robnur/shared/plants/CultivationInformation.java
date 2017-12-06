@@ -1,6 +1,9 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.plants;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 public abstract class CultivationInformation extends Idable implements Serializable {
 
@@ -16,6 +19,8 @@ public abstract class CultivationInformation extends Idable implements Serializa
     private int waterAmount;
 
     private int soilAmount;
+
+    private List<String> robots = new LinkedList<>();
 
     public CultivationInformation() {
     }
@@ -79,5 +84,13 @@ public abstract class CultivationInformation extends Idable implements Serializa
 
     public void setSoilAmount(int soilAmount) {
         this.soilAmount = soilAmount;
+    }
+
+    public void addResearchRobot(String id) {
+        robots.add(id);
+    }
+
+    public List<String> getResearchRobots() {
+        return robots;
     }
 }

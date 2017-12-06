@@ -14,6 +14,8 @@ public class PackRobot extends Robot {
     private ResearchService researchService;
     private TransactionService transactionService;
 
+    private final int TRANSACTION_TIMEOUT = 1000;
+
     public PackRobot(String id, PackingService packingService, MarketService marketService, ResearchService researchService, TransactionService transactionService) {
         this.setId(id);
 
@@ -26,35 +28,46 @@ public class PackRobot extends Robot {
         tryCreateBouquet();
     }
 
+
+    private void tryPutFlowersIntoResearch() {
+        Transaction transaction = transactionService.beginTransaction(TRANSACTION_TIMEOUT); // TODO change timeout
+        List<Flower> flowers = packingService.readAllFlowers(transaction);
+
+        int put = 0;
+        for(int i=0; i<Math.min(flowers.size(), 10); i++) {
+            Flower flower = packingService.getFlower(flowers.get(i).getId(),transaction);
+            researchService.putFlower(flower);
+            logger.info(String.format("Forward flower (id = %s) to research department.",flower.getId()));
+
+            put++;
+        }
+
+        transaction.commit();
+
+        // If we have packed 10 into research, chances are good there are more...
+        if(put == 10) {
+            tryPutFlowersIntoResearch();
+        }
+    }
     public void tryCreateBouquet(){
-        Transaction transaction = transactionService.beginTransaction(-1);
+        
+        // check if there are already enough bouquets in the market
+        if(marketService.getAmountOfBouquets() >= 5){
+            tryPutFlowersIntoResearch();
+            return;
+        }
+
+        Transaction transaction = transactionService.beginTransaction(TRANSACTION_TIMEOUT); // TODO change timeout
 
         List<Flower> flowers = packingService.readAllFlowers(transaction);
         List<Flower> flowersForBouquet = new ArrayList<>();
 
-        // check if there are already enough bouquets in the market
-        if(marketService.getAmountOfBouquets() >= 5){
-
-            // put flowers from packing-queue to the research department
-            for (Flower f: flowers) {
-                researchService.putFlower(packingService.getFlower(f.getId(),transaction));
-                logger.info(String.format("PackRobot %s: Forward flower (id = %s) to research department.",this.getId(), f.getId()));
-            }
-
-            transaction.commit();
-
-            return;
-        }
-
         if(getNumberOfDistinctFlowerTypes(flowers) >= 3){
 
             if(flowers.size() >= 5){
-                // build a bouquet with 5 flowers of at least 3 distinct types
-
                 flowersForBouquet.add(flowers.get(0));
                 flowersForBouquet.add(flowers.get(1));
                 flowersForBouquet.add(flowers.get(2));
-
                 switch (getNumberOfDistinctFlowerTypes(flowersForBouquet)){
                     case 1:
                         flowersForBouquet.add(getDistinctFlowerForBouquet(flowersForBouquet,flowers));
@@ -78,11 +91,8 @@ public class PackRobot extends Robot {
                 }
             }
             else if (flowers.size() >= 4) {
-                // build a bouquet with 4 flowers of at least 3 distinct types
-
                 flowersForBouquet.add(flowers.get(0));
                 flowersForBouquet.add(flowers.get(1));
-
                 switch (getNumberOfDistinctFlowerTypes(flowersForBouquet)) {
                     case 1:
                         flowersForBouquet.add(getDistinctFlowerForBouquet(flowersForBouquet,flowers));
@@ -106,10 +116,10 @@ public class PackRobot extends Robot {
                 return;
             }
 
-            // remove flowers from packing-queue
+            /* remove flowers from packing-queue */
             for (Flower f:flowersForBouquet) {
                 packingService.getFlower(f.getId(),transaction);
-                logger.info(String.format("PackRobot %s: Remove flower (id = %s) from packing-queue.",this.getId(),f.getId()));
+                logger.info(String.format("Remove flower (id = %s) from packing-queue.",f.getId()));
             }
 
             transaction.commit();
@@ -121,7 +131,7 @@ public class PackRobot extends Robot {
             bouquet.setPackingRobotId(getId());
 
             marketService.putBouquet(bouquet);
-            logger.info(String.format("PackRobot %s: Put new bouquet (id = %s) in the market.",this.getId(),bouquet.getId()));
+            logger.info(String.format("Put new bouquet (id = %s) in the market.",bouquet.getId()));
 
             tryCreateBouquet();    // try to create another bouquet
 
@@ -134,27 +144,45 @@ public class PackRobot extends Robot {
         }
     }
 
-    public void tryCreateVegetableBasket(){
-        Transaction transaction = transactionService.beginTransaction(-1);
-
+    private void tryPutVegetablesIntoResearch() {
+        Transaction transaction = transactionService.beginTransaction(TRANSACTION_TIMEOUT);
         List<Vegetable> vegetables = packingService.readAllVegetables(transaction);
 
+        int put = 0;
+        for(int i=0; i<Math.min(vegetables.size(), 10); i++) {
+            Vegetable vegetable = packingService.getVegetable(vegetables.get(i).getId(),transaction);
+            researchService.putVegetable(vegetable);
+            logger.info(String.format("Forward vegetable (id = %s) to research department.", vegetable.getId()));
+
+            put++;
+        }
+
+        transaction.commit();
+
+        // If we have packed 10 into research, chances are good there are more...
+        if(put == 10) {
+            tryPutVegetablesIntoResearch();
+        }
+    }
+
+    public void tryCreateVegetableBasket(){
         if(marketService.getAmountOfVegetableBaskets() >= 3)
         {
-            for (Vegetable v:vegetables) {
-                researchService.putVegetable(packingService.getVegetable(v.getId(),transaction));
-                logger.info(String.format("PackRobot %s: Forward vegetable (id = %s) to research department.",this.getId(), v.getId()));
-            }
-
-            transaction.commit();
+            tryPutVegetablesIntoResearch();
             return;
         }
 
+        Transaction transaction = transactionService.beginTransaction(TRANSACTION_TIMEOUT);
+        List<Vegetable> vegetables = packingService.readAllVegetables(transaction);
+
         if(vegetables.size() <= 5){
+            logger.debug(String.format("Not enough vegetables available (%d)", vegetables.size()));
             // not enough vegetables available
             transaction.commit();
             return;
         }
+
+        logger.debug(String.format("Enough vegetables available!"));
 
         List<VegetableType> checkedVegetableTypes = new ArrayList();    // list of VegetableType to avoid checking a VegetableType twice
 
@@ -175,9 +203,9 @@ public class PackRobot extends Robot {
                     List<Vegetable> vegetablesForVegetableBasket = new ArrayList<>();
 
                     for (int i = 0; i < 5; i++){
-                        packingService.getVegetable(vegetablesOfSameType.get(i).getId(),transaction);
-                        logger.info(String.format("PackRobot %s: Remove vegetable (id = %s) from packing-queue.",this.getId(), vegetablesOfSameType.get(i).getId()));
-                        vegetablesForVegetableBasket.add(packingService.getVegetable(vegetablesOfSameType.get(i).getId(),transaction));
+                        Vegetable vegetable = packingService.getVegetable(vegetablesOfSameType.get(i).getId(),transaction);
+                        logger.info(String.format("Remove vegetable (id = %s) from packing-queue.",vegetablesOfSameType.get(i).getId()));
+                        vegetablesForVegetableBasket.add(vegetable);
                     }
 
                     vegetableBasket.setVegetables(vegetablesForVegetableBasket);
@@ -187,7 +215,7 @@ public class PackRobot extends Robot {
                     waitPackingTime();
 
                     marketService.putVegetableBasket(vegetableBasket);
-                    logger.info(String.format("PackRobot %s: Put new vegetable basket (id = %s) in the market.",this.getId(), vegetableBasket.getId()));
+                    logger.info(String.format("Put new vegetable basket (id = %s) in the market.",vegetableBasket.getId()));
 
                     tryCreateVegetableBasket(); // try to create another vegetable basket
 
