@@ -30,9 +30,6 @@ public class StorageController {
     public TableColumn<SeedsTableDataModel, String> tcSeedType;
     public TableColumn<SeedsTableDataModel, String> tcSeedCount;
     public TableColumn<SeedsTableDataModel, Button> tcSeedBuy;
-    public TableColumn<SeedsTableDataModel, String> tcSeedSoil;
-    public TableColumn<SeedsTableDataModel, String> tcSeedWater;
-    public TableColumn<SeedsTableDataModel, String> tcSeedFertilizer;
 
     public TableView<ResourceTableDataModel> tvResources;
     public TableColumn<ResourceTableDataModel, String> tcResourcesArt;
@@ -241,9 +238,6 @@ public class StorageController {
 
         tcSeedType.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().type));
         tcSeedCount.setCellValueFactory(param -> new ReadOnlyStringWrapper("" + param.getValue().amount));
-        tcSeedSoil.setCellValueFactory(param -> new ReadOnlyStringWrapper("" + param.getValue().soil));
-        tcSeedWater.setCellValueFactory(param -> new ReadOnlyStringWrapper("" + param.getValue().water));
-        tcSeedFertilizer.setCellValueFactory(param -> new ReadOnlyStringWrapper("" + param.getValue().fertilizer));
 
         tcSeedBuy.setCellValueFactory(param -> {
             Button btnBuy = new Button("Kaufen");
