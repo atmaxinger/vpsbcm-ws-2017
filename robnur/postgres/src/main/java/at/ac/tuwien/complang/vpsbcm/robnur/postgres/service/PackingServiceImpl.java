@@ -85,10 +85,10 @@ public class PackingServiceImpl extends PackingService {
 
                     switch (table) {
                         case PACKING_FLOWER_TABLE:
-                            System.out.println("PACKING_FLOWER_TABLE");
+                            packRobot.tryCreateBouquet();
                             break;
                         case PACKING_VEGETABLE_TABLE:
-                            System.out.println("PACKING_VEGETABLE_TABLE");
+                            packRobot.tryCreateVegetableBasket();
                             break;
                     }
                 }
