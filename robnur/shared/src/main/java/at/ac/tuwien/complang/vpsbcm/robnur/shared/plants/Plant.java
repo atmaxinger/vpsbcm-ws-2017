@@ -5,6 +5,7 @@ import java.io.Serializable;
 public abstract class Plant extends Idable implements Serializable {
 
     private String plantRobot;
+    private String compostRobot;
 
     /* 0 ... 100 */
     private int growth;
@@ -23,6 +24,14 @@ public abstract class Plant extends Idable implements Serializable {
 
     public void setPlantRobot(String plantRobot) {
         this.plantRobot = plantRobot;
+    }
+
+    public String getCompostRobot() {
+        return compostRobot;
+    }
+
+    public void setCompostRobot(String compostRobot) {
+        this.compostRobot = compostRobot;
     }
 
     public abstract String getTypeName();

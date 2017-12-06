@@ -104,6 +104,7 @@ public class PlantAndHarvestRobot extends Robot {
             if (plant.getCultivationInformation().getRemainingNumberOfHarvests() > 0) {
                 greenhouseService.plant(plant, transaction);
             } else {
+                plant.setCompostRobot(getId());
                 compostService.putVegetablePlant(plant);
             }
 
@@ -145,6 +146,7 @@ public class PlantAndHarvestRobot extends Robot {
         FlowerPlant plant = greenhouseService.getHarvestableFlowerPlant(transaction);
 
         if(plant != null) {
+            plant.setCompostRobot(getId());
             compostService.putFlowerPlant(plant);
             return Flower.harvestFlowerFromFlowerPlant(plant);
         }
