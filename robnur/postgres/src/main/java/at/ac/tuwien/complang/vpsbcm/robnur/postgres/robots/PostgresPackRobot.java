@@ -17,6 +17,7 @@ public class PostgresPackRobot {
     public static void main(String[] args) throws URISyntaxException, SQLException {
         if(args.length != 1) {
             System.err.println("You need to specify the id!");
+            System.exit(0);
         }
 
         PackingServiceImpl packingService = new PackingServiceImpl();

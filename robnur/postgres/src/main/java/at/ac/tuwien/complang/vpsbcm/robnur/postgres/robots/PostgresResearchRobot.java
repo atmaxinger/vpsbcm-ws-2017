@@ -17,6 +17,7 @@ public class PostgresResearchRobot {
     public static void main(String[] args) throws URISyntaxException, SQLException {
         if(args.length != 1) {
             System.err.println("You need to specify the id!");
+            System.exit(1);
         }
 
         ResearchServiceImpl researchService = new ResearchServiceImpl();
