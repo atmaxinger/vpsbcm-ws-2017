@@ -94,6 +94,7 @@ public class InitDb {
                                 "FOR EACH ROW EXECUTE PROCEDURE %s_function();"
                         , table, table, table));
 
+                statement.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -103,9 +104,8 @@ public class InitDb {
     private static void createWaterTrigger(String waterTable) {
         PGConnection connection = PostgresHelper.getConnection();
 
-        Statement statement = null;
         try {
-            statement = connection.createStatement();
+            Statement statement = connection.createStatement();
 
             statement.execute(
                     String.format("CREATE OR REPLACE FUNCTION put_back_water() RETURNS TRIGGER AS $$" +
@@ -125,6 +125,8 @@ public class InitDb {
                                     "AFTER DELETE ON %s " +
                                     "EXECUTE PROCEDURE put_back_water();"
                             , waterTable));
+
+            statement.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }

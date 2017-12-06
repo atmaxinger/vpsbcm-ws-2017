@@ -59,9 +59,9 @@ public class ServiceUtil {
     }
 
     public static <T extends Serializable> void writeItem(T item, String table) {
-        Transaction t = newTransaction();
-        writeItem(item, table, t);
-        t.commit();
+        Transaction transaction = newTransaction();
+        writeItem(item, table, transaction);
+        transaction.commit();
     }
 
 
@@ -72,6 +72,7 @@ public class ServiceUtil {
             ObjectMapper mapper = new ObjectMapper()
                     .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
+            
             Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
 
             ResultSet rs = statement.executeQuery("SELECT * FROM " + table);
