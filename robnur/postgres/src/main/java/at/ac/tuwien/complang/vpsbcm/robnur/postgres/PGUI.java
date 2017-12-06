@@ -6,8 +6,6 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.gui.RobNurGUI;
 
 public class PGUI {
     public static void main(String[] args) {
-        RobNurGUI gui = new RobNurGUI();
-
         StorageService storageService = new StorageServiceImpl();
         GreenhouseService greenhouseService = new GreenhouseServiceImpl();
         MarketService marketService = new MarketServiceImpl();
