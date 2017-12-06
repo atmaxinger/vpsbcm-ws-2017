@@ -2,12 +2,12 @@ package at.ac.tuwien.complang.vpsbcm.robnur.shared.plants;
 
 import java.io.Serializable;
 
-public abstract class CultivationInformation implements Serializable {
+public abstract class CultivationInformation extends Idable implements Serializable {
 
     /* 0.2 ... 0.5 */
     private float growthRate;
 
-    private float harvest;  // number of vegetables or flowers which can be harvested
+    private int harvest;  // number of vegetables or flowers which can be harvested
 
     private int upgradeLevel;
 
@@ -41,11 +41,11 @@ public abstract class CultivationInformation implements Serializable {
         this.growthRate = growthRate;
     }
 
-    public float getHarvest() {
+    public int getHarvest() {
         return harvest;
     }
 
-    public void setHarvest(float harvest) {
+    public void setHarvest(int harvest) {
         this.harvest = harvest;
     }
 

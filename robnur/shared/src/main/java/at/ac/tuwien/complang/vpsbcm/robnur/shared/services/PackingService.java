@@ -5,19 +5,39 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
 
 import java.util.List;
 
-public interface PackingService {
+public abstract class PackingService {
 
-    void putFlower(Flower flower);
+    private StorageService.Callback<List<Flower>> flowersChanged;
+    private StorageService.Callback<List<Vegetable>> vegetablesChanged;
+    public void onFlowersChanged(StorageService.Callback<List<Flower>> flowersChanged) {
+        this.flowersChanged = flowersChanged;
+    }
 
-    void putVegetable(Vegetable vegetable);
+    public void onVegetablesChanged(StorageService.Callback<List<Vegetable>> vegetablesChanged) {
+        this.vegetablesChanged = vegetablesChanged;
+    }
 
-    // TODO: consider implementing abstract method that gets all the different flowers for a bouquet
-    List<Flower> getFlowersForBouquet(int amount);
+    protected void raiseFlowersChanged() {
+        if(flowersChanged != null) {
+            flowersChanged.handle(readAllFlowers(null));
+        }
+    }
 
-    // TODO: consider implementing abstract method that gets all the different vegetables for a basket
-    List<Vegetable> getVegetableForBasket(int amount);
+    protected void raiseVegetablesChanged() {
+        if(vegetablesChanged != null) {
+            vegetablesChanged.handle(readAllVegetables(null));
+        }
+    }
 
-    List<Flower> readAllFlowers();
+    public abstract void putFlower(Flower flower);
 
-    List<Vegetable> readAllVegetables();
+    public abstract void putVegetable(Vegetable vegetable);
+
+    public abstract Flower getFlower(String flowerId, Transaction transaction);
+
+    public abstract Vegetable getVegetable(String vegetableId, Transaction transaction);
+
+    public abstract List<Flower> readAllFlowers(Transaction transaction);
+
+    public abstract List<Vegetable> readAllVegetables(Transaction transaction);
 }

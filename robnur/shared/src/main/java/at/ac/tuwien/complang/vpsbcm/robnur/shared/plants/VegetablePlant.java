@@ -11,4 +11,9 @@ public class VegetablePlant extends Plant {
     public void setCultivationInformation(VegetablePlantCultivationInformation cultivationInformation) {
         this.cultivationInformation = cultivationInformation;
     }
+
+    @Override
+    public String getTypeName() {
+        return getCultivationInformation().getVegetableType().toString();
+    }
 }

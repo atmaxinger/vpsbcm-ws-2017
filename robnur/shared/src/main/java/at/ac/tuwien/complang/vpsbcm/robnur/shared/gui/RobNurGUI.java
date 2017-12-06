@@ -5,7 +5,6 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.TabPane;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -19,6 +18,8 @@ public class RobNurGUI extends Application {
     public static MarketService marketService;
     public static PackingService packingService;
     public static StorageService storageService;
+    public static ResearchService researchService;
+    public static TransactionService transactionService;
 
     public void execute(String[] args) {
         launch(args);

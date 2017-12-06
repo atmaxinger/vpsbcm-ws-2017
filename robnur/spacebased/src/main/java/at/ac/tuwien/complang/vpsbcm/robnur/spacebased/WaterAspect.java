@@ -1,6 +1,7 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.Water;
+import org.apache.log4j.Logger;
 import org.mozartspaces.capi3.Capi3AspectPort;
 import org.mozartspaces.capi3.SubTransaction;
 import org.mozartspaces.capi3.Transaction;
@@ -15,12 +16,9 @@ import java.io.Serializable;
 import java.util.List;
 
 public class WaterAspect extends AbstractContainerAspect {
+    final static Logger logger = Logger.getLogger(WaterAspect.class);
 
-    private Capi capi;
-
-    public WaterAspect(Capi capi) {
-        this.capi = capi;
-    }
+    private final int WATER_INTERVAL_MS = 1000;
 
     @Override
     public AspectResult postTake(TakeEntriesRequest<?> request,
@@ -30,9 +28,10 @@ public class WaterAspect extends AbstractContainerAspect {
                                  int executionCount,
                                  List<Serializable> entries) {
 
+        logger.debug("Someone has taken water - wait " + WATER_INTERVAL_MS + " ms");
 
         try {
-            Thread.sleep(1000);
+            Thread.sleep(WATER_INTERVAL_MS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -41,11 +40,18 @@ public class WaterAspect extends AbstractContainerAspect {
         water.setAmount(250);
 
         try {
-            capi.write(request.getContainer(), new Entry(water));
+            logger.debug("trying to put new water");
+
+            new Capi(getCore()).write(request.getContainer(), new Entry(water));
+
+            logger.debug("put new water");
+
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
 
         return AspectResult.OK;
     }
+
+
 }

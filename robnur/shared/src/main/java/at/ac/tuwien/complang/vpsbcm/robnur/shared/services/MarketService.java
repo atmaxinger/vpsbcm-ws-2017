@@ -1,28 +1,40 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.services;
 
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Bouquet;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableBasket;
 
 import java.util.List;
 
-public interface MarketService {
+public abstract class MarketService {
 
-    void putBouquet(Bouquet bouquet);
+    public interface Callback<T1,T2> {
+        void handle(T1 p1, T2 p2);
+    }
 
-    int getAmountOfBouquets();
+    protected Callback<List<VegetableBasket>, List<Bouquet>> marketChanged;
+    public void onMarketChanged(Callback<List<VegetableBasket>, List<Bouquet>> marketChanged) {
+        this.marketChanged = marketChanged;
+    }
 
-    void putVegetableBasket(VegetableBasket vegetableBasket);
+    protected void raiseChangedEvent() {
+        if(marketChanged != null) {
+            marketChanged.handle(readAllVegetableBaskets(), readAllBouquets());
+        }
+    }
 
-    int getAmountOfVegetableBaskets();
+    public abstract void putBouquet(Bouquet bouquet);
 
-    Bouquet getBouquet();
+    public abstract int getAmountOfBouquets();
 
-    VegetableBasket getVegetableBasket();
+    public abstract void putVegetableBasket(VegetableBasket vegetableBasket);
 
-    List<Bouquet> readAllBouquets();
+    public abstract int getAmountOfVegetableBaskets();
 
-    void sellBouquet(Bouquet bouquet);
+    public abstract List<Bouquet> readAllBouquets();
 
-    List<VegetableBasket> readAllVegetableBaskets();
+    public abstract void sellBouquet(Bouquet bouquet);
 
-    void sellVegetableBasket(VegetableBasket vegetableBasket);
+    public abstract List<VegetableBasket> readAllVegetableBaskets();
+
+    public abstract void sellVegetableBasket(VegetableBasket vegetableBasket);
 }
