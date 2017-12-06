@@ -49,8 +49,6 @@ public class PlantAndHarvestRobot extends Robot {
      * try to plant either a vegetable or a flower
      */
     public void tryPlant() {
-        logger.debug("tryPlant");
-
         boolean hasPlantedSomething = false;
 
         // Step 1: get current planted plants from greenhouse
@@ -97,7 +95,7 @@ public class PlantAndHarvestRobot extends Robot {
      * try to harvest all harvestable vegetables
      */
     private void tryHarvestVegetable() {
-        logger.log(Priority.DEBUG, "tryHarvestVegetable");
+        logger.debug("tryHarvestVegetable");
 
         Transaction t = transactionService.beginTransaction(harvestTransactionTimeout);
         List<Vegetable> harvested = greenhouseService.tryHarvestVegetablePlant(t);
@@ -157,7 +155,6 @@ public class PlantAndHarvestRobot extends Robot {
      * @return a suitable seed or null
      */
     private <P extends Plant, E extends Enum<E>> P tryToGetNextSeed(List<P> plantedPlants, E[] types, Transaction t) {
-        logger.debug("tryToGetNextSeed");
 
         List<PlantCount<E>> counts = new LinkedList<>();
 
@@ -233,7 +230,7 @@ public class PlantAndHarvestRobot extends Robot {
         // Step 1: First of all, try to get a seed
         P nextSeed = tryToGetNextSeed(planted, types, t);
         if (nextSeed != null) {
-            logger.debug(String.format("tryPlantPlant - have nextSeed (%s)", nextSeed.getTypeName()));
+            logger.info(String.format("PlantAndHarvestRobot %s: got %s seed", this.getId(), nextSeed.getTypeName()));
 
             // Step 2: try to get the amount of soil needed for the plant
             if (!storageService.tryGetExactAmountOfSoil(nextSeed.getCultivationInformation().getSoilAmount(), t)) {

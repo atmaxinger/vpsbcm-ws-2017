@@ -32,15 +32,20 @@ public class ResearchRobot extends Robot {
 
         // try to find a flower-plant to upgrade
         for (FlowerType flowerType : FlowerType.values()) {
+            logger.info(String.format("ResearchRobot %s: looking for flowers to upgrade", this.getId()));
             List<Flower> upgradableFlowersOfSameType = getUpgradableFlowersOfSameType(flowerType, flowers, 12);
 
             // check if there are enough upgradable flowers of the same type
             if (upgradableFlowersOfSameType == null) {
+                logger.info(String.format("ResearchRobot %s: did not find (enough) upgradeable flowers", this.getId()));
                 return;
             }
 
+            logger.info(String.format("ResearchRobot %s: found 12 flowers of same type (%s)", this.getId(), flowerType.name()));
+
             // remove the flowers from the research-queue
             for (Flower f : upgradableFlowersOfSameType) {
+                logger.info(String.format("ResearchRobot %s: remove flower(%s) form research-queue",this.getId(), f.getId()));
                 researchService.deleteFlower(f, transaction);
             }
 
@@ -50,6 +55,7 @@ public class ResearchRobot extends Robot {
 
             // put the flowers on the compost
             for (Flower f : upgradableFlowersOfSameType) {
+                logger.info(String.format("ResearchRobot %s: put flower(%s) on the compost",this.getId(), f.getId()));
                 compostService.putFlower(f);
             }
 
@@ -65,16 +71,21 @@ public class ResearchRobot extends Robot {
 
         // try to find a vegetable-plant to upgrade
         for (VegetableType vegetableType:VegetableType.values()) {
+            logger.info(String.format("ResearchRobot %s: looking for vegetables to upgrade", this.getId()));
             List<Vegetable> upgradableVegetablesOfSameType = getUpgradableVegetablesOfSameType(vegetableType,vegetables,12);
 
             // check if there are enough upgradable vegetables of the same type
             if(upgradableVegetablesOfSameType == null){
+                logger.info(String.format("ResearchRobot %s: did not find (enough) upgradeable vegetables", this.getId()));
                 return;
             }
+
+            logger.info(String.format("ResearchRobot %s: found 12 vegetables of same type (%s)", this.getId(), vegetableType.name()));
 
             // remove the vegetables from the research-queue
             for(Vegetable v : upgradableVegetablesOfSameType)
             {
+                logger.info(String.format("ResearchRobot %s: remove vegetable(%s) form research-queue",this.getId(), v.getId()));
                 researchService.deleteVegetable(v,transaction);
             }
 
@@ -85,6 +96,7 @@ public class ResearchRobot extends Robot {
             // put the flowers on the compost
             for(Vegetable v : upgradableVegetablesOfSameType)
             {
+                logger.info(String.format("ResearchRobot %s: put vegetable(%s) on the compost",this.getId(), v.getId()));
                 compostService.putVegetable(v);
             }
 
@@ -111,6 +123,8 @@ public class ResearchRobot extends Robot {
         configService.deleteFlowerPlantCultivationInformation(cultivationInformationOfFlowerType.getId(),transaction);
         configService.putFlowerPlantCultivationInformation(cultivationInformationOfFlowerType,transaction);
 
+        logger.info(String.format("ResearchRobot %s: upgraded Config of %s to level %d",this.getId(), flowerType.name(), cultivationInformationOfFlowerType.getUpgradeLevel()));
+
         waitResearchTime();
         transaction.commit();
     }
@@ -132,6 +146,8 @@ public class ResearchRobot extends Robot {
 
         configService.deleteVegetablePlantCultivationInformation(cultivationInformationOfVegetableType.getId(),transaction);
         configService.putVegetablePlantCultivationInformation(cultivationInformationOfVegetableType,transaction);
+
+        logger.info(String.format("ResearchRobot %s: upgraded Config of %s to level %d",this.getId(), vegetableType.name(), cultivationInformationOfVegetableType.getUpgradeLevel()));
 
         waitResearchTime();
         transaction.commit();
