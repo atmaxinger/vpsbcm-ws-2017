@@ -9,19 +9,39 @@
 <TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
   <tabs>
     <Tab text="Warenlager">
-         <content>
-             <fx:include source="storage.fxml" />
-         </content>
+     <content>
+       <fx:include source="storage.fxml" />
+     </content>
     </Tab>
     <Tab text="Gewächshaus">
       <content>
-        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+        <fx:include source="greenhouse.fxml" />
       </content>
     </Tab>
-      <Tab text="Shop">
-        <content>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-        </content>
-      </Tab>
+    <Tab text="Packing">
+      <content>
+        <fx:include source="packing.fxml" />
+      </content>
+    </Tab>
+    <Tab text="Research">
+      <content>
+        <fx:include source="research.fxml" />
+      </content>
+    </Tab>
+    <Tab text="Kompost">
+      <content>
+        <fx:include source="compost.fxml" />
+      </content>
+    </Tab>
+    <Tab text="Pflegehinweise">
+      <content>
+        <fx:include source="config.fxml" />
+      </content>
+    </Tab>
+    <Tab text="Shop">
+      <content>
+        <fx:include source="market.fxml" />
+      </content>
+    </Tab>
   </tabs>
 </TabPane>

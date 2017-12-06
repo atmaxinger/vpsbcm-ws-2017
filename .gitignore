@@ -51,3 +51,4 @@ fabric.properties
 .idea/
 *.iml
 target/
+robnur/postgres/src/main/resources/postgres.properties
