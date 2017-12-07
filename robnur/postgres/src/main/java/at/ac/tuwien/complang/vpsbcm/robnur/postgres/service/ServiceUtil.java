@@ -2,6 +2,7 @@ package at.ac.tuwien.complang.vpsbcm.robnur.postgres.service;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlantCultivationInformation;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -24,8 +25,10 @@ public class ServiceUtil {
         DELETE
     }
 
+    private static TransactionService transactionService = new TransactionServiceImpl();
+
     private static Transaction newTransaction() {
-        return (new TransactionServiceImpl()).beginTransaction(-1);
+        return transactionService.beginTransaction(-1);
     }
 
     /**
