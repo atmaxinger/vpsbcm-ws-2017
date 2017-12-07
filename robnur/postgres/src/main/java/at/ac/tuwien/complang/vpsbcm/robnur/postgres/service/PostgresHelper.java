@@ -6,6 +6,7 @@ import com.impossibl.postgres.jdbc.PGDataSource;
 import java.io.*;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Objects;
 import java.util.Properties;
 
 public class PostgresHelper {
@@ -19,14 +20,9 @@ public class PostgresHelper {
             String home = System.getProperty("user.home");
             File f = new File(home + "/robnur/postgres.properties");
 
-            //InputStream input = ClassLoader.getSystemResourceAsStream("postgres.properties");
-            //prop.load(input);
-
             prop.load(new FileReader(f));
 
             return prop.getProperty(property);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -38,7 +34,7 @@ public class PostgresHelper {
         if(dataSource == null) {
             dataSource = new PGDataSource();
             dataSource.setHost(readProperty("db.server"));
-            dataSource.setPort(Integer.parseInt(readProperty("db.port")));
+            dataSource.setPort(Integer.parseInt(Objects.requireNonNull(readProperty("db.port"))));
             dataSource.setDatabase(readProperty("db.database"));
             dataSource.setUser(readProperty("db.user"));
             dataSource.setPassword(readProperty("db.password"));

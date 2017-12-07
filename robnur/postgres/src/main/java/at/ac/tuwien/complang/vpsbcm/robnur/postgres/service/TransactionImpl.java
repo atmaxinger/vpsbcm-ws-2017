@@ -33,6 +33,15 @@ class TransactionImpl implements Transaction {
         }
     }
 
+    protected void finalize() throws Throwable
+    {
+        try { connection.close(); }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        super.finalize();
+    }
+
     public boolean hasBeenRolledBack() {
         return rolledBack;
     }

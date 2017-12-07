@@ -1,5 +1,6 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.postgres.service;
 
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlantCultivationInformation;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -51,9 +52,7 @@ public class ServiceUtil {
             statement.execute(String.format("INSERT INTO %s (DATA) VALUES ('%s')", table, mapper.writeValueAsString(item)));
 
             statement.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (JsonProcessingException e) {
+        } catch (SQLException | JsonProcessingException e) {
             e.printStackTrace();
         }
     }
@@ -84,13 +83,7 @@ public class ServiceUtil {
             }
 
             statement.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (JsonParseException e) {
-            e.printStackTrace();
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
 
@@ -104,6 +97,34 @@ public class ServiceUtil {
 
         return l;
     }
+
+    public static <T extends Serializable> T readItemByParameter(String parameterName, String parameterValue, String table, Class<T> resultClass, Transaction transaction) {
+
+        T result = null;
+
+        try {
+
+            ObjectMapper mapper = new ObjectMapper()
+                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+            Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
+
+            ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE (data " + prepareArrow(parameterName) + " %s)::text = '%s'", table,parameterName,parameterValue));
+
+            rs.next();
+            String data = rs.getString("data");
+            result = mapper.readValue(data, resultClass);
+
+            statement.close();
+
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        }
+
+        return result;
+
+    }
+
 
     public static <T extends Serializable> T getItemByParameter(String parameterName, String parameterValue, String table, Class<T> resultClass, Transaction transaction) {
 
@@ -126,13 +147,7 @@ public class ServiceUtil {
 
             statement.close();
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (JsonParseException e) {
-            e.printStackTrace();
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
 
@@ -165,13 +180,7 @@ public class ServiceUtil {
 
             statement.close();
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (JsonParseException e) {
-            e.printStackTrace();
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
 

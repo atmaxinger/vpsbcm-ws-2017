@@ -208,7 +208,7 @@ public class StorageServiceImpl extends StorageService {
         for (int i = 0; i<amount; i++){
             VegetableFertilizer vegetableFertilizer = vegetableFertilizers.get(i);
             result.add(vegetableFertilizer);
-            ServiceUtil.deleteItemById(vegetableFertilizer.getId(),STORAGE_FLOWER_FERTILIZER_TABLE,transaction);
+            ServiceUtil.deleteItemById(vegetableFertilizer.getId(),STORAGE_VEGETABLE_FERTILIZER_TABLE,transaction);
         }
         return result;
     }

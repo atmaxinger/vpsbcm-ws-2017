@@ -1,7 +1,9 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.postgres.service;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlantCultivationInformation;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlantCultivationInformation;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ConfigService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 
@@ -17,8 +19,18 @@ public class ConfigServiceImpl extends ConfigService {
         return ServiceUtil.getItemById(id,CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE,FlowerPlantCultivationInformation.class,transaction);
     }
 
+    @Override
+    public FlowerPlantCultivationInformation readFlowerPlantCultivationInformation(FlowerType flowerType, Transaction transaction) {
+        return ServiceUtil.readItemByParameter("flowerType",flowerType.name(),CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE,FlowerPlantCultivationInformation.class,transaction);
+    }
+
     public VegetablePlantCultivationInformation getVegetablePlantCultivationInformation(String id, Transaction transaction) {
         return ServiceUtil.getItemById(id,CONFIG_VEGETABLE_PLANT_CULTIVATION_INFORMATION_TABLE,VegetablePlantCultivationInformation.class,transaction);
+    }
+
+    @Override
+    public VegetablePlantCultivationInformation readVegetablePlantCultivationInformation(VegetableType vegetableType, Transaction transaction) {
+        return ServiceUtil.readItemByParameter("flowerType",vegetableType.name(),CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE,VegetablePlantCultivationInformation.class,transaction);
     }
 
     public void deleteFlowerPlantCultivationInformation(String id, Transaction transaction) {
