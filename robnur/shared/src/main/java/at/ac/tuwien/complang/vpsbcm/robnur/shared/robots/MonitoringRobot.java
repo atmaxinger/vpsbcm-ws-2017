@@ -34,45 +34,58 @@ public class MonitoringRobot extends Robot {
         plant.setGrowth(Math.min(plant.getGrowth() + add, 100));
     }
 
+
+    void monitorVegetables() {
+
+        // get all available plants
+        Transaction t = transactionService.beginTransaction(-1);
+
+        List<VegetablePlant> vegs = greenhouseService.getAllVegetablePlants(t);
+        if(vegs == null || vegs.isEmpty()) {
+            t.rollback();
+            return;
+        }
+
+        // grow
+        for(VegetablePlant p : vegs) {
+            doGrow(p, p.getCultivationInformation());
+        }
+
+        // write back plant
+        for(VegetablePlant p : vegs) {
+            greenhouseService.plant(p, t);
+        }
+
+        t.commit();
+    }
+
+    void monitorFlowers() {
+        // get all available plants
+        Transaction t = transactionService.beginTransaction(-1);
+
+        List<FlowerPlant> flos = greenhouseService.getAllFlowerPlants(t);
+
+        if(flos == null || flos.isEmpty()) {
+            t.rollback();
+            return;
+        }
+
+        for(FlowerPlant p : flos) {
+            doGrow(p, p.getCultivationInformation());
+        }
+
+        for(FlowerPlant p : flos) {
+            greenhouseService.plant(p, t);
+        }
+
+        t.commit();
+    }
+
     public void doStuff() {
 
         while (true) {
-            boolean didAnything = false;
-
-            // get all available plants
-            Transaction t = transactionService.beginTransaction(-1);
-
-            List<VegetablePlant> vegs = greenhouseService.getAllVegetablePlants(t);
-            List<FlowerPlant> flos = greenhouseService.getAllFlowerPlants(t);
-
-            // grow
-            for(VegetablePlant p : vegs) {
-                didAnything = true;
-                doGrow(p, p.getCultivationInformation());
-            }
-            for(FlowerPlant p : flos) {
-                didAnything = true;
-                doGrow(p, p.getCultivationInformation());
-            }
-
-            // write back plant
-            for(VegetablePlant p : vegs) {
-                didAnything = true;
-
-                greenhouseService.plant(p, t);
-            }
-            for(FlowerPlant p : flos) {
-                didAnything = true;
-
-                greenhouseService.plant(p, t);
-            }
-
-            if(didAnything) {
-                t.commit();
-            }
-            else {
-                t.rollback();
-            }
+            monitorVegetables();
+            monitorFlowers();
 
             try {
                 Thread.sleep(MONITORING_INTERVAL_MS);

@@ -32,7 +32,9 @@ class TransactionImpl implements Transaction {
     public void rollback() {
         try {
             //logger.debug(String.format("trying to rollback connection %s", connection));
+            //System.err.println("------------------- ROLLBACK TRANSACTION -------------------");
             connection.rollback();
+            connection.close();
             //logger.debug(String.format("rolled back connection %s", connection));
             //connection.close();
             //logger.debug(String.format("closed connection %s after rollback", connection));

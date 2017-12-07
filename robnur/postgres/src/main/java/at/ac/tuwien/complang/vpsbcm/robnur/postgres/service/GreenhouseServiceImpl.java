@@ -81,7 +81,8 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             try {
                 ServiceUtil.deleteItemById(vp.getId(), GREENHOUSE_VEGETABLE_PLANT_TABLE);
             } catch (SQLException e) {
-                e.printStackTrace();
+                System.err.println("SQLException in getAllVegetablePlants - returning null");
+                return null;
             }
         }
         return vegetablePlants;
@@ -94,7 +95,8 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             try {
                 ServiceUtil.deleteItemById(fp.getId(), GREENHOUSE_FLOWER_PLANT_TABLE);
             } catch (SQLException e) {
-                e.printStackTrace();
+                System.err.println("SQLException in getAllFloewrPlants - returning null");
+                return null;
             }
         }
         return flowerPlants;
