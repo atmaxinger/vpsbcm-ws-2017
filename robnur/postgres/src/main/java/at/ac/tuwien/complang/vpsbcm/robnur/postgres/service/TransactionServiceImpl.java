@@ -17,13 +17,13 @@ public class TransactionServiceImpl implements TransactionService {
         try {
             if(connection == null || connection.isClosed()) {
                 if(connection == null) {
-                    logger.debug("Connection was null");
+                    //logger.debug("Connection was null");
                 }
                 else if(connection.isClosed()) {
-                    logger.debug("Connection was closed");
+                    //logger.debug("Connection was closed");
                 }
                 connection = PostgresHelper.getNewConnection();
-                logger.debug(String.format("Created new connection %s", connection));
+                //logger.debug(String.format("Created new connection %s", connection));
             }
             connection.setAutoCommit(false);
             connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
@@ -38,7 +38,7 @@ public class TransactionServiceImpl implements TransactionService {
             e.printStackTrace();
         }
 
-        logger.debug(String.format("Started transaction on connection %s", connection));
+        //logger.debug(String.format("Started transaction on connection %s", connection));
 
         return new TransactionImpl(connection);
     }

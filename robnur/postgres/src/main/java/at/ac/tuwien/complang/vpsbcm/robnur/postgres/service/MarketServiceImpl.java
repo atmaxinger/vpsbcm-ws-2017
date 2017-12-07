@@ -5,6 +5,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableBasket;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.MarketService;
 import com.impossibl.postgres.api.jdbc.PGNotificationListener;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -56,7 +57,11 @@ public class MarketServiceImpl extends MarketService {
     }
 
     public void sellBouquet(Bouquet bouquet) {
-        ServiceUtil.deleteItemById(bouquet.getId(),MARKET_BOUQUET_TABLE);
+        try {
+            ServiceUtil.deleteItemById(bouquet.getId(),MARKET_BOUQUET_TABLE);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public List<VegetableBasket> readAllVegetableBaskets() {
@@ -64,7 +69,11 @@ public class MarketServiceImpl extends MarketService {
     }
 
     public void sellVegetableBasket(VegetableBasket vegetableBasket) {
-        ServiceUtil.deleteItemById(vegetableBasket.getId(),MARKET_VEGETABLE_BASKET_TABLE);
+        try {
+            ServiceUtil.deleteItemById(vegetableBasket.getId(),MARKET_VEGETABLE_BASKET_TABLE);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public static List<String> getTables() {

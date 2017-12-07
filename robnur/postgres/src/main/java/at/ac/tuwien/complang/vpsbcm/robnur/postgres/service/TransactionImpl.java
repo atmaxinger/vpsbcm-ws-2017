@@ -19,9 +19,9 @@ class TransactionImpl implements Transaction {
 
     public void commit() {
         try {
-            logger.debug(String.format("trying to commit connection %s", connection));
+            //logger.debug(String.format("trying to commit connection %s", connection));
             connection.commit();
-            logger.debug(String.format("committed connection %s", connection));
+            //logger.debug(String.format("committed connection %s", connection));
             //connection.close();
             //logger.debug(String.format("closed connection %s after commit", connection));
         } catch (SQLException e) {
@@ -31,9 +31,9 @@ class TransactionImpl implements Transaction {
 
     public void rollback() {
         try {
-            logger.debug(String.format("trying to rollback connection %s", connection));
+            //logger.debug(String.format("trying to rollback connection %s", connection));
             connection.rollback();
-            logger.debug(String.format("rolled back connection %s", connection));
+            //logger.debug(String.format("rolled back connection %s", connection));
             //connection.close();
             //logger.debug(String.format("closed connection %s after rollback", connection));
             rolledBack = true;

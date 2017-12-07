@@ -7,6 +7,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ResearchService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import com.impossibl.postgres.api.jdbc.PGNotificationListener;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -48,11 +49,19 @@ public class ResearchServiceImpl extends ResearchService {
     }
 
     public void deleteFlower(Flower flower, Transaction transaction) {
-        ServiceUtil.deleteItemById(flower.getId(),RESEARCH_FLOWER_TABLE,transaction);
+        try {
+            ServiceUtil.deleteItemById(flower.getId(),RESEARCH_FLOWER_TABLE,transaction);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void deleteVegetable(Vegetable vegetable, Transaction transaction) {
-        ServiceUtil.deleteItemById(vegetable.getId(),RESEARCH_VEGETABLE_TABLE,transaction);
+        try {
+            ServiceUtil.deleteItemById(vegetable.getId(),RESEARCH_VEGETABLE_TABLE,transaction);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public List<Flower> readAllFlowers(Transaction transaction) {

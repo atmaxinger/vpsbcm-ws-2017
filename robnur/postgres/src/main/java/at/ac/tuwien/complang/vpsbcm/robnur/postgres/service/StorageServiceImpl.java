@@ -13,6 +13,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.StorageService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import com.impossibl.postgres.api.jdbc.PGNotificationListener;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -124,7 +125,11 @@ public class StorageServiceImpl extends StorageService {
     protected List<SoilPackage> getAllSoilPackages(Transaction transaction) {
         List<SoilPackage> soilPackages = ServiceUtil.readAllItems(STORAGE_SOIL_TABLE,SoilPackage.class,transaction);
         for (SoilPackage sp:soilPackages) {
-            ServiceUtil.deleteItemById(sp.getId(),STORAGE_SOIL_TABLE,transaction);
+            try {
+                ServiceUtil.deleteItemById(sp.getId(),STORAGE_SOIL_TABLE,transaction);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return soilPackages;
     }
@@ -149,7 +154,6 @@ public class StorageServiceImpl extends StorageService {
         return ServiceUtil.readAllItems(STORAGE_SOIL_TABLE,SoilPackage.class,transaction);
     }
 
-    // TODO: handling the amount should be in the abstract class
     @Override
     public List<FlowerFertilizer> getFlowerFertilizer(int amount, Transaction transaction) {
         List<FlowerFertilizer> flowerFertilizers = ServiceUtil.readAllItems(STORAGE_FLOWER_FERTILIZER_TABLE,FlowerFertilizer.class,transaction);
@@ -163,7 +167,12 @@ public class StorageServiceImpl extends StorageService {
         for (int i = 0; i<amount; i++){
             FlowerFertilizer flowerFertilizer = flowerFertilizers.get(i);
             result.add(flowerFertilizer);
-            ServiceUtil.deleteItemById(flowerFertilizer.getId(),STORAGE_FLOWER_FERTILIZER_TABLE,transaction);
+            try {
+                ServiceUtil.deleteItemById(flowerFertilizer.getId(),STORAGE_FLOWER_FERTILIZER_TABLE,transaction);
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
         return result;
     }
@@ -208,7 +217,12 @@ public class StorageServiceImpl extends StorageService {
         for (int i = 0; i<amount; i++){
             VegetableFertilizer vegetableFertilizer = vegetableFertilizers.get(i);
             result.add(vegetableFertilizer);
-            ServiceUtil.deleteItemById(vegetableFertilizer.getId(),STORAGE_VEGETABLE_FERTILIZER_TABLE,transaction);
+            try {
+                ServiceUtil.deleteItemById(vegetableFertilizer.getId(),STORAGE_VEGETABLE_FERTILIZER_TABLE,transaction);
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
         return result;
     }
@@ -247,7 +261,11 @@ public class StorageServiceImpl extends StorageService {
         while (true){
             List<Water> waterList = ServiceUtil.readAllItems(STORAGE_WATER_TABLE,Water.class);
             if(waterList.size() >= 1){
-                ServiceUtil.deleteItemById(waterList.get(0).getId(),STORAGE_WATER_TABLE);
+                try {
+                    ServiceUtil.deleteItemById(waterList.get(0).getId(),STORAGE_WATER_TABLE);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
                 return waterList.get(0);
             }
         }

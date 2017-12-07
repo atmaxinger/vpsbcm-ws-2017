@@ -4,8 +4,8 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Plant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PlantAndHarvestRobot;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.GreenhouseService;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -34,7 +34,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
                     case GREENHOUSE_FLOWER_PLANT_TABLE:
                     case GREENHOUSE_VEGETABLE_PLANT_TABLE:
 
-                        if(greenhouseChanged != null) {
+                        if (greenhouseChanged != null) {
                             List<FlowerPlant> flowerPlants = readAllFlowerPlants();
                             List<VegetablePlant> vegetablePlants = readAllVegetablePlants();
                             List<Plant> plants = new LinkedList<>();
@@ -58,27 +58,31 @@ public class GreenhouseServiceImpl extends GreenhouseService {
 
     @Override
     public boolean plant(VegetablePlant vegetablePlant, Transaction transaction) {
-        if(readAllFlowerPlants(transaction).size() + readAllVegetablePlants(transaction).size() >= 20){
+        if (readAllFlowerPlants(transaction).size() + readAllVegetablePlants(transaction).size() >= 20) {
             return false;
         }
-        ServiceUtil.writeItem(vegetablePlant,GREENHOUSE_VEGETABLE_PLANT_TABLE,transaction);
+        ServiceUtil.writeItem(vegetablePlant, GREENHOUSE_VEGETABLE_PLANT_TABLE, transaction);
         return true;
     }
 
     @Override
     public boolean plant(FlowerPlant flowerPlant, Transaction transaction) {
-        if(readAllFlowerPlants(transaction).size() + readAllVegetablePlants(transaction).size() >= 20){
+        if (readAllFlowerPlants(transaction).size() + readAllVegetablePlants(transaction).size() >= 20) {
             return false;
         }
-        ServiceUtil.writeItem(flowerPlant,GREENHOUSE_FLOWER_PLANT_TABLE,transaction);
+        ServiceUtil.writeItem(flowerPlant, GREENHOUSE_FLOWER_PLANT_TABLE, transaction);
         return true;
     }
 
     @Override
     public List<VegetablePlant> getAllVegetablePlants(Transaction transaction) {
         List<VegetablePlant> vegetablePlants = readAllVegetablePlants(transaction);
-        for (VegetablePlant vp:vegetablePlants) {
-            ServiceUtil.deleteItemById(vp.getId(),GREENHOUSE_VEGETABLE_PLANT_TABLE);
+        for (VegetablePlant vp : vegetablePlants) {
+            try {
+                ServiceUtil.deleteItemById(vp.getId(), GREENHOUSE_VEGETABLE_PLANT_TABLE);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return vegetablePlants;
     }
@@ -86,51 +90,59 @@ public class GreenhouseServiceImpl extends GreenhouseService {
     @Override
     public List<FlowerPlant> getAllFlowerPlants(Transaction transaction) {
         List<FlowerPlant> flowerPlants = readAllFlowerPlants(transaction);
-        for (FlowerPlant fp:flowerPlants) {
-            ServiceUtil.deleteItemById(fp.getId(),GREENHOUSE_FLOWER_PLANT_TABLE);
+        for (FlowerPlant fp : flowerPlants) {
+            try {
+                ServiceUtil.deleteItemById(fp.getId(), GREENHOUSE_FLOWER_PLANT_TABLE);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return flowerPlants;
     }
 
     @Override
     public List<VegetablePlant> readAllVegetablePlants(Transaction transaction) {
-        return ServiceUtil.readAllItems(GREENHOUSE_VEGETABLE_PLANT_TABLE,VegetablePlant.class);
+        return ServiceUtil.readAllItems(GREENHOUSE_VEGETABLE_PLANT_TABLE, VegetablePlant.class);
     }
 
     @Override
     public List<FlowerPlant> readAllFlowerPlants(Transaction transaction) {
-        return ServiceUtil.readAllItems(GREENHOUSE_FLOWER_PLANT_TABLE,FlowerPlant.class);
+        return ServiceUtil.readAllItems(GREENHOUSE_FLOWER_PLANT_TABLE, FlowerPlant.class);
     }
 
     @Override
     public VegetablePlant getHarvestableVegetablePlant(Transaction transaction) {
         VegetablePlant result = null;
 
+        ObjectMapper mapper = new ObjectMapper()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        Statement statement = null;
         try {
+            statement = ((TransactionImpl) transaction).getConnection().createStatement();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
 
-            ObjectMapper mapper = new ObjectMapper()
-                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-            Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
-
-            ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE (data ->> 'growth')::numeric >= 100", GREENHOUSE_VEGETABLE_PLANT_TABLE));
+        ResultSet rs = null;
+        try {
+            rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE (data ->> 'growth')::numeric >= 100", GREENHOUSE_VEGETABLE_PLANT_TABLE));
 
             if (rs.next()) {
                 String data = rs.getString("data");
                 result = mapper.readValue(data, VegetablePlant.class);
 
-                ServiceUtil.deleteItemById(result.getId(),GREENHOUSE_VEGETABLE_PLANT_TABLE,transaction);
+                ServiceUtil.deleteItemById(result.getId(), GREENHOUSE_VEGETABLE_PLANT_TABLE, transaction);
             }
+        } catch (SQLException | IOException e) {
+            result = null;
+            e.printStackTrace();
+        }
 
+        try {
             statement.close();
-
         } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (JsonParseException e) {
-            e.printStackTrace();
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -141,31 +153,35 @@ public class GreenhouseServiceImpl extends GreenhouseService {
     public FlowerPlant getHarvestableFlowerPlant(Transaction transaction) {
         FlowerPlant result = null;
 
+
+        ObjectMapper mapper = new ObjectMapper()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        Statement statement = null;
         try {
+            statement = ((TransactionImpl) transaction).getConnection().createStatement();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
 
-            ObjectMapper mapper = new ObjectMapper()
-                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-            Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
-
-            ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE (data::json->>'growth')::numeric >= 100", GREENHOUSE_FLOWER_PLANT_TABLE));
+        ResultSet rs = null;
+        try {
+            rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE (data::json->>'growth')::numeric >= 100", GREENHOUSE_FLOWER_PLANT_TABLE));
 
             if (rs.next()) {
                 String data = rs.getString("data");
                 result = mapper.readValue(data, FlowerPlant.class);
 
-                ServiceUtil.deleteItemById(result.getId(),GREENHOUSE_FLOWER_PLANT_TABLE,transaction);
+                ServiceUtil.deleteItemById(result.getId(), GREENHOUSE_FLOWER_PLANT_TABLE, transaction);
             }
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        }
 
+        try {
             statement.close();
-
         } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (JsonParseException e) {
-            e.printStackTrace();
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -178,7 +194,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             @Override
             public void notification(int processId, String channelName, String payload) {
                 String table = ServiceUtil.getTableName(channelName, payload);
-                if(ServiceUtil.getOperation(channelName, payload) == ServiceUtil.DBOPERATION.INSERT) {
+                if (ServiceUtil.getOperation(channelName, payload) == ServiceUtil.DBOPERATION.INSERT) {
                     switch (table) {
                         case GREENHOUSE_FLOWER_PLANT_TABLE:
                         case GREENHOUSE_VEGETABLE_PLANT_TABLE:
@@ -197,6 +213,6 @@ public class GreenhouseServiceImpl extends GreenhouseService {
     }
 
     public static List<String> getTables() {
-        return Arrays.asList(GREENHOUSE_FLOWER_PLANT_TABLE,GREENHOUSE_VEGETABLE_PLANT_TABLE);
+        return Arrays.asList(GREENHOUSE_FLOWER_PLANT_TABLE, GREENHOUSE_VEGETABLE_PLANT_TABLE);
     }
 }

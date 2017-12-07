@@ -7,6 +7,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ConfigService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,11 +35,19 @@ public class ConfigServiceImpl extends ConfigService {
     }
 
     public void deleteFlowerPlantCultivationInformation(String id, Transaction transaction) {
-        ServiceUtil.deleteItemById(id,CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE,transaction);
+        try {
+            ServiceUtil.deleteItemById(id,CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE,transaction);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void deleteVegetablePlantCultivationInformation(String id, Transaction transaction) {
-        ServiceUtil.deleteItemById(id,CONFIG_VEGETABLE_PLANT_CULTIVATION_INFORMATION_TABLE,transaction);
+        try {
+            ServiceUtil.deleteItemById(id,CONFIG_VEGETABLE_PLANT_CULTIVATION_INFORMATION_TABLE,transaction);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void putFlowerPlantCultivationInformation(FlowerPlantCultivationInformation flowerPlantCultivationInformation, Transaction transaction) {
