@@ -53,7 +53,7 @@ public class MarketController {
         marketService.onMarketChanged(this::updateData);
 
         tcIndex.setSortable(false);
-        tcIndex.setCellValueFactory(column-> new ReadOnlyObjectWrapper<>(tvMarket.getItems().indexOf(column.getValue())+1));
+        tcIndex.setCellValueFactory(column-> new ReadOnlyObjectWrapper<>(column.getTableView().getItems().indexOf(column.getValue())+1));
 
         tcBasketId.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getId()));
         tcType.setCellValueFactory(column -> new ReadOnlyStringWrapper(getType(column.getValue())));

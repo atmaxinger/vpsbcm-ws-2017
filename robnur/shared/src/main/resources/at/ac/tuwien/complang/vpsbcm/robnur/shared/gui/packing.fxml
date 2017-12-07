@@ -11,6 +11,7 @@
     <items>
         <TableView fx:id="tvVegetables">
             <columns>
+                <TableColumn fx:id="tcVegetablesIndex" text="#"/>
                 <TableColumn fx:id="tcVegetablesId" prefWidth="320" text="Id" />
                 <TableColumn fx:id="tcVegetablesType" prefWidth="100" text="Typ" />
                 <TableColumn fx:id="tcVegetablesParent" text="Pflanzen Id" prefWidth="320"/>
@@ -21,6 +22,7 @@
 
         <TableView fx:id="tvFlowers">
             <columns>
+                <TableColumn fx:id="tcFlowersIndex" text="#"/>
                 <TableColumn fx:id="tcFlowersId" prefWidth="320" text="Id" />
                 <TableColumn fx:id="tcFlowersType" prefWidth="100" text="Typ" />
                 <TableColumn fx:id="tcFlowerParent" text="Pflanzen Id" prefWidth="320"/>

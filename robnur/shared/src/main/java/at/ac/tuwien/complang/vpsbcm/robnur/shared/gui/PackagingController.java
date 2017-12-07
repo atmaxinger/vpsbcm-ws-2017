@@ -3,6 +3,7 @@ package at.ac.tuwien.complang.vpsbcm.robnur.shared.gui;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Flower;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.PackingService;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -17,6 +18,7 @@ public class PackagingController {
     private PackingService packingService = RobNurGUI.packingService;
 
     public TableView<Vegetable> tvVegetables;
+    public TableColumn<Vegetable, Integer> tcVegetablesIndex;
     public TableColumn<Vegetable, String> tcVegetablesId;
     public TableColumn<Vegetable, String> tcVegetablesType;
     public TableColumn<Vegetable, String> tcVegetablesParent;
@@ -24,6 +26,7 @@ public class PackagingController {
     public TableColumn<Vegetable, String> tcVegetablesHarvestedBy;
 
     public TableView<Flower> tvFlowers;
+    public TableColumn<Flower, Integer> tcFlowersIndex;
     public TableColumn<Flower, String> tcFlowersId;
     public TableColumn<Flower, String> tcFlowersType;
     public TableColumn<Flower, String> tcFlowerParent;
@@ -40,6 +43,9 @@ public class PackagingController {
     private void initVegsTable() {
         packingService.onVegetablesChanged(this::initVegsData);
 
+        tcVegetablesIndex.setSortable(false);
+        tcVegetablesIndex.setCellValueFactory(column-> new ReadOnlyObjectWrapper<>(column.getTableView().getItems().indexOf(column.getValue())+1));
+
         tcVegetablesId.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getId()));
         tcVegetablesType.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getParentVegetablePlant().getCultivationInformation().getVegetableType().toString()));
         tcVegetablesParent.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getParentVegetablePlant().getId()));
@@ -52,6 +58,9 @@ public class PackagingController {
 
     private void initFlowersTable() {
         packingService.onFlowersChanged(this::initFlowerData);
+
+        tcFlowersIndex.setSortable(false);
+        tcFlowersIndex.setCellValueFactory(column-> new ReadOnlyObjectWrapper<>(column.getTableView().getItems().indexOf(column.getValue())+1));
 
         tcFlowersId.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getId()));
         tcFlowersType.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getParentFlowerPlant().getCultivationInformation().getFlowerType().toString()));

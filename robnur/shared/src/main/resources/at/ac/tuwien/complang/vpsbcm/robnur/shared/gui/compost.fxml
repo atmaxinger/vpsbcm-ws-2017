@@ -7,6 +7,7 @@
        <TitledPane animated="false" text="Blumen Pflanzen">
            <TableView fx:id="tvFlowerPlants">
                <columns>
+                   <TableColumn fx:id="tcFlowerPlantsIndex" text="#" />
                    <TableColumn fx:id="tcFlowerPlantsId" text="Id" prefWidth="320" />
                    <TableColumn fx:id="tcFlowerPlantsType" text="Blumen Sorte" prefWidth="100" />
                    <TableColumn fx:id="tcFlowerPlantsPlantRobot" text="Pflanz Roboter" prefWidth="100" />
@@ -17,6 +18,7 @@
        <TitledPane animated="false" text="Blumen">
            <TableView fx:id="tvFlowers">
                <columns>
+                   <TableColumn fx:id="tcFlowersIndex" text="#" />
                    <TableColumn fx:id="tcFlowersId" text="Id" prefWidth="320"/>
                    <TableColumn fx:id="tcFlowersType" text="Blumen Sorte" prefWidth="100"/>
                    <TableColumn fx:id="tcFlowersParent" text="Eltern Pflanze" prefWidth="320"/>
@@ -30,6 +32,7 @@
        <TitledPane animated="false" text="Gemüse Pflanzen">
            <TableView fx:id="tvVegetablePlants">
                <columns>
+                   <TableColumn fx:id="tcVegetablePlantsIndex" text="#" />
                    <TableColumn fx:id="tcVegetablePlantsId" text="Id" prefWidth="320"/>
                    <TableColumn fx:id="tcVegetablePlantsType" text="Gemüse Sorte" prefWidth="100"/>
                    <TableColumn fx:id="tcVegetablePlantsPlantRobot" text="Pflanz Roboter" prefWidth="100" />
@@ -40,6 +43,7 @@
        <TitledPane animated="false" text="Gemüse">
            <TableView fx:id="tvVegetables">
                <columns>
+                   <TableColumn fx:id="tcVegetablesIndex" text="#" />
                    <TableColumn fx:id="tcVegetablesId" text="Id" prefWidth="320"/>
                    <TableColumn fx:id="tcVegetablesType" text="Gemüse Sorte" prefWidth="100"/>
                    <TableColumn fx:id="tcVegetablesParent" text="Eltern Pflanze" prefWidth="320"/>

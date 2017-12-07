@@ -3,6 +3,7 @@ package at.ac.tuwien.complang.vpsbcm.robnur.shared.gui;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Flower;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ResearchService;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -14,10 +15,13 @@ import java.util.List;
 public class ResearchController {
 
     public TableView<Vegetable> tvVegetables;
+    public TableColumn<Vegetable, Integer> tcVegetablesIndex;
     public TableColumn<Vegetable, String> tcVegetablesId;
     public TableColumn<Vegetable, String> tcVegetablesPlantId;
     public TableColumn<Vegetable, String> tcVegetablesType;
+
     public TableView<Flower> tvFlowers;
+    public TableColumn<Flower, Integer> tcFlowersIndex;
     public TableColumn<Flower, String> tcFlowersId;
     public TableColumn<Flower, String> tcFlowersPlantId;
     public TableColumn<Flower, String> tcFlowersType;
@@ -44,6 +48,9 @@ public class ResearchController {
 
     // wow - such creative - much thought - very wow
     private void initializeVegeTable() {
+        tcVegetablesIndex.setSortable(false);
+        tcVegetablesIndex.setCellValueFactory(column-> new ReadOnlyObjectWrapper<>(column.getTableView().getItems().indexOf(column.getValue())+1));
+
         tcVegetablesId.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getId()));
         tcVegetablesPlantId.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getParentPlant().getId()));
         tcVegetablesType.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getParentPlant().getTypeName()));
@@ -54,6 +61,9 @@ public class ResearchController {
     }
 
     private void initializeFlowersTable() {
+        tcFlowersIndex.setSortable(false);
+        tcFlowersIndex.setCellValueFactory(column-> new ReadOnlyObjectWrapper<>(column.getTableView().getItems().indexOf(column.getValue())+1));
+
         tcFlowersId.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getId()));
         tcFlowersPlantId.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getParentPlant().getId()));
         tcFlowersType.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getParentPlant().getTypeName()));

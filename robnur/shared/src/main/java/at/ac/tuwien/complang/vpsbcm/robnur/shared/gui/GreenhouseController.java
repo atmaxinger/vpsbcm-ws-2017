@@ -36,7 +36,7 @@ public class GreenhouseController {
         greenhouseService.onGreenhouseChanged(data -> updateData(data));
 
         tcIndex.setSortable(false);
-        tcIndex.setCellValueFactory(column-> new ReadOnlyObjectWrapper<>(greenHouse.getItems().indexOf(column.getValue())+1));
+        tcIndex.setCellValueFactory(column-> new ReadOnlyObjectWrapper<>(column.getTableView().getItems().indexOf(column.getValue())+1));
 
         tcPlantId.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getId()));
 
