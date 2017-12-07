@@ -52,6 +52,7 @@ public class ServiceUtil {
 
             statement.close();
         } catch (SQLException | JsonProcessingException e) {
+            System.err.println("Ignoring");
             e.printStackTrace();
         }
     }
@@ -83,6 +84,7 @@ public class ServiceUtil {
 
             statement.close();
         } catch (SQLException | IOException e) {
+            System.err.println("Ignoring (result = " + result + ")");
             e.printStackTrace();
         }
 
@@ -117,6 +119,7 @@ public class ServiceUtil {
             statement.close();
 
         } catch (SQLException | IOException e) {
+            System.err.println("Ignoring (result = " + result + ")");
             e.printStackTrace();
         }
 
@@ -137,6 +140,7 @@ public class ServiceUtil {
         try {
             statement = ((TransactionImpl) transaction).getConnection().createStatement();
         } catch (SQLException e) {
+            System.err.println("returning null");
             e.printStackTrace();
             return null;
         }
@@ -151,6 +155,7 @@ public class ServiceUtil {
 
             deleteItemByParameter(parameterName, parameterValue, table, transaction);
         } catch (SQLException | IOException e) {
+            System.err.println("returning null");
             result = null;
             e.printStackTrace();
         }
@@ -158,6 +163,7 @@ public class ServiceUtil {
         try {
             statement.close();
         } catch (SQLException e) {
+            System.err.println("Ignoring");
             e.printStackTrace();
         }
 
@@ -180,6 +186,7 @@ public class ServiceUtil {
         try {
             statement = ((TransactionImpl) transaction).getConnection().createStatement();
         } catch (SQLException e) {
+            System.err.println("returning null");
             e.printStackTrace();
             return null;
         }
@@ -196,12 +203,14 @@ public class ServiceUtil {
             }
         } catch (SQLException | IOException e) {
             result = null;
+            System.err.println("returning null");
             e.printStackTrace();
         }
 
         try {
             statement.close();
         } catch (SQLException e) {
+            System.err.println("Ignoring");
             e.printStackTrace();
         }
 

@@ -37,7 +37,7 @@ class TransactionImpl implements Transaction {
             connection.close();
             //logger.debug(String.format("rolled back connection %s", connection));
             //connection.close();
-            //logger.debug(String.format("closed connection %s after rollback", connection));
+            logger.debug(String.format("closed connection %s after rollback", connection));
             rolledBack = true;
         } catch (SQLException e) {
             e.printStackTrace();

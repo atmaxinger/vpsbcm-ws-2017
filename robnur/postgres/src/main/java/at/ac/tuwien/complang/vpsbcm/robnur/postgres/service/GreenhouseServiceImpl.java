@@ -95,7 +95,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             try {
                 ServiceUtil.deleteItemById(fp.getId(), GREENHOUSE_FLOWER_PLANT_TABLE);
             } catch (SQLException e) {
-                System.err.println("SQLException in getAllFloewrPlants - returning null");
+                System.err.println("SQLException in getAllFlowerPlants - returning null");
                 return null;
             }
         }
@@ -123,6 +123,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         try {
             statement = ((TransactionImpl) transaction).getConnection().createStatement();
         } catch (SQLException e) {
+            System.err.println("returning null");
             e.printStackTrace();
             return null;
         }
@@ -139,12 +140,14 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             }
         } catch (SQLException | IOException e) {
             result = null;
+            System.err.println("returning null");
             e.printStackTrace();
         }
 
         try {
             statement.close();
         } catch (SQLException e) {
+            System.err.println("Ignoring");
             e.printStackTrace();
         }
 
@@ -163,6 +166,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         try {
             statement = ((TransactionImpl) transaction).getConnection().createStatement();
         } catch (SQLException e) {
+            System.err.println("Returning null");
             e.printStackTrace();
             return null;
         }
@@ -178,12 +182,15 @@ public class GreenhouseServiceImpl extends GreenhouseService {
                 ServiceUtil.deleteItemById(result.getId(), GREENHOUSE_FLOWER_PLANT_TABLE, transaction);
             }
         } catch (SQLException | IOException e) {
+            result = null;
+            System.err.println("Returning null");
             e.printStackTrace();
         }
 
         try {
             statement.close();
         } catch (SQLException e) {
+            System.err.println("Ignoring");
             e.printStackTrace();
         }
 

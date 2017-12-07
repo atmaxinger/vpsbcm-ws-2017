@@ -23,7 +23,7 @@ public class TransactionServiceImpl implements TransactionService {
                     //logger.debug("Connection was closed");
                 }
                 connection = PostgresHelper.getNewConnection();
-                //logger.debug(String.format("Created new connection %s", connection));
+                logger.debug(String.format("Created new connection %s", connection));
             }
             connection.setAutoCommit(false);
             connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
