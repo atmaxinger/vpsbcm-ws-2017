@@ -1,7 +1,9 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlantCultivationInformation;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlantCultivationInformation;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ConfigService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import org.mozartspaces.capi3.*;
@@ -11,6 +13,7 @@ import org.mozartspaces.notifications.Operation;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class ConfigServiceImpl extends ConfigService {
@@ -26,7 +29,7 @@ public class ConfigServiceImpl extends ConfigService {
         capi = new Capi(core);
         notificationManager = new NotificationManager(core);
 
-        List<Coordinator> coordinators = Arrays.asList(new AnyCoordinator(), new QueryCoordinator());
+        List<Coordinator> coordinators = Arrays.asList(new AnyCoordinator(), new QueryCoordinator(), new LabelCoordinator());
 
         try {
             flowerPlantCultivationInformationContainer = CapiUtil.lookupOrCreateContainer("flowerPlantCultivationInformationContainer", spaceUri, coordinators, null, capi);
@@ -47,8 +50,22 @@ public class ConfigServiceImpl extends ConfigService {
     }
 
     @Override
+    public FlowerPlantCultivationInformation readFlowerPlantCultivationInformation(FlowerType flowerType, Transaction transaction) {
+        Selector selector = LabelCoordinator.newSelector(flowerType.name(),1);
+
+        return ServiceUtil.readItem(selector,flowerPlantCultivationInformationContainer,transaction,capi);
+    }
+
+    @Override
     public VegetablePlantCultivationInformation getVegetablePlantCultivationInformation(String id, Transaction transaction) {
         return ServiceUtil.getItemById(id,vegetablePlantCultivationInformationContainer,transaction,capi);
+    }
+
+    @Override
+    public VegetablePlantCultivationInformation readVegetablePlantCultivationInformation(VegetableType vegetableType, Transaction transaction) {
+        Selector selector = LabelCoordinator.newSelector(vegetableType.name(),1);
+
+        return ServiceUtil.readItem(selector,vegetablePlantCultivationInformationContainer,transaction,capi);
     }
 
     @Override
@@ -63,12 +80,14 @@ public class ConfigServiceImpl extends ConfigService {
 
     @Override
     public void putFlowerPlantCultivationInformation(FlowerPlantCultivationInformation flowerPlantCultivationInformation, Transaction transaction) {
-        ServiceUtil.writeItem(flowerPlantCultivationInformation,flowerPlantCultivationInformationContainer,transaction,capi);
+        Entry entry = new Entry(flowerPlantCultivationInformation,LabelCoordinator.newCoordinationData(flowerPlantCultivationInformation.getFlowerType().name()));
+        ServiceUtil.writeItem(entry,flowerPlantCultivationInformationContainer,transaction,capi);
     }
 
     @Override
     public void putVegetablePlantCultivationInformation(VegetablePlantCultivationInformation vegetablePlantCultivationInformation, Transaction transaction) {
-        ServiceUtil.writeItem(vegetablePlantCultivationInformation,vegetablePlantCultivationInformationContainer,transaction,capi);
+        Entry entry = new Entry(vegetablePlantCultivationInformation,LabelCoordinator.newCoordinationData(vegetablePlantCultivationInformation.getVegetableType().name()));
+        ServiceUtil.writeItem(entry,vegetablePlantCultivationInformationContainer,transaction,capi);
     }
 
     @Override

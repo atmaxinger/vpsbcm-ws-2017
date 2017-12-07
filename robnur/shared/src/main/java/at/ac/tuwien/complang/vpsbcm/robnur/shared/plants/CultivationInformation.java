@@ -12,7 +12,7 @@ public abstract class CultivationInformation extends Idable implements Serializa
 
     private int harvest;  // number of vegetables or flowers which can be harvested
 
-    private int upgradeLevel = 1;
+    private int upgradeLevel = 0;
 
     private int fertilizerAmount;
 

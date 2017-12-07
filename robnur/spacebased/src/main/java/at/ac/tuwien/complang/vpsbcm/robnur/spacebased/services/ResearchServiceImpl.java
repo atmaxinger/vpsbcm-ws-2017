@@ -7,6 +7,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ResearchService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import org.mozartspaces.capi3.AnyCoordinator;
 import org.mozartspaces.capi3.Coordinator;
+import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.core.*;
 import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
@@ -29,7 +30,7 @@ public class ResearchServiceImpl extends ResearchService {
         capi = new Capi(core);
         notificationManager = new NotificationManager(core);
 
-        List<Coordinator> coordinators = Arrays.asList(new AnyCoordinator());
+        List<Coordinator> coordinators = Arrays.asList(new AnyCoordinator(),new QueryCoordinator());
 
         try {
             flowerContainer = CapiUtil.lookupOrCreateContainer("flowerContainer",spaceUri,coordinators,null,capi);

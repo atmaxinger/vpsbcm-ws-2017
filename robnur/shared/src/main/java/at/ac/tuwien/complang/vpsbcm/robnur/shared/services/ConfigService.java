@@ -1,7 +1,9 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.services;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlantCultivationInformation;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlantCultivationInformation;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableType;
 
 import java.util.List;
 
@@ -31,7 +33,11 @@ public abstract class ConfigService {
     }
     public abstract FlowerPlantCultivationInformation getFlowerPlantCultivationInformation(String id, Transaction transaction);
 
+    public abstract FlowerPlantCultivationInformation readFlowerPlantCultivationInformation(FlowerType flowerType, Transaction transaction);
+
     public abstract VegetablePlantCultivationInformation getVegetablePlantCultivationInformation(String id, Transaction transaction);
+
+    public abstract VegetablePlantCultivationInformation readVegetablePlantCultivationInformation(VegetableType vegetableType, Transaction transaction);
 
     public abstract void deleteFlowerPlantCultivationInformation(String id, Transaction transaction);
 

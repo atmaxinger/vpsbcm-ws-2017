@@ -37,7 +37,7 @@ public class PackRobot extends Robot {
         for(int i=0; i<Math.min(flowers.size(), 10); i++) {
             Flower flower = packingService.getFlower(flowers.get(i).getId(),transaction);
             researchService.putFlower(flower);
-            logger.info(String.format("Forward flower (id = %s) to research department.",flower.getId()));
+            logger.info(String.format("PackRobot %s: forward flower (id = %s) to research department",this.getId(),flower.getId()));
 
             put++;
         }
@@ -50,14 +50,15 @@ public class PackRobot extends Robot {
         }
     }
     public void tryCreateBouquet(){
-        
+        logger.debug(String.format("PackRobot %s: try to create bouquet",this.getId()));
+
         // check if there are already enough bouquets in the market
         if(marketService.getAmountOfBouquets() >= 5){
             tryPutFlowersIntoResearch();
             return;
         }
 
-        Transaction transaction = transactionService.beginTransaction(TRANSACTION_TIMEOUT); // TODO change timeout
+        Transaction transaction = transactionService.beginTransaction(TRANSACTION_TIMEOUT);
 
         List<Flower> flowers = packingService.readAllFlowers(transaction);
         List<Flower> flowersForBouquet = new ArrayList<>();
@@ -65,6 +66,8 @@ public class PackRobot extends Robot {
         if(getNumberOfDistinctFlowerTypes(flowers) >= 3){
 
             if(flowers.size() >= 5){
+                // try to create bouquet with 5 flowers (at leas 3 different types)
+
                 flowersForBouquet.add(flowers.get(0));
                 flowersForBouquet.add(flowers.get(1));
                 flowersForBouquet.add(flowers.get(2));
@@ -91,6 +94,8 @@ public class PackRobot extends Robot {
                 }
             }
             else if (flowers.size() >= 4) {
+                // try to create bouquet with 4 flowers (at leas 3 different types)
+
                 flowersForBouquet.add(flowers.get(0));
                 flowersForBouquet.add(flowers.get(1));
                 switch (getNumberOfDistinctFlowerTypes(flowersForBouquet)) {
@@ -112,6 +117,7 @@ public class PackRobot extends Robot {
                 }
             }else{
                 // not enough flowers
+                logger.debug(String.format("PackRobot %s: not enough flowers to create bouquet",this.getId()));
                 transaction.commit();
                 return;
             }
@@ -119,7 +125,7 @@ public class PackRobot extends Robot {
             /* remove flowers from packing-queue */
             for (Flower f:flowersForBouquet) {
                 packingService.getFlower(f.getId(),transaction);
-                logger.info(String.format("Remove flower (id = %s) from packing-queue.",f.getId()));
+                logger.info(String.format("PackRobot %s: remove flower(%s) from packing-queue",this.getId(), f.getId()));
             }
 
             transaction.commit();
@@ -131,7 +137,7 @@ public class PackRobot extends Robot {
             bouquet.setPackingRobotId(getId());
 
             marketService.putBouquet(bouquet);
-            logger.info(String.format("Put new bouquet (id = %s) in the market.",bouquet.getId()));
+            logger.info(String.format("PackRobot %s: created bouquet(%s) and put it into basket",this.getId(),bouquet.getId()));
 
             tryCreateBouquet();    // try to create another bouquet
 
@@ -152,7 +158,7 @@ public class PackRobot extends Robot {
         for(int i=0; i<Math.min(vegetables.size(), 10); i++) {
             Vegetable vegetable = packingService.getVegetable(vegetables.get(i).getId(),transaction);
             researchService.putVegetable(vegetable);
-            logger.info(String.format("Forward vegetable (id = %s) to research department.", vegetable.getId()));
+            logger.info(String.format("PackRobot %s: forward vegetable(%s) to research department.",this.getId(),vegetable.getId()));
 
             put++;
         }
@@ -166,6 +172,8 @@ public class PackRobot extends Robot {
     }
 
     public void tryCreateVegetableBasket(){
+        logger.debug(String.format("PackRobot %s: try to create vegetable basket",this.getId()));
+
         if(marketService.getAmountOfVegetableBaskets() >= 3)
         {
             tryPutVegetablesIntoResearch();
@@ -176,13 +184,13 @@ public class PackRobot extends Robot {
         List<Vegetable> vegetables = packingService.readAllVegetables(transaction);
 
         if(vegetables.size() <= 5){
-            logger.debug(String.format("Not enough vegetables available (%d)", vegetables.size()));
             // not enough vegetables available
+            logger.debug(String.format("PackRobot %s: not enough vegetable to create vegetable basket",this.getId()));
             transaction.commit();
             return;
         }
 
-        logger.debug(String.format("Enough vegetables available!"));
+        logger.debug(String.format("PackRobot %s: start creating vegetable basket",this.getId()));
 
         List<VegetableType> checkedVegetableTypes = new ArrayList();    // list of VegetableType to avoid checking a VegetableType twice
 
@@ -203,8 +211,8 @@ public class PackRobot extends Robot {
                     List<Vegetable> vegetablesForVegetableBasket = new ArrayList<>();
 
                     for (int i = 0; i < 5; i++){
+                        logger.info(String.format("PackRobot %s: remove vegetable(%s) from packing-queue",this.getId(), v.getId()));
                         Vegetable vegetable = packingService.getVegetable(vegetablesOfSameType.get(i).getId(),transaction);
-                        logger.info(String.format("Remove vegetable (id = %s) from packing-queue.",vegetablesOfSameType.get(i).getId()));
                         vegetablesForVegetableBasket.add(vegetable);
                     }
 
@@ -215,7 +223,7 @@ public class PackRobot extends Robot {
                     waitPackingTime();
 
                     marketService.putVegetableBasket(vegetableBasket);
-                    logger.info(String.format("Put new vegetable basket (id = %s) in the market.",vegetableBasket.getId()));
+                    logger.info(String.format("PackRobot %s: created vegetable basket(%s) and put it into basket",this.getId(),vegetableBasket.getId()));
 
                     tryCreateVegetableBasket(); // try to create another vegetable basket
 
