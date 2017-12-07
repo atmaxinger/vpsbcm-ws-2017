@@ -23,6 +23,7 @@ public class MarketController {
     public TableColumn<EndProduct, String> tcType;
     public TableColumn<EndProduct, Button> tcInfo;
     public TableColumn<EndProduct, Button> tcBuy;
+    public TableColumn<EndProduct, String> tcPackRobot;
 
 
     private MarketService marketService = RobNurGUI.marketService;
@@ -57,6 +58,8 @@ public class MarketController {
 
         tcBasketId.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getId()));
         tcType.setCellValueFactory(column -> new ReadOnlyStringWrapper(getType(column.getValue())));
+
+        tcPackRobot.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getPackingRobotId()));
 
         tcInfo.setCellValueFactory(column -> {
             Button btn = new Button("Infos");

@@ -14,6 +14,7 @@
                 <TableColumn fx:id="tcIndex" text="#" />
                 <TableColumn fx:id="tcBasketId" text="Produkt Id" prefWidth="320" />
                 <TableColumn fx:id="tcType" prefWidth="100" text="Art" />
+                <TableColumn fx:id="tcPackRobot" prefWidth="100" text="Pack Roboter" />
                 <TableColumn fx:id="tcInfo" text="Informationen" />
                 <TableColumn fx:id="tcBuy" text="Kaufen" />
             </columns>
