@@ -48,6 +48,8 @@ public class ServiceUtil {
 
             ObjectMapper mapper = new ObjectMapper();
 
+            System.err.println("WRITE TO " + table);
+
             statement.execute(String.format("INSERT INTO %s (DATA) VALUES ('%s')", table, mapper.writeValueAsString(item)));
 
             statement.close();

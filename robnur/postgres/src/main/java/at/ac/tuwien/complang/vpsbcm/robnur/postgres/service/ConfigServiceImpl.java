@@ -20,7 +20,7 @@ public class ConfigServiceImpl extends ConfigService {
         try {
             Listener flowerPlantListener = new Listener(CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE) {
                 @Override
-                public void onNotify() {
+                public void onNotify(int pid, DBMETHOD method) {
                     notifyFlowerCultivationInformationChanged(readAllFlowerPlantCultivationInformation(null));
                 }
             };
@@ -28,7 +28,7 @@ public class ConfigServiceImpl extends ConfigService {
 
             Listener flowersListener = new Listener(CONFIG_VEGETABLE_PLANT_CULTIVATION_INFORMATION_TABLE) {
                 @Override
-                public void onNotify() {
+                public void onNotify(int pid, DBMETHOD method) {
                     notifyVegetableCultivationInformationChanged(readAllVegetablePlantCultivationInformation(null));
                 }
             };

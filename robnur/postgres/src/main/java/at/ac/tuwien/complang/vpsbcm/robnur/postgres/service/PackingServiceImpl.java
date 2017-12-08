@@ -20,7 +20,7 @@ public class PackingServiceImpl extends PackingService {
         try {
             Listener flowerListener = new Listener(PACKING_FLOWER_TABLE) {
                 @Override
-                public void onNotify() {
+                public void onNotify(int pid, DBMETHOD method) {
                     raiseFlowersChanged();
                 }
             };
@@ -28,7 +28,7 @@ public class PackingServiceImpl extends PackingService {
 
             Listener vegetableListener = new Listener(PACKING_VEGETABLE_TABLE) {
                 @Override
-                public void onNotify() {
+                public void onNotify(int pid, DBMETHOD method) {
                     raiseVegetablesChanged();
                 }
             };

@@ -22,7 +22,7 @@ public class CompostServiceImpl extends CompostService {
         try {
             Listener flowerPlantListener = new Listener(COMPOST_FLOWER_PLANT_TABLE) {
                 @Override
-                public void onNotify() {
+                public void onNotify(int pid, DBMETHOD method) {
                     notifyFlowerPlantsChanged(readAllFlowerPlants());
                 }
             };
@@ -30,7 +30,7 @@ public class CompostServiceImpl extends CompostService {
 
             Listener flowersListener = new Listener(COMPOST_FLOWER_TABLE) {
                 @Override
-                public void onNotify() {
+                public void onNotify(int pid, DBMETHOD method) {
                     notifyFlowersChanged(readAllFlowers());
                 }
             };
@@ -38,7 +38,7 @@ public class CompostServiceImpl extends CompostService {
 
             Listener vegetablePlantListener = new Listener(COMPOST_VEGETABLE_PLANT_TABLE) {
                 @Override
-                public void onNotify() {
+                public void onNotify(int pid, DBMETHOD method) {
                     notifyVegetablePlantsChanged(readAllVegetablePlants());
                 }
             };
@@ -46,7 +46,7 @@ public class CompostServiceImpl extends CompostService {
 
             Listener vegetablesListener = new Listener(COMPOST_VEGETABLE_TABLE) {
                 @Override
-                public void onNotify() {
+                public void onNotify(int pid, DBMETHOD method) {
                     notifyVegetablesChanged(readAllVegetables());
                 }
             };

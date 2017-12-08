@@ -2,7 +2,9 @@ package at.ac.tuwien.complang.vpsbcm.robnur.postgres.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.postgresql.PGConnection;
+import org.postgresql.PGNotification;
 
+import javax.management.Notification;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.*;
@@ -14,6 +16,10 @@ abstract class Listener extends Thread {
     private Method method;
     private Object robot;
 
+    boolean shouldRun = true;
+
+    public enum DBMETHOD { INSERT, DELETE, UNKNOWN }
+
     Listener(String listenerName) throws SQLException {
         conn = PostgresHelper.getNewConnection();
         Statement stmt = conn.createStatement();
@@ -22,7 +28,7 @@ abstract class Listener extends Thread {
     }
 
     public void run() {
-        while (true) {
+        while (shouldRun) {
             try {
                 // issue a dummy query to contact the backend
                 // and receive any pending notifications.
@@ -31,9 +37,20 @@ abstract class Listener extends Thread {
                 rs.close();
                 stmt.close();
 
-                org.postgresql.PGNotification notifications[] = ((PGConnection) conn).getNotifications();
+                PGNotification notifications[] = ((PGConnection) conn).getNotifications();
                 if (notifications != null) {
-                    onNotify();
+                    for(PGNotification notification : notifications) {
+                        System.err.println("GOT NOTIFICATION ON " + notification.getName() + " FOR METHOD " + notification.getParameter());
+
+                        DBMETHOD dbmethod = DBMETHOD.UNKNOWN;
+                        if(notification.getParameter().toLowerCase().equals("insert")) {
+                            dbmethod = DBMETHOD.INSERT;
+                        } else if(notification.getParameter().toLowerCase().equals("delete")) {
+                            dbmethod = DBMETHOD.DELETE;
+                        }
+
+                        onNotify(notification.getPID(), dbmethod);
+                    }
                 }
 
                 // wait a while before checking again for new
@@ -45,6 +62,9 @@ abstract class Listener extends Thread {
         }
     }
 
-    abstract public void onNotify();
+    public void shutdown() {
+        shouldRun = false;
+    }
 
+    public abstract void onNotify(int pid, DBMETHOD method);
 }

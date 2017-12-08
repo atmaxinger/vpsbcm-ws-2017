@@ -20,7 +20,7 @@ public class ResearchServiceImpl extends ResearchService {
         try {
             Listener flowerListener = new Listener(RESEARCH_FLOWER_TABLE) {
                 @Override
-                public void onNotify() {
+                public void onNotify(int pid, DBMETHOD method) {
                     notifyFlowersChanged(readAllFlowers(null));
                 }
             };
@@ -28,7 +28,7 @@ public class ResearchServiceImpl extends ResearchService {
 
             Listener vegetableListener = new Listener(RESEARCH_VEGETABLE_TABLE) {
                 @Override
-                public void onNotify() {
+                public void onNotify(int pid, DBMETHOD method) {
                     notifyVegetablesChanged(readAllVegetables(null));
                 }
             };

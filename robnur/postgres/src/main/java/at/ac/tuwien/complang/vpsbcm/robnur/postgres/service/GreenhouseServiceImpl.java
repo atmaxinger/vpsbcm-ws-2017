@@ -30,7 +30,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         try {
             Listener flowerListener = new Listener(GREENHOUSE_FLOWER_PLANT_TABLE) {
                 @Override
-                public void onNotify() {
+                public void onNotify(int pid, DBMETHOD method) {
                     if (greenhouseChanged != null) {
                         List<FlowerPlant> flowerPlants = readAllFlowerPlants();
                         List<VegetablePlant> vegetablePlants = readAllVegetablePlants();
@@ -45,7 +45,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
 
             Listener vegetableListener = new Listener(GREENHOUSE_VEGETABLE_PLANT_TABLE) {
                 @Override
-                public void onNotify() {
+                public void onNotify(int pid, DBMETHOD method) {
                     if (greenhouseChanged != null) {
                         List<FlowerPlant> flowerPlants = readAllFlowerPlants();
                         List<VegetablePlant> vegetablePlants = readAllVegetablePlants();
@@ -216,8 +216,9 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         try {
             Listener flowerListener = new Listener(GREENHOUSE_FLOWER_PLANT_TABLE) {
                 @Override
-                public void onNotify() {
+                public void onNotify(int pid, DBMETHOD method) {
                     robot.tryHarvestFlower();
+                    robot.tryPlant();
                 }
             };
             flowerListener.start();
@@ -225,8 +226,9 @@ public class GreenhouseServiceImpl extends GreenhouseService {
 
             Listener vegetableListener = new Listener(GREENHOUSE_VEGETABLE_PLANT_TABLE) {
                 @Override
-                public void onNotify() {
+                public void onNotify(int pid, DBMETHOD method) {
                     robot.tryHarvestVegetable();
+                    robot.tryPlant();
                 }
             };
             vegetableListener.start();

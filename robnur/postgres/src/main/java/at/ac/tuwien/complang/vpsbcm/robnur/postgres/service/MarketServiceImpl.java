@@ -17,7 +17,7 @@ public class MarketServiceImpl extends MarketService {
         try {
             Listener flowerListener = new Listener(MARKET_BOUQUET_TABLE) {
                 @Override
-                public void onNotify() {
+                public void onNotify(int pid, DBMETHOD method) {
                     raiseChangedEvent();
                 }
             };
@@ -25,7 +25,7 @@ public class MarketServiceImpl extends MarketService {
 
             Listener vegetableListener = new Listener(MARKET_VEGETABLE_BASKET_TABLE) {
                 @Override
-                public void onNotify() {
+                public void onNotify(int pid, DBMETHOD method) {
                     raiseChangedEvent();
                 }
             };

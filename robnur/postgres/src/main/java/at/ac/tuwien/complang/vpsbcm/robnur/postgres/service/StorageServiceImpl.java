@@ -31,7 +31,7 @@ public class StorageServiceImpl extends StorageService {
         try {
             Listener flowerSeedListener = new Listener(STORAGE_FLOWER_SEED_TABLE) {
                 @Override
-                public void onNotify() {
+                public void onNotify(int pid, DBMETHOD method) {
                    notifyFlowerSeedsChanged(readAllFlowerSeeds());
                 }
             };
@@ -39,7 +39,7 @@ public class StorageServiceImpl extends StorageService {
 
             Listener vegetableSeedListener = new Listener(STORAGE_VEGETABLE_SEED_TABLE) {
                 @Override
-                public void onNotify() {
+                public void onNotify(int pid, DBMETHOD method) {
                     notifyVegetableSeedsChanged(readAllVegetableSeeds());
                 }
             };
@@ -47,7 +47,7 @@ public class StorageServiceImpl extends StorageService {
 
             Listener soilListener = new Listener(STORAGE_SOIL_TABLE) {
                 @Override
-                public void onNotify() {
+                public void onNotify(int pid, DBMETHOD method) {
                     notifySoilPackagesChanged(readAllSoilPackage());
                 }
             };
@@ -55,7 +55,7 @@ public class StorageServiceImpl extends StorageService {
 
             Listener flowerFertilizerListener = new Listener(STORAGE_FLOWER_FERTILIZER_TABLE) {
                 @Override
-                public void onNotify() {
+                public void onNotify(int pid, DBMETHOD method) {
                     notifyFlowerFertilizerChanged(readAllFlowerFertilizer());
                 }
             };
@@ -63,7 +63,7 @@ public class StorageServiceImpl extends StorageService {
 
             Listener vegetableFertilizerListener = new Listener(STORAGE_VEGETABLE_FERTILIZER_TABLE) {
                 @Override
-                public void onNotify() {
+                public void onNotify(int pid, DBMETHOD method) {
                     notifyVegetableFertilizerChanged(readAllVegetableFertilizer());
                 }
             };
@@ -288,7 +288,7 @@ public class StorageServiceImpl extends StorageService {
 
             Listener flowerSeedListener = new Listener(STORAGE_FLOWER_SEED_TABLE) {
                 @Override
-                public void onNotify() {
+                public void onNotify(int pid, DBMETHOD method) {
                     robot.tryHarvestPlant();
                     robot.tryPlant();
                 }
@@ -297,7 +297,7 @@ public class StorageServiceImpl extends StorageService {
 
             Listener vegetableSeedListener = new Listener(STORAGE_VEGETABLE_SEED_TABLE) {
                 @Override
-                public void onNotify() {
+                public void onNotify(int pid, DBMETHOD method) {
                     robot.tryHarvestPlant();
                     robot.tryPlant();
                 }
@@ -306,7 +306,7 @@ public class StorageServiceImpl extends StorageService {
 
             Listener soilListener = new Listener(STORAGE_SOIL_TABLE) {
                 @Override
-                public void onNotify() {
+                public void onNotify(int pid, DBMETHOD method) {
                     robot.tryHarvestPlant();
                     robot.tryPlant();
                 }
@@ -315,7 +315,7 @@ public class StorageServiceImpl extends StorageService {
 
             Listener flowerFertilizerListener = new Listener(STORAGE_FLOWER_FERTILIZER_TABLE) {
                 @Override
-                public void onNotify() {
+                public void onNotify(int pid, DBMETHOD method) {
                     robot.tryHarvestPlant();
                     robot.tryPlant();
                 }
@@ -324,7 +324,7 @@ public class StorageServiceImpl extends StorageService {
 
             Listener vegetableVerbalizeListener = new Listener(STORAGE_VEGETABLE_FERTILIZER_TABLE) {
                 @Override
-                public void onNotify() {
+                public void onNotify(int pid, DBMETHOD method) {
                     robot.tryHarvestPlant();
                     robot.tryPlant();
                 }
@@ -333,7 +333,7 @@ public class StorageServiceImpl extends StorageService {
 
             Listener waterListener = new Listener(STORAGE_WATER_TABLE) {
                 @Override
-                public void onNotify() {
+                public void onNotify(int pid, DBMETHOD method) {
                     robot.tryHarvestPlant();
                     robot.tryPlant();
                 }
