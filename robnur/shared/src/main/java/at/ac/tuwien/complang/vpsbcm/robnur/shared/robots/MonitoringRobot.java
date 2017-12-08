@@ -8,6 +8,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.CultivationInformation;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.GreenhouseService;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -19,6 +20,37 @@ public class MonitoringRobot extends Robot {
 
     private Random rand = new Random();
 
+    private List<String> takenVegetableIds = new LinkedList<>();
+    private List<String> putVegetableIds = new LinkedList<>();
+
+    private String formatList(List<String> list) {
+        String s = "";
+
+        for(int i=0; i<list.size(); i++) {
+            s += list.get(i);
+            if(i < list.size()-1) {
+                s+=", ";
+            }
+        }
+
+        return s;
+    }
+
+    private List<String> getMissingIds(List<String> takenIds, List<String> putIds) {
+        List<String> missing = new LinkedList<>();
+
+        for (String planted : takenIds) {
+            if(!putIds.contains(planted)) {
+                missing.add(planted);
+            }
+        }
+
+        return missing;
+    }
+
+    private void outputStatistics() {
+        System.out.println("--- MISSING VEGETABLES: " + formatList(getMissingIds(takenVegetableIds, putVegetableIds)));
+    }
 
     public MonitoringRobot(GreenhouseService greenhouseService, TransactionService transactionService) {
         this.greenhouseService = greenhouseService;
@@ -45,6 +77,7 @@ public class MonitoringRobot extends Robot {
             t.rollback();
             return;
         }
+        vegs.stream().map(v -> takenVegetableIds.add(v.getId()));
 
         // grow
         for(VegetablePlant p : vegs) {
@@ -58,9 +91,13 @@ public class MonitoringRobot extends Robot {
                 t.rollback();
                 return;
             }
+
+            putVegetableIds.add(p.getId());
         }
 
         t.commit();
+
+        outputStatistics();
     }
 
     void monitorFlowers() {
