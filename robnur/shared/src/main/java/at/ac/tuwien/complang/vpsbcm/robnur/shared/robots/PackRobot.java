@@ -36,6 +36,11 @@ public class PackRobot extends Robot {
         int put = 0;
         for(int i=0; i<Math.min(flowers.size(), 10); i++) {
             Flower flower = packingService.getFlower(flowers.get(i).getId(),transaction);
+            if(flower == null) {
+                transaction.rollback();
+                return;
+            }
+
             researchService.putFlower(flower);
             logger.info(String.format("PackRobot %s: forward flower (id = %s) to research department",this.getId(),flower.getId()));
 
@@ -157,6 +162,11 @@ public class PackRobot extends Robot {
         int put = 0;
         for(int i=0; i<Math.min(vegetables.size(), 10); i++) {
             Vegetable vegetable = packingService.getVegetable(vegetables.get(i).getId(),transaction);
+            if(vegetable == null) {
+                transaction.rollback();
+                return;
+            }
+
             researchService.putVegetable(vegetable);
             logger.info(String.format("PackRobot %s: forward vegetable(%s) to research department.",this.getId(),vegetable.getId()));
 

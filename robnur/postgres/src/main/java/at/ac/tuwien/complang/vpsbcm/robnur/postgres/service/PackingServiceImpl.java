@@ -74,29 +74,27 @@ public class PackingServiceImpl extends PackingService {
     }
 
     public void registerPackRobot(PackRobot packRobot) {
-
-        /*PGNotificationListener listener = new PGNotificationListener() {
-            @Override
-            public void notification(int processId, String channelName, String payload) {
-                String table = ServiceUtil.getTableName(channelName, payload);
-                if(ServiceUtil.getOperation(channelName, payload) == ServiceUtil.DBOPERATION.INSERT) {
-                    System.out.println("/channels/" + channelName + " " + table);
-
-                    switch (table) {
-                        case PACKING_FLOWER_TABLE:
-                            packRobot.tryCreateBouquet();
-                            break;
-                        case PACKING_VEGETABLE_TABLE:
-                            packRobot.tryCreateVegetableBasket();
-                            break;
-                    }
+        try {
+            Listener flowerListener = new Listener(PACKING_FLOWER_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    packRobot.tryCreateBouquet();
+                    packRobot.tryCreateVegetableBasket();
                 }
-            }
-        };
+            };
+            flowerListener.start();
 
-        PostgresHelper.getConnection().addNotificationListener(listener);
+            Listener vegetableListener = new Listener(PACKING_VEGETABLE_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    packRobot.tryCreateVegetableBasket();
+                    packRobot.tryCreateBouquet();
+                }
+            };
+            vegetableListener.start();
 
-        PostgresHelper.setUpListen(PACKING_FLOWER_TABLE);
-        PostgresHelper.setUpListen(PACKING_VEGETABLE_TABLE);*/
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
