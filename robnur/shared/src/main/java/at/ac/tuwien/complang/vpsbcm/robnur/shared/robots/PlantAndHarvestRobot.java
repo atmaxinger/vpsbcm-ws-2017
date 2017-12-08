@@ -22,6 +22,19 @@ public class PlantAndHarvestRobot extends Robot {
     private int plantTransactionTimeout = 60*1000;
     private int harvestTransactionTimeout = 1000;
 
+    private int plantedVegetablePlants = 0;
+    private int harvestedVegetablePlants = 0;
+    private int harvestedVegetables = 0;
+
+    private int plantedFlowerPlants = 0;
+    private int harvestedFlowerPlants = 0;
+    private int harvestedFlowers = 0;
+
+    private void outputStatistics() {
+        System.out.println(String.format("----- PLANTED VEGETABLE PLANTS: %d | HARVESTED VEGETABLE PLANTS: %d | HARVESTED VEGETABLES: %d -----", plantedVegetablePlants, harvestedVegetablePlants, harvestedVegetables));
+        System.out.println(String.format("----- PLANTED FLOWER PLANTS: %d | HARVESTED FLOWER PLANTS: %d | HARVESTED FLOWERS: %d -----", plantedFlowerPlants, harvestedFlowerPlants, harvestedFlowers));
+    }
+
     public PlantAndHarvestRobot(String id, int plantTransactionTimeout, int harvestTransactionTimeout, StorageService storageService, GreenhouseService greenhouseService, TransactionService transactionService, PackingService packingService, CompostService compostService) {
         this.setId(id);
         this.plantTransactionTimeout = plantTransactionTimeout;
@@ -40,15 +53,17 @@ public class PlantAndHarvestRobot extends Robot {
     /**
      * Try to harvest all harvestable plants
      */
-    public void tryHarvestPlant() {
+    public synchronized void tryHarvestPlant() {
         tryHarvestFlower();
         tryHarvestVegetable();
+
+        outputStatistics();
     }
 
     /**
      * try to plant either a vegetable or a flower
      */
-    public void tryPlant() {
+    public synchronized void tryPlant() {
 
         boolean hasPlantedSomething = false;
 
@@ -90,6 +105,8 @@ public class PlantAndHarvestRobot extends Robot {
             tryHarvestPlant();
             tryPlant();
         }
+
+        outputStatistics();
     }
 
 
@@ -103,7 +120,10 @@ public class PlantAndHarvestRobot extends Robot {
 
             // if this plant can still be harvested then "plant" it again
             if (plant.getCultivationInformation().getRemainingNumberOfHarvests() > 0) {
-                greenhouseService.plant(plant, transaction);
+                if(!greenhouseService.plant(plant, transaction)) {
+                    System.err.println("could not put vegetable plant with still remaining harvests back - return null");
+                    return null;
+                }
             } else {
                 plant.setCompostRobot(getId());
                 compostService.putVegetablePlant(plant);
@@ -132,6 +152,9 @@ public class PlantAndHarvestRobot extends Robot {
                 veg.setHarvestRobot(this.getId());
                 packingService.putVegetable(veg);
             }
+
+            harvestedVegetablePlants++;
+            harvestedVegetables += harvested.size();
 
             t.commit();
 
@@ -172,6 +195,9 @@ public class PlantAndHarvestRobot extends Robot {
                 flo.setHarvestRobot(this.getId());
                 packingService.putFlower(flo);
             }
+
+            harvestedFlowers+=harvested.size();
+            harvestedFlowerPlants++;
 
             t.commit();
 
@@ -295,6 +321,7 @@ public class PlantAndHarvestRobot extends Robot {
                     t.rollback();
                     return false;
                 }
+                plantedVegetablePlants++;
                 logger.debug(String.format("tryPlantPlant - planted vegetable %s", nextSeed.getTypeName()));
             } else if (nextSeed instanceof FlowerPlant) {
                 if(!greenhouseService.plant((FlowerPlant) nextSeed, t)) {
@@ -302,6 +329,7 @@ public class PlantAndHarvestRobot extends Robot {
                     t.rollback();
                     return false;
                 }
+                plantedFlowerPlants++;
                 logger.info(String.format("PlantAndHarvestRobot %s: planted seed(%s, %s)", this.getId(), nextSeed.getTypeName(), nextSeed.getId()));
             } else {
                 logger.log(Priority.toPriority(Priority.ERROR_INT), String.format("tryPlantPlant - not planted - unknown plant"));

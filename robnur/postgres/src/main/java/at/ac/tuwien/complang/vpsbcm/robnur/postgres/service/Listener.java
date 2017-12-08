@@ -40,8 +40,6 @@ abstract class Listener extends Thread {
                 PGNotification notifications[] = ((PGConnection) conn).getNotifications();
                 if (notifications != null) {
                     for(PGNotification notification : notifications) {
-                        System.err.println("GOT NOTIFICATION ON " + notification.getName() + " FOR METHOD " + notification.getParameter());
-
                         DBMETHOD dbmethod = DBMETHOD.UNKNOWN;
                         if(notification.getParameter().toLowerCase().equals("insert")) {
                             dbmethod = DBMETHOD.INSERT;

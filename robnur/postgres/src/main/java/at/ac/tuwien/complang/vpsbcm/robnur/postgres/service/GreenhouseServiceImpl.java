@@ -68,8 +68,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         if (readAllFlowerPlants(transaction).size() + readAllVegetablePlants(transaction).size() >= 20) {
             return false;
         }
-        ServiceUtil.writeItem(vegetablePlant, GREENHOUSE_VEGETABLE_PLANT_TABLE, transaction);
-        return true;
+        return ServiceUtil.writeItem(vegetablePlant, GREENHOUSE_VEGETABLE_PLANT_TABLE, transaction);
     }
 
     @Override
@@ -77,8 +76,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         if (readAllFlowerPlants(transaction).size() + readAllVegetablePlants(transaction).size() >= 20) {
             return false;
         }
-        ServiceUtil.writeItem(flowerPlant, GREENHOUSE_FLOWER_PLANT_TABLE, transaction);
-        return true;
+        return ServiceUtil.writeItem(flowerPlant, GREENHOUSE_FLOWER_PLANT_TABLE, transaction);
     }
 
     @Override
@@ -131,7 +129,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         try {
             statement = ((TransactionImpl) transaction).getConnection().createStatement();
         } catch (SQLException e) {
-            System.err.println("returning null");
+            System.err.println("getHarvestableVegetablePlant -create statement - returning null");
             e.printStackTrace();
             return null;
         }
@@ -148,14 +146,14 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             }
         } catch (SQLException | IOException e) {
             result = null;
-            System.err.println("returning null");
+            System.err.println("getHarvestableVegetablePlant - select and delete - returning null");
             e.printStackTrace();
         }
 
         try {
             statement.close();
         } catch (SQLException e) {
-            System.err.println("Ignoring");
+            System.err.println("getHarvestableVegetablePlant - statement close - Ignoring");
             e.printStackTrace();
         }
 
@@ -174,7 +172,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         try {
             statement = ((TransactionImpl) transaction).getConnection().createStatement();
         } catch (SQLException e) {
-            System.err.println("Returning null");
+            System.err.println("getHarvestableFlowerPlant - create statement - returning null");
             e.printStackTrace();
             return null;
         }
@@ -191,14 +189,14 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             }
         } catch (SQLException | IOException e) {
             result = null;
-            System.err.println("Returning null");
+            System.err.println("getHarvestableFlowerPlant - select and delete - returning null");
             e.printStackTrace();
         }
 
         try {
             statement.close();
         } catch (SQLException e) {
-            System.err.println("Ignoring");
+            System.err.println("getHarvestableFlowerPlant - statement close - ignoring");
             e.printStackTrace();
         }
 
@@ -210,7 +208,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             Listener flowerListener = new Listener(GREENHOUSE_FLOWER_PLANT_TABLE) {
                 @Override
                 public void onNotify(int pid, DBMETHOD method) {
-                    robot.tryHarvestFlower();
+                    robot.tryHarvestPlant();
                     robot.tryPlant();
                 }
             };
@@ -220,7 +218,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             Listener vegetableListener = new Listener(GREENHOUSE_VEGETABLE_PLANT_TABLE) {
                 @Override
                 public void onNotify(int pid, DBMETHOD method) {
-                    robot.tryHarvestVegetable();
+                    robot.tryHarvestPlant();
                     robot.tryPlant();
                 }
             };

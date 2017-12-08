@@ -42,7 +42,7 @@ public class ServiceUtil {
         } else return "->>";
     }
 
-    public static <T extends Serializable> void writeItem(T item, String table, Transaction transaction) {
+    public static <T extends Serializable> boolean writeItem(T item, String table, Transaction transaction) {
         try {
             Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
 
@@ -52,15 +52,24 @@ public class ServiceUtil {
 
             statement.close();
         } catch (SQLException | JsonProcessingException e) {
-            System.err.println("Ignoring");
+            System.err.println("writeItem - return false");
             e.printStackTrace();
+            return false;
         }
+
+        return true;
     }
 
-    public static <T extends Serializable> void writeItem(T item, String table) {
+    public static <T extends Serializable> boolean writeItem(T item, String table) {
+        boolean res = false;
         Transaction transaction = newTransaction();
-        writeItem(item, table, transaction);
-        transaction.commit();
+        res = writeItem(item, table, transaction);
+        if(!res) {
+            transaction.rollback();
+        } else {
+            transaction.commit();
+        }
+        return res;
     }
 
 
@@ -84,7 +93,7 @@ public class ServiceUtil {
 
             statement.close();
         } catch (SQLException | IOException e) {
-            System.err.println("Ignoring (result = " + result + ")");
+            System.err.println("readAllItems - Ignoring (result = " + result + ")");
             e.printStackTrace();
         }
 
@@ -119,7 +128,7 @@ public class ServiceUtil {
             statement.close();
 
         } catch (SQLException | IOException e) {
-            System.err.println("Ignoring (result = " + result + ")");
+            System.err.println("readItemByParameter - Ignoring (result = " + result + ")");
             e.printStackTrace();
         }
 
@@ -140,7 +149,7 @@ public class ServiceUtil {
         try {
             statement = ((TransactionImpl) transaction).getConnection().createStatement();
         } catch (SQLException e) {
-            System.err.println("returning null");
+            System.err.println("getItemByParameter - createStatement - returning null");
             e.printStackTrace();
             return null;
         }
@@ -155,7 +164,7 @@ public class ServiceUtil {
 
             deleteItemByParameter(parameterName, parameterValue, table, transaction);
         } catch (SQLException | IOException e) {
-            System.err.println("returning null");
+            System.err.println("getItemByParameter - select and delete - returning null");
             result = null;
             e.printStackTrace();
         }
@@ -163,7 +172,7 @@ public class ServiceUtil {
         try {
             statement.close();
         } catch (SQLException e) {
-            System.err.println("Ignoring");
+            System.err.println("getItemByParameter - statement.close - Ignoring");
             e.printStackTrace();
         }
 
@@ -186,7 +195,7 @@ public class ServiceUtil {
         try {
             statement = ((TransactionImpl) transaction).getConnection().createStatement();
         } catch (SQLException e) {
-            System.err.println("returning null");
+            System.err.println("getItemsByParameter - create statement - returning null");
             e.printStackTrace();
             return null;
         }
@@ -203,14 +212,14 @@ public class ServiceUtil {
             }
         } catch (SQLException | IOException e) {
             result = null;
-            System.err.println("returning null");
+            System.err.println("getItemsByParameter - select and delete - returning null");
             e.printStackTrace();
         }
 
         try {
             statement.close();
         } catch (SQLException e) {
-            System.err.println("Ignoring");
+            System.err.println("getItemsByParameter - statement close - Ignoring");
             e.printStackTrace();
         }
 

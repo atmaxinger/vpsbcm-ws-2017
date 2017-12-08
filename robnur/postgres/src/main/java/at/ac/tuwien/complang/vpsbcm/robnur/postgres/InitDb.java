@@ -47,6 +47,8 @@ public class InitDb {
         ConfigService configService = new ConfigServiceImpl();
         putInitialFlowerPlantCultivationInformation(configService);
         putInitialVegetablePlantCultivationInformation(configService);
+
+        System.out.println("FINISHED");
     }
 
     private static void createTables(List<String> tables){
@@ -109,7 +111,7 @@ public class InitDb {
             statement.execute(
                     String.format("CREATE OR REPLACE FUNCTION put_back_water() RETURNS TRIGGER AS $$" +
                             " BEGIN " +
-                            " PERFORM pg_sleep(1); " +
+                            //"  PERFORM pg_sleep(1); " +
                             " INSERT INTO %s(data) VALUES('{\"amount\":250,\"id\":\"49c660b6-b9e9-4a47-9922-2bfeefaef67c\"}'); " +
                             " RETURN NULL; " +
                             " END; " +

@@ -53,7 +53,11 @@ public class MonitoringRobot extends Robot {
 
         // write back plant
         for(VegetablePlant p : vegs) {
-            greenhouseService.plant(p, t);
+            if(!greenhouseService.plant(p, t)) {
+                System.err.println("could not put plant back - rollback");
+                t.rollback();
+                return;
+            }
         }
 
         t.commit();
@@ -75,7 +79,11 @@ public class MonitoringRobot extends Robot {
         }
 
         for(FlowerPlant p : flos) {
-            greenhouseService.plant(p, t);
+            if(!greenhouseService.plant(p, t)) {
+                System.err.println("could not put plant back - rollback");
+                t.rollback();
+                return;
+            }
         }
 
         t.commit();
