@@ -11,7 +11,6 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.Water;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PlantAndHarvestRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.StorageService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
-import com.impossibl.postgres.api.jdbc.PGNotificationListener;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -29,7 +28,7 @@ public class StorageServiceImpl extends StorageService {
 
 
     public StorageServiceImpl() {
-        PGNotificationListener listener = new PGNotificationListener() {
+        /*PGNotificationListener listener = new PGNotificationListener() {
             @Override
             public void notification(int processId, String channelName, String payload) {
                 String table = ServiceUtil.getTableName(channelName, payload);
@@ -64,7 +63,7 @@ public class StorageServiceImpl extends StorageService {
         PostgresHelper.setUpListen(STORAGE_SOIL_TABLE);
         PostgresHelper.setUpListen(STORAGE_FLOWER_FERTILIZER_TABLE);
         PostgresHelper.setUpListen(STORAGE_VEGETABLE_FERTILIZER_TABLE);
-        PostgresHelper.setUpListen(STORAGE_WATER_TABLE);
+        PostgresHelper.setUpListen(STORAGE_WATER_TABLE);*/
     }
 
 
@@ -278,31 +277,65 @@ public class StorageServiceImpl extends StorageService {
 
     public void registerPlantAndHarvestRobot(PlantAndHarvestRobot robot) {
 
-        PGNotificationListener listener = new PGNotificationListener() {
-            @Override
-            public void notification(int processId, String channelName, String payload) {
+        try {
 
-                System.out.println("RECEIVED NOTIFICATION FOR ROBOT");
-
-                String table = ServiceUtil.getTableName(channelName, payload);
-                if(ServiceUtil.getOperation(channelName, payload) == ServiceUtil.DBOPERATION.INSERT) {
-                    switch (table) {
-                        case STORAGE_FLOWER_SEED_TABLE:
-                        case STORAGE_VEGETABLE_SEED_TABLE:
-                        case STORAGE_SOIL_TABLE:
-                        case STORAGE_FLOWER_FERTILIZER_TABLE:
-                        case STORAGE_VEGETABLE_FERTILIZER_TABLE:
-                        case STORAGE_WATER_TABLE:
-                            robot.tryHarvestPlant();
-                            robot.tryPlant();
-                            break;
-                    }
+            Listener flowerSeedListener = new Listener(STORAGE_FLOWER_SEED_TABLE) {
+                @Override
+                public void onNotify() {
+                    robot.tryHarvestPlant();
+                    robot.tryPlant();
                 }
-            }
-        };
+            };
+            flowerSeedListener.start();
 
-        PostgresHelper.getConnection().addNotificationListener(listener);
+            Listener vegetableSeedListener = new Listener(STORAGE_VEGETABLE_SEED_TABLE) {
+                @Override
+                public void onNotify() {
+                    robot.tryHarvestPlant();
+                    robot.tryPlant();
+                }
+            };
+            vegetableSeedListener.start();
 
+            Listener soilListener = new Listener(STORAGE_SOIL_TABLE) {
+                @Override
+                public void onNotify() {
+                    robot.tryHarvestPlant();
+                    robot.tryPlant();
+                }
+            };
+            soilListener.start();
+
+            Listener flowerFertilizerListener = new Listener(STORAGE_FLOWER_FERTILIZER_TABLE) {
+                @Override
+                public void onNotify() {
+                    robot.tryHarvestPlant();
+                    robot.tryPlant();
+                }
+            };
+            flowerFertilizerListener.start();
+
+            Listener vegetableVerbalizeListener = new Listener(STORAGE_VEGETABLE_FERTILIZER_TABLE) {
+                @Override
+                public void onNotify() {
+                    robot.tryHarvestPlant();
+                    robot.tryPlant();
+                }
+            };
+            vegetableVerbalizeListener.start();
+
+            Listener waterListener = new Listener(STORAGE_WATER_TABLE) {
+                @Override
+                public void onNotify() {
+                    robot.tryHarvestPlant();
+                    robot.tryPlant();
+                }
+            };
+            waterListener.start();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public static List<String> getTables() {

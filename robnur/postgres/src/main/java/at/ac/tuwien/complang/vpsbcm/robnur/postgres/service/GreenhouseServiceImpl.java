@@ -10,8 +10,8 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.impossibl.postgres.api.jdbc.PGNotificationListener;
 
+import javax.xml.stream.FactoryConfigurationError;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -26,34 +26,41 @@ public class GreenhouseServiceImpl extends GreenhouseService {
     private static final String GREENHOUSE_VEGETABLE_PLANT_TABLE = "gvp";
 
     public GreenhouseServiceImpl() {
-        PGNotificationListener listener = new PGNotificationListener() {
-            @Override
-            public void notification(int processId, String channelName, String payload) {
-                String table = ServiceUtil.getTableName(channelName, payload);
-                switch (table) {
-                    case GREENHOUSE_FLOWER_PLANT_TABLE:
-                    case GREENHOUSE_VEGETABLE_PLANT_TABLE:
 
-                        if (greenhouseChanged != null) {
-                            List<FlowerPlant> flowerPlants = readAllFlowerPlants();
-                            List<VegetablePlant> vegetablePlants = readAllVegetablePlants();
-                            List<Plant> plants = new LinkedList<>();
-                            plants.addAll(flowerPlants);
-                            plants.addAll(vegetablePlants);
-
-                            greenhouseChanged.handle(plants);
-                        }
-
-                        break;
+        try {
+            Listener flowerListener = new Listener(GREENHOUSE_FLOWER_PLANT_TABLE) {
+                @Override
+                public void onNotify() {
+                    if (greenhouseChanged != null) {
+                        List<FlowerPlant> flowerPlants = readAllFlowerPlants();
+                        List<VegetablePlant> vegetablePlants = readAllVegetablePlants();
+                        List<Plant> plants = new LinkedList<>();
+                        plants.addAll(flowerPlants);
+                        plants.addAll(vegetablePlants);
+                        greenhouseChanged.handle(plants);
+                    }
                 }
+            };
+            flowerListener.start();
 
-            }
-        };
+            Listener vegetableListener = new Listener(GREENHOUSE_VEGETABLE_PLANT_TABLE) {
+                @Override
+                public void onNotify() {
+                    if (greenhouseChanged != null) {
+                        List<FlowerPlant> flowerPlants = readAllFlowerPlants();
+                        List<VegetablePlant> vegetablePlants = readAllVegetablePlants();
+                        List<Plant> plants = new LinkedList<>();
+                        plants.addAll(flowerPlants);
+                        plants.addAll(vegetablePlants);
+                        greenhouseChanged.handle(plants);
+                    }
+                }
+            };
+            vegetableListener.start();
 
-        PostgresHelper.getConnection().addNotificationListener(listener);
-
-        PostgresHelper.setUpListen(GREENHOUSE_FLOWER_PLANT_TABLE);
-        PostgresHelper.setUpListen(GREENHOUSE_VEGETABLE_PLANT_TABLE);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -77,14 +84,22 @@ public class GreenhouseServiceImpl extends GreenhouseService {
     @Override
     public List<VegetablePlant> getAllVegetablePlants(Transaction transaction) {
         List<VegetablePlant> vegetablePlants = readAllVegetablePlants(transaction);
-        for (VegetablePlant vp : vegetablePlants) {
-            try {
-                ServiceUtil.deleteItemById(vp.getId(), GREENHOUSE_VEGETABLE_PLANT_TABLE);
-            } catch (SQLException e) {
-                System.err.println("SQLException in getAllVegetablePlants - returning null");
-                return null;
-            }
+
+        boolean successfull = false;
+
+        while (successfull)
+
+        try {
+            Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
+            statement.execute("DELETE FROM " + GREENHOUSE_VEGETABLE_PLANT_TABLE);
+            statement.close();
+            successfull = true;
+        } catch (SQLException e) {
+            System.out.println("DELETE FROM + GREENHOUSE_VEGETABLE_PLANT_TABLE ---------not successfull");
+            successfull = false;
+            e.printStackTrace();
         }
+
         return vegetablePlants;
     }
 
@@ -198,27 +213,26 @@ public class GreenhouseServiceImpl extends GreenhouseService {
     }
 
     public void registerPlantAndHarvestRobot(PlantAndHarvestRobot robot) {
-
-        PGNotificationListener listener = new PGNotificationListener() {
-            @Override
-            public void notification(int processId, String channelName, String payload) {
-                String table = ServiceUtil.getTableName(channelName, payload);
-                if (ServiceUtil.getOperation(channelName, payload) == ServiceUtil.DBOPERATION.INSERT) {
-                    switch (table) {
-                        case GREENHOUSE_FLOWER_PLANT_TABLE:
-                        case GREENHOUSE_VEGETABLE_PLANT_TABLE:
-                            robot.tryHarvestPlant();
-                            robot.tryPlant();
-                            break;
-                    }
+        try {
+            Listener flowerListener = new Listener(GREENHOUSE_FLOWER_PLANT_TABLE) {
+                @Override
+                public void onNotify() {
+                    robot.tryHarvestFlower();
                 }
-            }
-        };
+            };
+            flowerListener.start();
 
-        PostgresHelper.getConnection().addNotificationListener(listener);
 
-        PostgresHelper.setUpListen(GREENHOUSE_FLOWER_PLANT_TABLE);
-        PostgresHelper.setUpListen(GREENHOUSE_VEGETABLE_PLANT_TABLE);
+            Listener vegetableListener = new Listener(GREENHOUSE_VEGETABLE_PLANT_TABLE) {
+                @Override
+                public void onNotify() {
+                    robot.tryHarvestVegetable();
+                }
+            };
+            vegetableListener.start();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public static List<String> getTables() {

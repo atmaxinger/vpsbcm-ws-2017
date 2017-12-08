@@ -23,6 +23,10 @@ public class MonitoringRobot extends Robot {
     public MonitoringRobot(GreenhouseService greenhouseService, TransactionService transactionService) {
         this.greenhouseService = greenhouseService;
         this.transactionService = transactionService;
+
+
+
+        //monitorGreenhouse();
     }
 
     private void doGrow(Plant plant, CultivationInformation cultivationInformation) {
@@ -81,7 +85,7 @@ public class MonitoringRobot extends Robot {
         t.commit();
     }
 
-    public void doStuff() {
+    public void monitorGreenhouse() {
 
         while (true) {
             monitorVegetables();

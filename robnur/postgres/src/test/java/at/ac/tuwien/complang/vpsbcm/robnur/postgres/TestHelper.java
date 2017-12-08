@@ -11,7 +11,7 @@ public class TestHelper {
     public static void createAllTables(List<String> tables){
         for (String t:tables) {
             try {
-                createTable(t,PostgresHelper.getConnection().createStatement());
+                createTable(t,PostgresHelper.getNewConnection().createStatement());
             } catch (SQLException e) {
                 e.printStackTrace();
             }

@@ -3,7 +3,6 @@ package at.ac.tuwien.complang.vpsbcm.robnur.postgres.service;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Bouquet;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableBasket;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.MarketService;
-import com.impossibl.postgres.api.jdbc.PGNotificationListener;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -15,7 +14,7 @@ public class MarketServiceImpl extends MarketService {
     private static final String MARKET_VEGETABLE_BASKET_TABLE = "mvb";
 
     public MarketServiceImpl() {
-        PGNotificationListener listener = new PGNotificationListener() {
+        /*PGNotificationListener listener = new PGNotificationListener() {
             @Override
             public void notification(int processId, String channelName, String payload) {
                 String table = ServiceUtil.getTableName(channelName, payload);
@@ -33,7 +32,7 @@ public class MarketServiceImpl extends MarketService {
         PostgresHelper.getConnection().addNotificationListener(listener);
 
         PostgresHelper.setUpListen(MARKET_BOUQUET_TABLE);
-        PostgresHelper.setUpListen(MARKET_VEGETABLE_BASKET_TABLE);
+        PostgresHelper.setUpListen(MARKET_VEGETABLE_BASKET_TABLE);*/
     }
 
     public void putBouquet(Bouquet bouquet) {

@@ -5,7 +5,6 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.CompostService;
-import com.impossibl.postgres.api.jdbc.PGNotificationListener;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,7 +18,7 @@ public class CompostServiceImpl extends CompostService {
 
 
     public CompostServiceImpl() {
-        PGNotificationListener listener = new PGNotificationListener() {
+    /*    PGNotificationListener listener = new PGNotificationListener() {
             @Override
             public void notification(int processId, String channelName, String payload) {
                 String table = ServiceUtil.getTableName(channelName, payload);
@@ -41,7 +40,7 @@ public class CompostServiceImpl extends CompostService {
             }
         };
 
-        PostgresHelper.getConnection().addNotificationListener(listener);
+        PostgresHelper.getConnection().addNotificationListener(listener);*/
 
         PostgresHelper.setUpListen(COMPOST_FLOWER_PLANT_TABLE);
         PostgresHelper.setUpListen(COMPOST_VEGETABLE_PLANT_TABLE);

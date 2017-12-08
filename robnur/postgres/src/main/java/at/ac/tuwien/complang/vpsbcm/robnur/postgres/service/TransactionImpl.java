@@ -21,6 +21,7 @@ class TransactionImpl implements Transaction {
         try {
             //logger.debug(String.format("trying to commit connection %s", connection));
             connection.commit();
+            connection.close();
             //logger.debug(String.format("committed connection %s", connection));
             //connection.close();
             //logger.debug(String.format("closed connection %s after commit", connection));

@@ -15,25 +15,16 @@ public class TransactionServiceImpl implements TransactionService {
 
     public Transaction beginTransaction(long timeoutMillis) {
         try {
-            if(connection == null || connection.isClosed()) {
-                if(connection == null) {
-                    //logger.debug("Connection was null");
-                }
-                else if(connection.isClosed()) {
-                    //logger.debug("Connection was closed");
-                }
-                connection = PostgresHelper.getNewConnection();
-                logger.debug(String.format("Created new connection %s", connection));
-            }
+            connection = PostgresHelper.getNewConnection();
             connection.setAutoCommit(false);
             connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
-            connection.setNetworkTimeout(Executors.newFixedThreadPool(10), Integer.MAX_VALUE);
-            if(timeoutMillis >= 0) {
+//            connection.setNetworkTimeout(Executors.newFixedThreadPool(10), Integer.MAX_VALUE);
+/*            if(timeoutMillis >= 0) {
                 if(timeoutMillis >= Integer.MAX_VALUE) {
                     throw new IllegalArgumentException(String.format("timeoutMillis too large (max %d)", Integer.MAX_VALUE));
-                }
-                connection.setNetworkTimeout(Executors.newFixedThreadPool(10), (int) timeoutMillis);
-            }
+                }*/
+//                connection.setNetworkTimeout(Executors.newFixedThreadPool(10), (int) timeoutMillis);
+            //}
         } catch (SQLException e) {
             e.printStackTrace();
         }

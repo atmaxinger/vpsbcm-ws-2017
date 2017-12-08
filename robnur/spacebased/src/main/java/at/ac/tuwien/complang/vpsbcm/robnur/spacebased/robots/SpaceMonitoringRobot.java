@@ -24,6 +24,6 @@ public class SpaceMonitoringRobot {
 
         MonitoringRobot monitoringRobot = new MonitoringRobot(greenhouseService, transactionService);
 
-        monitoringRobot.doStuff();
+        monitoringRobot.monitorGreenhouse();
     }
 }

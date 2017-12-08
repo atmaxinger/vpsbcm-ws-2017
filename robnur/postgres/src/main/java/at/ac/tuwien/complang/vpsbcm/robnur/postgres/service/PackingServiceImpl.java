@@ -5,7 +5,6 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PackRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.PackingService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
-import com.impossibl.postgres.api.jdbc.PGNotificationListener;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,7 +17,7 @@ public class PackingServiceImpl extends PackingService {
 
     public PackingServiceImpl() {
 
-        PGNotificationListener listener = new PGNotificationListener() {
+        /*PGNotificationListener listener = new PGNotificationListener() {
             @Override
             public void notification(int processId, String channelName, String payload) {
                 String table = ServiceUtil.getTableName(channelName, payload);
@@ -37,7 +36,7 @@ public class PackingServiceImpl extends PackingService {
         PostgresHelper.getConnection().addNotificationListener(listener);
 
         PostgresHelper.setUpListen(PACKING_FLOWER_TABLE);
-        PostgresHelper.setUpListen(PACKING_VEGETABLE_TABLE);
+        PostgresHelper.setUpListen(PACKING_VEGETABLE_TABLE);*/
     }
 
     public void putFlower(Flower flower) {
@@ -76,7 +75,7 @@ public class PackingServiceImpl extends PackingService {
 
     public void registerPackRobot(PackRobot packRobot) {
 
-        PGNotificationListener listener = new PGNotificationListener() {
+        /*PGNotificationListener listener = new PGNotificationListener() {
             @Override
             public void notification(int processId, String channelName, String payload) {
                 String table = ServiceUtil.getTableName(channelName, payload);
@@ -98,6 +97,6 @@ public class PackingServiceImpl extends PackingService {
         PostgresHelper.getConnection().addNotificationListener(listener);
 
         PostgresHelper.setUpListen(PACKING_FLOWER_TABLE);
-        PostgresHelper.setUpListen(PACKING_VEGETABLE_TABLE);
+        PostgresHelper.setUpListen(PACKING_VEGETABLE_TABLE);*/
     }
 }

@@ -9,7 +9,6 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.StorageService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlantCultivationInformation;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlantCultivationInformation;
-import com.impossibl.postgres.api.jdbc.PGConnection;
 
 import java.sql.*;
 import java.util.List;
@@ -52,7 +51,7 @@ public class InitDb {
 
     private static void createTables(List<String> tables){
 
-        PGConnection connection = PostgresHelper.getConnection();
+        Connection connection = PostgresHelper.getNewConnection();
 
         for (String t:tables) {
             try {
@@ -68,7 +67,7 @@ public class InitDb {
 
     private static void createNotifyFunction(List<String> tables) {
 
-        PGConnection connection = PostgresHelper.getConnection();
+        Connection connection = PostgresHelper.getNewConnection();
 
         for (String table : tables) {
 
@@ -102,7 +101,7 @@ public class InitDb {
     }
 
     private static void createWaterTrigger(String waterTable) {
-        PGConnection connection = PostgresHelper.getConnection();
+        Connection connection = PostgresHelper.getNewConnection();
 
         try {
             Statement statement = connection.createStatement();

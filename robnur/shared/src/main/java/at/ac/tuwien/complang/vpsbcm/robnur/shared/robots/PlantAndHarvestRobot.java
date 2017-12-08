@@ -49,6 +49,7 @@ public class PlantAndHarvestRobot extends Robot {
      * try to plant either a vegetable or a flower
      */
     public void tryPlant() {
+
         boolean hasPlantedSomething = false;
 
         // Step 1: get current planted plants from greenhouse
@@ -117,7 +118,7 @@ public class PlantAndHarvestRobot extends Robot {
     /**
      * try to harvest all harvestable vegetables
      */
-    private void tryHarvestVegetable() {
+    public void tryHarvestVegetable() {
         logger.debug(String.format("PlantAndHarvestRobot %s: Try harvest vegetable", getId()));
 
         Transaction t = transactionService.beginTransaction(harvestTransactionTimeout);
@@ -141,7 +142,7 @@ public class PlantAndHarvestRobot extends Robot {
     }
 
 
-    public List<Flower> tryHarvestFlowerPlant(Transaction transaction) {
+    private List<Flower> tryHarvestFlowerPlant(Transaction transaction) {
         FlowerPlant plant = greenhouseService.getHarvestableFlowerPlant(transaction);
 
         if(plant != null) {
@@ -158,7 +159,7 @@ public class PlantAndHarvestRobot extends Robot {
     /**
      * try to harvest all harvestable flowers
      */
-    private void tryHarvestFlower() {
+    public void tryHarvestFlower() {
         logger.debug(String.format("PlantAndHarvestRobot %s: Try harvest flower", getId()));
 
         Transaction t = transactionService.beginTransaction(harvestTransactionTimeout);

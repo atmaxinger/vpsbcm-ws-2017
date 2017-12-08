@@ -5,7 +5,6 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.ResearchRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ResearchService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
-import com.impossibl.postgres.api.jdbc.PGNotificationListener;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -18,26 +17,25 @@ public class ResearchServiceImpl extends ResearchService {
 
     public void ResearchServiceImpl() {
 
-        PGNotificationListener listener = new PGNotificationListener() {
-            @Override
-            public void notification(int processId, String channelName, String payload) {
-                String table = ServiceUtil.getTableName(channelName, payload);
-                switch (table) {
-                    case RESEARCH_FLOWER_TABLE:
-                        notifyFlowersChanged(readAllFlowers(null));
-                        break;
-                    case RESEARCH_VEGETABLE_TABLE:
-                        notifyVegetablesChanged(readAllVegetables(null));
-                        break;
+        try {
+            Listener flowerListener = new Listener(RESEARCH_FLOWER_TABLE) {
+                @Override
+                public void onNotify() {
+                    notifyFlowersChanged(readAllFlowers(null));
                 }
+            };
+            flowerListener.start();
 
-            }
-        };
-
-        PostgresHelper.getConnection().addNotificationListener(listener);
-
-        PostgresHelper.setUpListen(RESEARCH_FLOWER_TABLE);
-        PostgresHelper.setUpListen(RESEARCH_VEGETABLE_TABLE);
+            Listener vegetableListener = new Listener(RESEARCH_VEGETABLE_TABLE) {
+                @Override
+                public void onNotify() {
+                    notifyVegetablesChanged(readAllVegetables(null));
+                }
+            };
+            vegetableListener.start();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void putFlower(Flower flower) {
@@ -78,7 +76,7 @@ public class ResearchServiceImpl extends ResearchService {
 
     public void registerResearchRobot(ResearchRobot researchRobot) {
 
-        PGNotificationListener listener = new PGNotificationListener() {
+        /*PGNotificationListener listener = new PGNotificationListener() {
             @Override
             public void notification(int processId, String channelName, String payload) {
                 String table = ServiceUtil.getTableName(channelName, payload);
@@ -98,6 +96,6 @@ public class ResearchServiceImpl extends ResearchService {
         PostgresHelper.getConnection().addNotificationListener(listener);
 
         PostgresHelper.setUpListen(RESEARCH_FLOWER_TABLE);
-        PostgresHelper.setUpListen(RESEARCH_VEGETABLE_TABLE);
+        PostgresHelper.setUpListen(RESEARCH_VEGETABLE_TABLE);*/
     }
 }
