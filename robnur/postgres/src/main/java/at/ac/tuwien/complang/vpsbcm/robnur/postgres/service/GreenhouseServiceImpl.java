@@ -85,21 +85,14 @@ public class GreenhouseServiceImpl extends GreenhouseService {
     public List<VegetablePlant> getAllVegetablePlants(Transaction transaction) {
         List<VegetablePlant> vegetablePlants = readAllVegetablePlants(transaction);
 
-        boolean successfull = false;
-
-        while (successfull)
-
-        try {
-            Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
-            statement.execute("DELETE FROM " + GREENHOUSE_VEGETABLE_PLANT_TABLE);
-            statement.close();
-            successfull = true;
-        } catch (SQLException e) {
-            System.out.println("DELETE FROM + GREENHOUSE_VEGETABLE_PLANT_TABLE ---------not successfull");
-            successfull = false;
-            e.printStackTrace();
+        for (VegetablePlant vp : vegetablePlants) {
+            try {
+                ServiceUtil.deleteItemById(vp.getId(), GREENHOUSE_VEGETABLE_PLANT_TABLE);
+            } catch (SQLException e) {
+                System.err.println("SQLException in getAllVegetablePlants - returning null");
+                return null;
+            }
         }
-
         return vegetablePlants;
     }
 

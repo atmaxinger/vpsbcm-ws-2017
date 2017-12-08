@@ -55,7 +55,7 @@ abstract class Listener extends Thread {
 
                 // wait a while before checking again for new
                 // notifications
-                Thread.sleep(500);
+                Thread.sleep(100);
             } catch (SQLException | InterruptedException e) {
                 e.printStackTrace();
             }
