@@ -89,6 +89,10 @@ public abstract class StorageService {
         int numberOfFertilizers = readAllVegetableFertilizer(transaction).size();
         int soilAmount = availableSoilAmount(transaction);
 
+        if(availiableSeeds == null) {
+            return null;
+        }
+
         for(VegetablePlant plant : availiableSeeds) {
             if(plant.getCultivationInformation().getVegetableType() == type) {
                 if(numberOfFertilizers >= plant.getCultivationInformation().getFertilizerAmount()) {
@@ -117,6 +121,10 @@ public abstract class StorageService {
         List<FlowerPlant> availiableSeeds = getSeeds(type, transaction);
         int numberOfFertilizers = readAllFlowerFertilizer(transaction).size();
         int soilAmount = availableSoilAmount(transaction);
+
+        if(availiableSeeds == null) {
+            return null;
+        }
 
         for (FlowerPlant plant : availiableSeeds) {
             if (plant.getCultivationInformation().getFlowerType() == type) {
