@@ -29,11 +29,16 @@ public class PostgresHelper {
     }
 
     public static Connection getNewConnection(){
+        String server = readProperty("db.server");
+        int port = Integer.parseInt(readProperty("db.port"));
+        String database = readProperty("db.database");
+        String user = readProperty("db.user");
+        String password = readProperty("db.password");
 
-        String url = "jdbc:postgresql://localhost/robnur";
+        String url = String.format("jdbc:postgresql://%s:%d/%s", server, port, database);
         Properties props = new Properties();
-        props.setProperty("user","tobiaskain");
-        props.setProperty("password","");
+        props.setProperty("user", user);
+        props.setProperty("password", password);
         try {
             return DriverManager.getConnection(url, props);
         } catch (SQLException e) {
@@ -43,7 +48,6 @@ public class PostgresHelper {
     }
 
     public static void setUpListen(String table) {
-
         try {
             Statement statement = PostgresHelper.getNewConnection().createStatement();
             statement.execute(String.format("LISTEN %s_notify", table));
@@ -52,6 +56,4 @@ public class PostgresHelper {
             e.printStackTrace();
         }
     }
-
-
 }
