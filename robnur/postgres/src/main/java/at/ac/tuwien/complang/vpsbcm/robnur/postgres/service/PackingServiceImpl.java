@@ -6,6 +6,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PackRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.PackingService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,27 +17,26 @@ public class PackingServiceImpl extends PackingService {
 
 
     public PackingServiceImpl() {
-
-        /*PGNotificationListener listener = new PGNotificationListener() {
-            @Override
-            public void notification(int processId, String channelName, String payload) {
-                String table = ServiceUtil.getTableName(channelName, payload);
-
-                switch (table) {
-                    case PACKING_FLOWER_TABLE:
-                        raiseFlowersChanged();
-                    case PACKING_VEGETABLE_TABLE:
-                        raiseVegetablesChanged();
-                        break;
+        try {
+            Listener flowerListener = new Listener(PACKING_FLOWER_TABLE) {
+                @Override
+                public void onNotify() {
+                    raiseFlowersChanged();
                 }
+            };
+            flowerListener.start();
 
-            }
-        };
+            Listener vegetableListener = new Listener(PACKING_VEGETABLE_TABLE) {
+                @Override
+                public void onNotify() {
+                    raiseVegetablesChanged();
+                }
+            };
+            vegetableListener.start();
 
-        PostgresHelper.getConnection().addNotificationListener(listener);
-
-        PostgresHelper.setUpListen(PACKING_FLOWER_TABLE);
-        PostgresHelper.setUpListen(PACKING_VEGETABLE_TABLE);*/
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void putFlower(Flower flower) {

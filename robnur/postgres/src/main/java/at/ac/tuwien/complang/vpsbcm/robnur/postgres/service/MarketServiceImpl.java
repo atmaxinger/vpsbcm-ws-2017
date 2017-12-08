@@ -1,11 +1,11 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.postgres.service;
 
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Bouquet;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableBasket;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.MarketService;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class MarketServiceImpl extends MarketService {
@@ -14,25 +14,26 @@ public class MarketServiceImpl extends MarketService {
     private static final String MARKET_VEGETABLE_BASKET_TABLE = "mvb";
 
     public MarketServiceImpl() {
-        /*PGNotificationListener listener = new PGNotificationListener() {
-            @Override
-            public void notification(int processId, String channelName, String payload) {
-                String table = ServiceUtil.getTableName(channelName, payload);
-
-                switch (table) {
-                    case MARKET_BOUQUET_TABLE:
-                    case MARKET_VEGETABLE_BASKET_TABLE:
-                        raiseChangedEvent();
-                        break;
+        try {
+            Listener flowerListener = new Listener(MARKET_BOUQUET_TABLE) {
+                @Override
+                public void onNotify() {
+                    raiseChangedEvent();
                 }
+            };
+            flowerListener.start();
 
-            }
-        };
+            Listener vegetableListener = new Listener(MARKET_VEGETABLE_BASKET_TABLE) {
+                @Override
+                public void onNotify() {
+                    raiseChangedEvent();
+                }
+            };
+            vegetableListener.start();
 
-        PostgresHelper.getConnection().addNotificationListener(listener);
-
-        PostgresHelper.setUpListen(MARKET_BOUQUET_TABLE);
-        PostgresHelper.setUpListen(MARKET_VEGETABLE_BASKET_TABLE);*/
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void putBouquet(Bouquet bouquet) {

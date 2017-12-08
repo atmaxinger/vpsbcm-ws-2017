@@ -6,6 +6,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.CompostService;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,34 +19,42 @@ public class CompostServiceImpl extends CompostService {
 
 
     public CompostServiceImpl() {
-    /*    PGNotificationListener listener = new PGNotificationListener() {
-            @Override
-            public void notification(int processId, String channelName, String payload) {
-                String table = ServiceUtil.getTableName(channelName, payload);
-                switch (table) {
-                    case COMPOST_FLOWER_PLANT_TABLE:
-                        notifyFlowerPlantsChanged(readAllFlowerPlants());
-                        break;
-                    case COMPOST_VEGETABLE_PLANT_TABLE:
-                        notifyVegetablePlantsChanged(readAllVegetablePlants());
-                        break;
-                    case COMPOST_FLOWER_TABLE:
-                        notifyFlowersChanged(readAllFlowers());
-                        break;
-                    case COMPOST_VEGETABLE_TABLE:
-                        notifyVegetablesChanged(readAllVegetables());
-                        break;
+        try {
+            Listener flowerPlantListener = new Listener(COMPOST_FLOWER_PLANT_TABLE) {
+                @Override
+                public void onNotify() {
+                    notifyFlowerPlantsChanged(readAllFlowerPlants());
                 }
+            };
+            flowerPlantListener.start();
 
-            }
-        };
+            Listener flowersListener = new Listener(COMPOST_FLOWER_TABLE) {
+                @Override
+                public void onNotify() {
+                    notifyFlowersChanged(readAllFlowers());
+                }
+            };
+            flowersListener.start();
 
-        PostgresHelper.getConnection().addNotificationListener(listener);*/
+            Listener vegetablePlantListener = new Listener(COMPOST_VEGETABLE_PLANT_TABLE) {
+                @Override
+                public void onNotify() {
+                    notifyVegetablePlantsChanged(readAllVegetablePlants());
+                }
+            };
+            vegetablePlantListener.start();
 
-        PostgresHelper.setUpListen(COMPOST_FLOWER_PLANT_TABLE);
-        PostgresHelper.setUpListen(COMPOST_VEGETABLE_PLANT_TABLE);
-        PostgresHelper.setUpListen(COMPOST_FLOWER_TABLE);
-        PostgresHelper.setUpListen(COMPOST_VEGETABLE_TABLE);
+            Listener vegetablesListener = new Listener(COMPOST_VEGETABLE_TABLE) {
+                @Override
+                public void onNotify() {
+                    notifyVegetablesChanged(readAllVegetables());
+                }
+            };
+            vegetablesListener.start();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void putFlowerPlant(FlowerPlant flowerPlant) {

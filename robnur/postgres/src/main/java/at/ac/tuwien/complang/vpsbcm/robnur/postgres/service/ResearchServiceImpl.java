@@ -15,7 +15,7 @@ public class ResearchServiceImpl extends ResearchService {
     private static final String RESEARCH_FLOWER_TABLE = "rf";
     private static final String RESEARCH_VEGETABLE_TABLE = "rv";
 
-    public void ResearchServiceImpl() {
+    public ResearchServiceImpl() {
 
         try {
             Listener flowerListener = new Listener(RESEARCH_FLOWER_TABLE) {

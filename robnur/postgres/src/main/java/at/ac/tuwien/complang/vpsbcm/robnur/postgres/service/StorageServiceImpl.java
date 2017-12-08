@@ -28,44 +28,51 @@ public class StorageServiceImpl extends StorageService {
 
 
     public StorageServiceImpl() {
-        /*PGNotificationListener listener = new PGNotificationListener() {
-            @Override
-            public void notification(int processId, String channelName, String payload) {
-                String table = ServiceUtil.getTableName(channelName, payload);
-                System.out.println("RECEIVED NOTIFICATION ON " + table + " OPERATION: " + ServiceUtil.getOperation(channelName, payload));
-
-                switch (table){
-                    case STORAGE_FLOWER_SEED_TABLE:
-                        notifyFlowerSeedsChanged(readAllFlowerSeeds());
-                        break;
-                    case STORAGE_VEGETABLE_SEED_TABLE:
-                        notifyVegetableSeedsChanged(readAllVegetableSeeds());
-                        break;
-                    case STORAGE_SOIL_TABLE:
-                        notifySoilPackagesChanged(readAllSoilPackage());
-                        break;
-                    case STORAGE_FLOWER_FERTILIZER_TABLE:
-                        notifyFlowerFertilizerChanged(readAllFlowerFertilizer());
-                        break;
-                    case STORAGE_VEGETABLE_FERTILIZER_TABLE:
-                        notifyVegetableFertilizerChanged(readAllVegetableFertilizer());
-                        break;
-                    case STORAGE_WATER_TABLE:
-                        break;
+        try {
+            Listener flowerSeedListener = new Listener(STORAGE_FLOWER_SEED_TABLE) {
+                @Override
+                public void onNotify() {
+                   notifyFlowerSeedsChanged(readAllFlowerSeeds());
                 }
-            }
-        };
+            };
+            flowerSeedListener.start();
 
-        PostgresHelper.getConnection().addNotificationListener(listener);
+            Listener vegetableSeedListener = new Listener(STORAGE_VEGETABLE_SEED_TABLE) {
+                @Override
+                public void onNotify() {
+                    notifyVegetableSeedsChanged(readAllVegetableSeeds());
+                }
+            };
+            vegetableSeedListener.start();
 
-        PostgresHelper.setUpListen(STORAGE_FLOWER_SEED_TABLE);
-        PostgresHelper.setUpListen(STORAGE_VEGETABLE_SEED_TABLE);
-        PostgresHelper.setUpListen(STORAGE_SOIL_TABLE);
-        PostgresHelper.setUpListen(STORAGE_FLOWER_FERTILIZER_TABLE);
-        PostgresHelper.setUpListen(STORAGE_VEGETABLE_FERTILIZER_TABLE);
-        PostgresHelper.setUpListen(STORAGE_WATER_TABLE);*/
+            Listener soilListener = new Listener(STORAGE_SOIL_TABLE) {
+                @Override
+                public void onNotify() {
+                    notifySoilPackagesChanged(readAllSoilPackage());
+                }
+            };
+            soilListener.start();
+
+            Listener flowerFertilizerListener = new Listener(STORAGE_FLOWER_FERTILIZER_TABLE) {
+                @Override
+                public void onNotify() {
+                    notifyFlowerFertilizerChanged(readAllFlowerFertilizer());
+                }
+            };
+            flowerFertilizerListener.start();
+
+            Listener vegetableFertilizerListener = new Listener(STORAGE_VEGETABLE_FERTILIZER_TABLE) {
+                @Override
+                public void onNotify() {
+                    notifyVegetableFertilizerChanged(readAllVegetableFertilizer());
+                }
+            };
+            vegetableFertilizerListener.start();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
-
 
     @Override
     protected List<FlowerPlant> getSeeds(FlowerType type, Transaction transaction) {

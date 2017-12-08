@@ -16,6 +16,29 @@ public class ConfigServiceImpl extends ConfigService {
     private static final String CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE = "cfpci";
     private static final String CONFIG_VEGETABLE_PLANT_CULTIVATION_INFORMATION_TABLE = "cvpci";
 
+    public ConfigServiceImpl() {
+        try {
+            Listener flowerPlantListener = new Listener(CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE) {
+                @Override
+                public void onNotify() {
+                    notifyFlowerCultivationInformationChanged(readAllFlowerPlantCultivationInformation(null));
+                }
+            };
+            flowerPlantListener.start();
+
+            Listener flowersListener = new Listener(CONFIG_VEGETABLE_PLANT_CULTIVATION_INFORMATION_TABLE) {
+                @Override
+                public void onNotify() {
+                    notifyVegetableCultivationInformationChanged(readAllVegetablePlantCultivationInformation(null));
+                }
+            };
+            flowersListener.start();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public FlowerPlantCultivationInformation getFlowerPlantCultivationInformation(String id, Transaction transaction) {
         return ServiceUtil.getItemById(id,CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE,FlowerPlantCultivationInformation.class,transaction);
     }
