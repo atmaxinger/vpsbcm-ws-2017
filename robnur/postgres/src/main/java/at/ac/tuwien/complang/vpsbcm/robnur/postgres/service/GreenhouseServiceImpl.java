@@ -1,5 +1,6 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.postgres.service;
 
+import at.ac.tuwien.complang.vpsbcm.robnur.postgres.robots.PostgresMonitoringRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Plant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
@@ -8,19 +9,22 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.GreenhouseService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.xml.stream.FactoryConfigurationError;
 import java.io.IOException;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class GreenhouseServiceImpl extends GreenhouseService {
+
+    private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(GreenhouseServiceImpl.class);
 
     private static final String GREENHOUSE_FLOWER_PLANT_TABLE = "gfp";
     private static final String GREENHOUSE_VEGETABLE_PLANT_TABLE = "gvp";
@@ -65,9 +69,9 @@ public class GreenhouseServiceImpl extends GreenhouseService {
 
     @Override
     public boolean plant(VegetablePlant vegetablePlant, Transaction transaction) {
-        if (readAllFlowerPlants(transaction).size() + readAllVegetablePlants(transaction).size() >= 20) {
+        /*if (readAllFlowerPlants(transaction).size() + readAllVegetablePlants(transaction).size() >= 20) {
             return false;
-        }
+        }*/
         return ServiceUtil.writeItem(vegetablePlant, GREENHOUSE_VEGETABLE_PLANT_TABLE, transaction);
     }
 
@@ -83,13 +87,16 @@ public class GreenhouseServiceImpl extends GreenhouseService {
     public List<VegetablePlant> getAllVegetablePlants(Transaction transaction) {
         List<VegetablePlant> vegetablePlants = readAllVegetablePlants(transaction);
 
-        for (VegetablePlant vp : vegetablePlants) {
-            try {
-                ServiceUtil.deleteItemById(vp.getId(), GREENHOUSE_VEGETABLE_PLANT_TABLE);
-            } catch (SQLException e) {
-                System.err.println("SQLException in getAllVegetablePlants - returning null");
-                return null;
-            }
+        logger.info(String.format("GreenhouseServiceImpl: read %d vegetable plants", vegetablePlants.size()));
+
+        try {
+            Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
+            int cnt = statement.executeUpdate("DELETE FROM " + GREENHOUSE_VEGETABLE_PLANT_TABLE);
+            logger.info(String.format("GreenhouseServiceImpl: deleted %d vegetable plants", cnt));
+        } catch (SQLException e) {
+            logger.info(String.format("GreenhouseServiceImpl: deleted did not work --> try again"));
+            e.printStackTrace();
+            return null;
         }
         return vegetablePlants;
     }
@@ -97,14 +104,17 @@ public class GreenhouseServiceImpl extends GreenhouseService {
     @Override
     public List<FlowerPlant> getAllFlowerPlants(Transaction transaction) {
         List<FlowerPlant> flowerPlants = readAllFlowerPlants(transaction);
-        for (FlowerPlant fp : flowerPlants) {
-            try {
-                ServiceUtil.deleteItemById(fp.getId(), GREENHOUSE_FLOWER_PLANT_TABLE);
-            } catch (SQLException e) {
-                System.err.println("SQLException in getAllFlowerPlants - returning null");
-                return null;
-            }
+
+        try {
+            Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
+            int cnt = statement.executeUpdate("DELETE FROM " + GREENHOUSE_FLOWER_PLANT_TABLE);
+            logger.info(String.format("GreenhouseServiceImpl: deleted %d flower plants", cnt));
+        } catch (SQLException e) {
+            logger.info(String.format("GreenhouseServiceImpl: deleted flowerplant did not work --> try again"));
+            e.printStackTrace();
+            return null;
         }
+
         return flowerPlants;
     }
 
