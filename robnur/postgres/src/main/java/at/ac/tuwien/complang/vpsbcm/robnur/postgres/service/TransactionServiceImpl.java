@@ -13,7 +13,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     private Connection connection = null;
 
-    public Transaction beginTransaction(long timeoutMillis) {
+    public Transaction beginTransaction(long timoutMillis, String reason) {
         try {
             connection = PostgresHelper.getNewConnection();
             connection.setAutoCommit(false);
@@ -31,6 +31,10 @@ public class TransactionServiceImpl implements TransactionService {
 
         //logger.debug(String.format("Started transaction on connection %s", connection));
 
-        return new TransactionImpl(connection);
+        return new TransactionImpl(connection, reason);
+    }
+
+    public Transaction beginTransaction(long timeoutMillis) {
+        return beginTransaction(timeoutMillis, "");
     }
 }

@@ -12,14 +12,17 @@ class TransactionImpl implements Transaction {
 
     private Connection connection;
     private boolean rolledBack = false;
+    private String reason;
 
-    public TransactionImpl(Connection connection) {
+    public TransactionImpl(Connection connection, String reason) {
         this.connection = connection;
+        this.reason = reason;
     }
 
     public void commit() {
         try {
             //logger.debug(String.format("trying to commit connection %s", connection));
+            System.err.println(String.format("-------- COMMIT TRANSACTION (%s) --------", reason));
             connection.commit();
             connection.close();
             //logger.debug(String.format("committed connection %s", connection));
@@ -33,7 +36,7 @@ class TransactionImpl implements Transaction {
     public void rollback() {
         try {
             //logger.debug(String.format("trying to rollback connection %s", connection));
-            System.err.println("------------------- ROLLBACK TRANSACTION -------------------");
+            System.err.println(String.format("------------------- ROLLBACK TRANSACTION (%s)-------------------", reason));
             connection.rollback();
             connection.close();
             //logger.debug(String.format("rolled back connection %s", connection));

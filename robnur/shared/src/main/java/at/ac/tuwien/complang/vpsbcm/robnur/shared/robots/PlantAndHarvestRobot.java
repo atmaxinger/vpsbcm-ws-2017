@@ -174,7 +174,7 @@ public class PlantAndHarvestRobot extends Robot {
     public void tryHarvestVegetable() {
         logger.debug(String.format("PlantAndHarvestRobot %s: Try harvest vegetable", getId()));
 
-        Transaction t = transactionService.beginTransaction(harvestTransactionTimeout);
+        Transaction t = transactionService.beginTransaction(harvestTransactionTimeout, "Harvest Vegetable - " + harvestedVegetablePlants);
         List<Vegetable> harvested = tryHarvestVegetablePlant(t);
 
         if (harvested != null && harvested.size() > 0) {
@@ -219,7 +219,7 @@ public class PlantAndHarvestRobot extends Robot {
     public void tryHarvestFlower() {
         logger.debug(String.format("PlantAndHarvestRobot %s: Try harvest flower", getId()));
 
-        Transaction t = transactionService.beginTransaction(harvestTransactionTimeout);
+        Transaction t = transactionService.beginTransaction(harvestTransactionTimeout, "Harvest Flower");
         List<Flower> harvested = tryHarvestFlowerPlant(t);
         if (harvested != null && harvested.size() > 0) {
 
@@ -316,7 +316,7 @@ public class PlantAndHarvestRobot extends Robot {
      * @return true if a new plant has been planted, false otherwise
      */
     private <P extends Plant, E extends Enum<E>> boolean tryPlantPlant(List<P> planted, E[] types) {
-        Transaction t = transactionService.beginTransaction(plantTransactionTimeout);
+        Transaction t = transactionService.beginTransaction(plantTransactionTimeout, "Plant Plant");
 
         // Step 1: First of all, try to get a seed
         P nextSeed = tryToGetNextSeed(planted, types, t);

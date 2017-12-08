@@ -71,6 +71,11 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Transaction beginTransaction(long timeoutMillis) {
+        return beginTransaction(timeoutMillis, "");
+    }
+
+    @Override
+    public Transaction beginTransaction(long timeoutMillis, String reason) {
         if(timeoutMillis < 0) {
             timeoutMillis = MzsConstants.TransactionTimeout.INFINITE;
         }
@@ -81,7 +86,7 @@ public class TransactionServiceImpl implements TransactionService {
             transaction.capi = this.capi;
             transaction.ref = ref;
 
-            logger.debug(String.format("Started transaction %s", ref.getId()));
+            logger.debug(String.format("Started transaction %s for %s", ref.getId(), reason));
 
 
             return transaction;
