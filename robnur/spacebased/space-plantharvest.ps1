@@ -1,7 +1,7 @@
 param(
         [Parameter(Mandatory=$true)][int]$id,
         [string]$space = "xvsm://localhost:9876",
-        [int]$plantTimeout = 120*1000,
+        [int]$plantTimeout = 30*1000,
         [int]$harvestTimeout = 5000
 )
 
