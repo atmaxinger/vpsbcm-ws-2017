@@ -42,7 +42,7 @@ public class PackRobot extends Robot {
             }
 
             flower.addPutResearchRobot(getId());
-            researchService.putFlower(flower);
+            researchService.putFlower(flower, transaction);
             logger.info(String.format("PackRobot %s: forward flower (id = %s) to research department",this.getId(),flower.getId()));
 
             put++;
@@ -169,7 +169,7 @@ public class PackRobot extends Robot {
             }
 
             vegetable.addPutResearchRobot(getId());
-            researchService.putVegetable(vegetable);
+            researchService.putVegetable(vegetable, transaction);
             logger.info(String.format("PackRobot %s: forward vegetable(%s) to research department.",this.getId(),vegetable.getId()));
 
             put++;

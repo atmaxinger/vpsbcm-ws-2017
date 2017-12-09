@@ -53,10 +53,10 @@ public abstract class ResearchServiceTest {
         vegetable2 = new Vegetable();
         vegetable2.setParentVegetablePlant(vegetablePlant2);
 
-        researchService.putFlower(flower1);
-        researchService.putFlower(flower2);
-        researchService.putVegetable(vegetable1);
-        researchService.putVegetable(vegetable2);
+        researchService.putFlower(flower1, null);
+        researchService.putFlower(flower2, null);
+        researchService.putVegetable(vegetable1, null);
+        researchService.putVegetable(vegetable2, null);
     }
 
 

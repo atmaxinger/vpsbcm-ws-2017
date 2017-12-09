@@ -47,13 +47,13 @@ public class ResearchServiceImpl extends ResearchService {
     }
 
     @Override
-    public void putFlower(Flower flower) {
-        ServiceUtil.writeItem(flower,flowerContainer,null,capi);
+    public void putFlower(Flower flower, Transaction transaction) {
+        ServiceUtil.writeItem(flower,flowerContainer,transaction,capi);
     }
 
     @Override
-    public void putVegetable(Vegetable vegetable) {
-        ServiceUtil.writeItem(vegetable,vegetableContainer,null,capi);
+    public void putVegetable(Vegetable vegetable, Transaction transaction) {
+        ServiceUtil.writeItem(vegetable,vegetableContainer,transaction,capi);
     }
 
     @Override

@@ -38,12 +38,12 @@ public class ResearchServiceImpl extends ResearchService {
         }
     }
 
-    public void putFlower(Flower flower) {
-        ServiceUtil.writeItem(flower,RESEARCH_FLOWER_TABLE);
+    public void putFlower(Flower flower, Transaction transaction) {
+        ServiceUtil.writeItem(flower,RESEARCH_FLOWER_TABLE, transaction);
     }
 
-    public void putVegetable(Vegetable vegetable) {
-        ServiceUtil.writeItem(vegetable,RESEARCH_VEGETABLE_TABLE);
+    public void putVegetable(Vegetable vegetable, Transaction transaction) {
+        ServiceUtil.writeItem(vegetable,RESEARCH_VEGETABLE_TABLE, transaction);
     }
 
     public void deleteFlower(Flower flower, Transaction transaction) {

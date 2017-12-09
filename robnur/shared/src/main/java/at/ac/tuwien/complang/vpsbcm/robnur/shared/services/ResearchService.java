@@ -29,11 +29,11 @@ public abstract class ResearchService {
         this.vegetablesChanged = vegetablesChanged;
     }
 
-    public abstract void putFlower(Flower flower);
+    public abstract void putFlower(Flower flower, Transaction transaction);
 
-    public abstract void putVegetable(Vegetable vegetable);
+    public abstract void putVegetable(Vegetable vegetable, Transaction transaction);
 
-    public abstract void deleteFlower(Flower flower,Transaction transaction);
+    public abstract void deleteFlower(Flower flower, Transaction transaction);
 
     public abstract void deleteVegetable(Vegetable vegetable,Transaction transaction);
 

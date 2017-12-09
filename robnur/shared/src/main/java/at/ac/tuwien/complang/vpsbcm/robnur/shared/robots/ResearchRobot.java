@@ -68,10 +68,11 @@ public class ResearchRobot extends Robot {
                 for (Flower f : upgradableFlowersOfSameType) {
                     logger.info(String.format("ResearchRobot %s: put back flower(%s) to research-queue", this.getId(), f.getId()));
                     f.addPutResearchRobot(getId());
-                    researchService.putFlower(f);
+                    researchService.putFlower(f, null);
                 }
 
-            }else {
+            }
+            else {
                 // put the flowers on the compost
                 for (Flower f : upgradableFlowersOfSameType) {
                     logger.info(String.format("ResearchRobot %s: put flower(%s) on the compost", this.getId(), f.getId()));
@@ -130,7 +131,7 @@ public class ResearchRobot extends Robot {
                 for (Vegetable v : upgradableVegetablesOfSameType) {
                     logger.info(String.format("ResearchRobot %s: put vegetable(%s) back in research-queue", this.getId(), v.getId()));
                     v.addPutResearchRobot(getId());
-                    researchService.putVegetable(v);
+                    researchService.putVegetable(v, null);
                 }
                 return;
 
