@@ -34,8 +34,8 @@ public class MarketServiceImpl extends MarketService {
         List<Coordinator> coordinators = Arrays.asList(new AnyCoordinator(), new QueryCoordinator());
 
         try {
-            bouquetContainer = CapiUtil.lookupOrCreateContainer("bouquetContainer", spaceUri, coordinators, null,capi);
-            vegetableBasketContainer = CapiUtil.lookupOrCreateContainer("vegetableBasketContainer", spaceUri, coordinators, null,capi);
+            bouquetContainer = CapiUtil.lookupOrCreateContainer("marketBouquetContainer", spaceUri, coordinators, null,capi);
+            vegetableBasketContainer = CapiUtil.lookupOrCreateContainer("marketVegetableBasketContainer", spaceUri, coordinators, null,capi);
 
             notificationManager.createNotification(bouquetContainer, (notification, operation, list) -> raiseChangedEvent(), Operation.DELETE, Operation.TAKE, Operation.WRITE);
             notificationManager.createNotification(vegetableBasketContainer, (notification, operation, list) -> raiseChangedEvent(), Operation.DELETE, Operation.TAKE, Operation.WRITE);

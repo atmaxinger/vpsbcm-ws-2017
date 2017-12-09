@@ -33,8 +33,8 @@ public class ResearchServiceImpl extends ResearchService {
         List<Coordinator> coordinators = Arrays.asList(new AnyCoordinator(),new QueryCoordinator());
 
         try {
-            flowerContainer = CapiUtil.lookupOrCreateContainer("flowerContainer",spaceUri,coordinators,null,capi);
-            vegetableContainer = CapiUtil.lookupOrCreateContainer("vegetableContainer",spaceUri,coordinators,null,capi);
+            flowerContainer = CapiUtil.lookupOrCreateContainer("researchFlowerContainer",spaceUri,coordinators,null,capi);
+            vegetableContainer = CapiUtil.lookupOrCreateContainer("researchVegetableContainer",spaceUri,coordinators,null,capi);
 
             notificationManager.createNotification(flowerContainer, (notification, operation, list) -> notifyFlowersChanged(readAllFlowers(null)), Operation.WRITE, Operation.DELETE, Operation.TAKE);
             notificationManager.createNotification(vegetableContainer, (notification, operation, list) -> notifyVegetablesChanged(readAllVegetables(null)), Operation.WRITE, Operation.DELETE, Operation.TAKE);

@@ -45,12 +45,12 @@ public class StorageServiceImpl extends StorageService {
 
         List<FifoCoordinator> coords = null;
 
-        flowerSeedContainer = CapiUtil.lookupOrCreateContainer("flowerSeedContainer", spaceUri, Arrays.asList(new AnyCoordinator(), new QueryCoordinator(), new LabelCoordinator()), null, capi);
-        vegetableSeedContainer = CapiUtil.lookupOrCreateContainer("vegetableSeedContainer", spaceUri, Arrays.asList(new AnyCoordinator(), new QueryCoordinator(), new LabelCoordinator()), null, capi);
+        flowerSeedContainer = CapiUtil.lookupOrCreateContainer("storageFlowerSeedContainer", spaceUri, Arrays.asList(new AnyCoordinator(), new QueryCoordinator(), new LabelCoordinator()), null, capi);
+        vegetableSeedContainer = CapiUtil.lookupOrCreateContainer("storageVegetableSeedContainer", spaceUri, Arrays.asList(new AnyCoordinator(), new QueryCoordinator(), new LabelCoordinator()), null, capi);
 
-        soilContainer = CapiUtil.lookupOrCreateContainer("soilContainer", spaceUri, coords, null, capi);
-        flowerFertilizerContainer = CapiUtil.lookupOrCreateContainer("flowerFertilizerContainer", spaceUri, coords, null, capi);
-        vegetableFertilizerContainer = CapiUtil.lookupOrCreateContainer("vegetableFertilizerContainer", spaceUri, coords, null, capi);
+        soilContainer = CapiUtil.lookupOrCreateContainer("storageSoilContainer", spaceUri, coords, null, capi);
+        flowerFertilizerContainer = CapiUtil.lookupOrCreateContainer("storageFlowerFertilizerContainer", spaceUri, coords, null, capi);
+        vegetableFertilizerContainer = CapiUtil.lookupOrCreateContainer("storageVegetableFertilizerContainer", spaceUri, coords, null, capi);
         waterContainer = CapiUtil.lookupOrCreateContainer("waterContainer", spaceUri, coords, null, capi);
 
         try {

@@ -34,10 +34,10 @@ public class CompostServiceImpl extends CompostService {
         List<Coordinator> coordinators = Arrays.asList(new AnyCoordinator());
 
         try {
-            flowerPlantContainer = CapiUtil.lookupOrCreateContainer("flowerPlantContainer",spaceUri,coordinators,null,capi);
-            flowerContainer = CapiUtil.lookupOrCreateContainer("flowerContainer",spaceUri,coordinators,null,capi);
-            vegetablePlantContainer = CapiUtil.lookupOrCreateContainer("vegetablePlantContainer",spaceUri,coordinators,null,capi);
-            vegetableContainer = CapiUtil.lookupOrCreateContainer("vegetableContainer",spaceUri,coordinators,null,capi);
+            flowerPlantContainer = CapiUtil.lookupOrCreateContainer("compostFlowerPlantContainer",spaceUri,coordinators,null,capi);
+            flowerContainer = CapiUtil.lookupOrCreateContainer("compostFlowerContainer",spaceUri,coordinators,null,capi);
+            vegetablePlantContainer = CapiUtil.lookupOrCreateContainer("compostVegetablePlantContainer",spaceUri,coordinators,null,capi);
+            vegetableContainer = CapiUtil.lookupOrCreateContainer("compostVegetableContainer",spaceUri,coordinators,null,capi);
 
             notificationManager.createNotification(flowerPlantContainer, (notification, operation, list) -> notifyFlowerPlantsChanged(readAllFlowerPlants()), Operation.WRITE, Operation.TAKE, Operation.DELETE);
             notificationManager.createNotification(flowerContainer, (notification, operation, list) -> notifyFlowersChanged(readAllFlowers()), Operation.WRITE, Operation.TAKE, Operation.DELETE);
