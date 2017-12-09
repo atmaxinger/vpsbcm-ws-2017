@@ -120,7 +120,7 @@ public class ResearchRobot extends Robot {
             // remove the vegetables from the research-queue
             for (Vegetable v : upgradableVegetablesOfSameType) {
                 logger.info(String.format("ResearchRobot %s: remove vegetable(%s) form research-queue", this.getId(), v.getId()));
-                researchService.putVegetable(v);
+                researchService.deleteVegetable(v,transaction);
             }
 
             transaction.commit();
