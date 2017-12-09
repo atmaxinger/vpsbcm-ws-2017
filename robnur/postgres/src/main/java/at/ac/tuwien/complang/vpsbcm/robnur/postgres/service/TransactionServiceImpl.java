@@ -11,11 +11,13 @@ import java.util.concurrent.Executors;
 public class TransactionServiceImpl implements TransactionService {
     final static Logger logger = Logger.getLogger(TransactionService.class);
 
-    private Connection connection = null;
+    public synchronized Transaction beginTransaction(long timoutMillis, String reason) {
+        Connection connection = null;
 
-    public Transaction beginTransaction(long timoutMillis, String reason) {
         try {
-            connection = PostgresHelper.getNewConnection();
+
+            connection = PostgresHelper.getNewConnection("begin transaction, reason: " + reason);
+            //logger.debug("NEW CONNECTION: " + connection + " reason: " + reason);
             connection.setAutoCommit(false);
             connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
 //            connection.setNetworkTimeout(Executors.newFixedThreadPool(10), Integer.MAX_VALUE);

@@ -12,7 +12,7 @@ public class Vegetable extends Harvestable implements Serializable{
         return parentVegetablePlant;
     }
 
-    public static List<Vegetable> harvestVegetablesFormPlant(VegetablePlant plant) {
+    public synchronized static List<Vegetable> harvestVegetablesFormPlant(VegetablePlant plant) {
         List<Vegetable> vegetables = new LinkedList<>();
 
         if(plant.getCultivationInformation().getRemainingNumberOfHarvests() > 0) {

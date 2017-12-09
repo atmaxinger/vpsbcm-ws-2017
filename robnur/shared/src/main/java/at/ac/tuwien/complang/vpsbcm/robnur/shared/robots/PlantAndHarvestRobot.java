@@ -5,12 +5,11 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.*;
 import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class PlantAndHarvestRobot extends Robot {
+
+    private HashMap<String,Integer> plantCount = new HashMap<>();
 
     final static Logger logger = Logger.getLogger(PlantAndHarvestRobot.class);
     private StorageService storageService;
@@ -34,9 +33,9 @@ public class PlantAndHarvestRobot extends Robot {
     private int harvestedFlowers = 0;
 
     private void outputStatistics() {
-        System.out.println(String.format("----- PLANTED VEGETABLE PLANTS: %d | HARVESTED VEGETABLE PLANTS: %d | HARVESTED VEGETABLES: %d -----", plantedVegetablePlants, harvestedVegetablePlants, harvestedVegetables));
-        System.out.println(String.format("-------- MISSING VEGETABLE PLANT IDS: %s ----" , formatList(getNotHarvestedIds(plantedVegetablePlantIds, harvestedVegetablePlantIds))));
-        System.out.println(String.format("----- PLANTED FLOWER PLANTS: %d | HARVESTED FLOWER PLANTS: %d | HARVESTED FLOWERS: %d -----", plantedFlowerPlants, harvestedFlowerPlants, harvestedFlowers));
+        //System.out.println(String.format("----- PLANTED VEGETABLE PLANTS: %d | HARVESTED VEGETABLE PLANTS: %d | HARVESTED VEGETABLES: %d -----", plantedVegetablePlants, harvestedVegetablePlants, harvestedVegetables));
+        ///System.out.println(String.format("-------- MISSING VEGETABLE PLANT IDS: %s ----" , formatList(getNotHarvestedIds(plantedVegetablePlantIds, harvestedVegetablePlantIds))));
+        //System.out.println(String.format("----- PLANTED FLOWER PLANTS: %d | HARVESTED FLOWER PLANTS: %d | HARVESTED FLOWERS: %d -----", plantedFlowerPlants, harvestedFlowerPlants, harvestedFlowers));
     }
 
     private String formatList(List<String> list) {
@@ -140,23 +139,32 @@ public class PlantAndHarvestRobot extends Robot {
 
 
     private List<Vegetable> tryHarvestVegetablePlant(Transaction transaction) {
+
         VegetablePlant plant = greenhouseService.getHarvestableVegetablePlant(transaction);
 
         if(plant != null) {
-            if(harvestedVegetablePlantIds.contains(plant.getId())) {
-                System.err.println("WTF!!!! ALREADY HARVESTED PLANT WITH ID " + plant.getId());
-            }
 
-            logger.info(String.format("harvested vegetables (%s) from plant %s", plant.getTypeName(), plant.getId()));
+            int before = plant.getCultivationInformation().getRemainingNumberOfHarvests();
 
             List<Vegetable> vegetables = Vegetable.harvestVegetablesFormPlant(plant);
+            logger.info(String.format("harvested vegetables (%s) from plant %s", plant.getTypeName(), plant.getId()));
 
             // if this plant can still be harvested then "plant" it again
             if (plant.getCultivationInformation().getRemainingNumberOfHarvests() > 0) {
                 if(!greenhouseService.plant(plant, transaction)) {
-                    System.err.println("could not put vegetable plant with still remaining harvests back - return null");
+                    logger.error("could not put vegetable plant with still remaining harvests back - return null");
                     return null;
                 }
+
+                // 2017-12-09 19:32:39 ERROR PlantAndHarvestRobot - cnt + plant.getCultivationInformation().getRemainingNumberOfHarvests() != 3;  3 + 1 != 3; before was: 2; plantId: 9a54918c-eb4a-411f-b3d2-802726849d9f
+                // 2017-12-09 19:32:34 ERROR PlantAndHarvestRobot - cnt + plant.getCultivationInformation().getRemainingNumberOfHarvests() != 3;  2 + 2 != 3; before was: 3; plantId: 9a54918c-eb4a-411f-b3d2-802726849d9f
+
+                int cnt = plantCount.get(plant.getId());
+                if (cnt + plant.getCultivationInformation().getRemainingNumberOfHarvests() != 3){
+                    logger.error(String.format("cnt + plant.getCultivationInformation().getRemainingNumberOfHarvests() != 3;  %d + %d != 3; before was: %d; plantId: %s, threadid: %s, growth: %d",cnt, plant.getCultivationInformation().getRemainingNumberOfHarvests(),before,plant.getId(),Thread.currentThread().getId(),plant.getGrowth()));
+                }
+                plantCount.put(plant.getId(),cnt +1);
+
             } else {
                 plant.setCompostRobot(getId());
                 compostService.putVegetablePlant(plant);
@@ -180,10 +188,10 @@ public class PlantAndHarvestRobot extends Robot {
         if (harvested != null && harvested.size() > 0) {
 
             for (Vegetable veg : harvested) {
-                logger.info(String.format("PlantAndHarvestRobot %s: put vegetable(%s) into packing", getId(), veg.getId()));
+                logger.info(String.format("PlantAndHarvestRobot %s: put vegetable(%s) into packing, threadid = %s", getId(), veg.getId(),Thread.currentThread().getId()));
 
                 veg.setHarvestRobot(this.getId());
-                packingService.putVegetable(veg);
+                packingService.putVegetable(veg,t);
             }
 
             t.commit();
@@ -195,6 +203,7 @@ public class PlantAndHarvestRobot extends Robot {
             tryHarvestVegetable();
         } else {
             t.rollback();
+            logger.info("tryHarvestVegetable ------------- Rollback");
         }
     }
 
@@ -370,6 +379,11 @@ public class PlantAndHarvestRobot extends Robot {
             }
 
             t.commit();
+
+            if(plantCount.containsKey(nextSeed.getId())){
+                logger.error("Again planted seed " + nextSeed.getId());
+            }
+            plantCount.put(nextSeed.getId(),1);
 
             if (nextSeed instanceof VegetablePlant) {
                 plantedVegetablePlants++;

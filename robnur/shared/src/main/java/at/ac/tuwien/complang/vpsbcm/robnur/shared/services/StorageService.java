@@ -85,21 +85,28 @@ public abstract class StorageService {
      * @return seed that can be planted or null
      */
     public VegetablePlant tryGetSeed(VegetableType type, Transaction transaction) {
-        List<VegetablePlant> availiableSeeds = getSeeds(type, transaction);
-        int numberOfFertilizers = readAllVegetableFertilizer(transaction).size();
-        int soilAmount = availableSoilAmount(transaction);
+        List<VegetablePlant> availableSeeds = getSeeds(type, transaction);
+        List<VegetableFertilizer> vegetableFertilizers = readAllVegetableFertilizer(transaction);
 
-        if(availiableSeeds == null) {
+        if(availableSeeds == null) {
             return null;
         }
 
-        for(VegetablePlant plant : availiableSeeds) {
+        if(vegetableFertilizers == null){
+            return  null;
+        }
+
+        int numberOfFertilizers = vegetableFertilizers.size();
+        int soilAmount = availableSoilAmount(transaction);
+
+
+        for(VegetablePlant plant : availableSeeds) {
             if(plant.getCultivationInformation().getVegetableType() == type) {
                 if(numberOfFertilizers >= plant.getCultivationInformation().getFertilizerAmount()) {
                     if(soilAmount >= plant.getCultivationInformation().getSoilAmount()) {
-                        availiableSeeds.remove(plant);
+                        availableSeeds.remove(plant);
                         // Put remaining seeds back
-                        putVegetableSeeds(availiableSeeds, transaction);
+                        putVegetableSeeds(availableSeeds, transaction);
                         return plant;
                     }
                 }
@@ -118,21 +125,27 @@ public abstract class StorageService {
      * @return seed that can be planted or null
      */
     public FlowerPlant tryGetSeed(FlowerType type, Transaction transaction) {
-        List<FlowerPlant> availiableSeeds = getSeeds(type, transaction);
-        int numberOfFertilizers = readAllFlowerFertilizer(transaction).size();
-        int soilAmount = availableSoilAmount(transaction);
+        List<FlowerPlant> availableSeeds = getSeeds(type, transaction);
+        List<FlowerFertilizer> flowerFertilizers = readAllFlowerFertilizer(transaction);
 
-        if(availiableSeeds == null) {
+        if(availableSeeds == null) {
             return null;
         }
 
-        for (FlowerPlant plant : availiableSeeds) {
+        if(flowerFertilizers == null){
+            return null;
+        }
+
+        int numberOfFertilizers = flowerFertilizers.size();
+        int soilAmount = availableSoilAmount(transaction);
+
+        for (FlowerPlant plant : availableSeeds) {
             if (plant.getCultivationInformation().getFlowerType() == type) {
                 if (numberOfFertilizers >= plant.getCultivationInformation().getFertilizerAmount()) {
                     if (soilAmount >= plant.getCultivationInformation().getSoilAmount()) {
-                        availiableSeeds.remove(plant);
+                        availableSeeds.remove(plant);
                         // Put remaining seeds back
-                        putFlowerSeeds(availiableSeeds, transaction);
+                        putFlowerSeeds(availableSeeds, transaction);
                         return plant;
                     }
                 }

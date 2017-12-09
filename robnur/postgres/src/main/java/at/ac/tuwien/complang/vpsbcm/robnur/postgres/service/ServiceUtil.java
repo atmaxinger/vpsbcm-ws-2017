@@ -5,6 +5,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -22,10 +23,22 @@ public class ServiceUtil {
         DELETE
     }
 
+    final static Logger logger = Logger.getLogger(ServiceUtil.class);
+
     private static TransactionService transactionService = new TransactionServiceImpl();
 
     private static Transaction newTransaction() {
-        return transactionService.beginTransaction(-1);
+        TransactionImpl transaction = (TransactionImpl) transactionService.beginTransaction(-1);
+
+        try {
+            if(transaction.getConnection().isClosed()){
+                System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WHY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WHY");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return transaction;
     }
 
     /**
@@ -93,7 +106,8 @@ public class ServiceUtil {
 
             statement.close();
         } catch (SQLException | IOException e) {
-            System.err.println("readAllItems - Ignoring (result = " + result + ")");
+            result = null;
+            System.err.println("readAllItems - return null");
             e.printStackTrace();
         }
 
@@ -101,7 +115,7 @@ public class ServiceUtil {
     }
 
     public static <T extends Serializable> List<T> readAllItems(String table, Class<T> resultClass) {
-        Transaction t = newTransaction();
+        Transaction t = transactionService.beginTransaction(-1,"READ ALL ITEMS " + table);
         List<T> l = readAllItems(table, resultClass, t);
         t.commit();
 
@@ -237,9 +251,16 @@ public class ServiceUtil {
 
     public static void deleteItemByParameter(String parameterName, String parameterValue, String table, Transaction transaction) throws SQLException {
 
-        Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
-        statement.execute(String.format("DELETE FROM %s WHERE (data " + prepareArrow(parameterName) + " %s)::text = '%s'", table, parameterName, parameterValue));
-        statement.close();
+        try {
+            Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
+            statement.execute(String.format("DELETE FROM %s WHERE (data " + prepareArrow(parameterName) + " %s)::text = '%s'", table, parameterName, parameterValue));
+            statement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            logger.info(String.format("DELETE FROM %s WHERE (data " + prepareArrow(parameterName) + " %s)::text = '%s'", table, parameterName, parameterValue));
+            throw e;
+        }
+
     }
 
     public static void deleteItemById(String id, String table, Transaction transaction) throws SQLException {

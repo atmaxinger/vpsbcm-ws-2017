@@ -1,5 +1,7 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.postgres.service;
 
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
+import org.apache.log4j.Logger;
 import org.postgresql.PGConnection;
 
 import java.io.*;
@@ -12,7 +14,10 @@ import java.util.Properties;
 
 public class PostgresHelper {
 
-    private static String readProperty(String property) {
+    final static Logger logger = Logger.getLogger(PostgresHelper.class);
+
+
+    private synchronized static String readProperty(String property) {
         Properties prop = new Properties();
         try {
             String home = System.getProperty("user.home");
@@ -28,7 +33,7 @@ public class PostgresHelper {
         return null;
     }
 
-    public static Connection getNewConnection(){
+    public synchronized static Connection getNewConnection(String reason){
         String server = readProperty("db.server");
         int port = Integer.parseInt(readProperty("db.port"));
         String database = readProperty("db.database");
@@ -40,20 +45,12 @@ public class PostgresHelper {
         props.setProperty("user", user);
         props.setProperty("password", password);
         try {
-            return DriverManager.getConnection(url, props);
+            Connection connection = DriverManager.getConnection(url, props);
+            //logger.debug("NEW CONNECTION: " + connection + " reason: " + reason);
+            return connection;
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public static void setUpListen(String table) {
-        try {
-            Statement statement = PostgresHelper.getNewConnection().createStatement();
-            statement.execute(String.format("LISTEN %s_notify", table));
-            statement.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 }

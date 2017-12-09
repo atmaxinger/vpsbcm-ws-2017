@@ -44,6 +44,8 @@ public class InitDb {
 
         createWaterTrigger("sw");
 
+        createGreenhouseTrigger();
+
         ConfigService configService = new ConfigServiceImpl();
         putInitialFlowerPlantCultivationInformation(configService);
         putInitialVegetablePlantCultivationInformation(configService);
@@ -53,7 +55,7 @@ public class InitDb {
 
     private static void createTables(List<String> tables){
 
-        Connection connection = PostgresHelper.getNewConnection();
+        Connection connection = PostgresHelper.getNewConnection("create table");
 
         for (String t:tables) {
             try {
@@ -65,11 +67,17 @@ public class InitDb {
                 e.printStackTrace();
             }
         }
+
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private static void createNotifyFunction(List<String> tables) {
 
-        Connection connection = PostgresHelper.getNewConnection();
+        Connection connection = PostgresHelper.getNewConnection("create notify");
 
         for (String table : tables) {
 
@@ -100,10 +108,17 @@ public class InitDb {
                 e.printStackTrace();
             }
         }
+
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private static void createWaterTrigger(String waterTable) {
-        Connection connection = PostgresHelper.getNewConnection();
+        Connection connection = PostgresHelper.getNewConnection("create water trigger");
 
         try {
             Statement statement = connection.createStatement();
@@ -111,7 +126,7 @@ public class InitDb {
             statement.execute(
                     String.format("CREATE OR REPLACE FUNCTION put_back_water() RETURNS TRIGGER AS $$" +
                             " BEGIN " +
-                            " PERFORM pg_sleep(1); " +
+                           // " PERFORM pg_sleep(1); " +
                             " INSERT INTO %s(data) VALUES('{\"amount\":250,\"id\":\"49c660b6-b9e9-4a47-9922-2bfeefaef67c\"}'); " +
                             " RETURN NULL; " +
                             " END; " +
@@ -128,6 +143,41 @@ public class InitDb {
                             , waterTable));
 
             statement.close();
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void createGreenhouseTrigger(){
+        Connection connection = PostgresHelper.getNewConnection("greenhouseTrigger");
+        try {
+            Statement statement = connection.createStatement();
+
+            statement.execute("CREATE OR REPLACE FUNCTION check_greenhouse_count() RETURNS trigger AS $$ " +
+                    "    DECLARE " +
+                    "        flower_count int; " +
+                    "        vegetable_count int; " +
+                    "    BEGIN " +
+                    "         SELECT " +
+                    "           count(*) into flower_count " +
+                    "           FROM gfp; " +
+                    "         SELECT " +
+                    "           count(*) into vegetable_count " +
+                    "           FROM gvp; " +
+                    "         IF ((flower_count + vegetable_count) >= 20) THEN " +
+                    "           RAISE EXCEPTION 'too much plants in greenhouse'; " +
+                    "         END IF; " +
+                    "        RETURN NEW;" +
+                    "     END; " +
+                    "$$ LANGUAGE plpgsql; " +
+                    "CREATE TRIGGER gvp_check_count BEFORE INSERT ON gvp " +
+                    "    FOR EACH ROW EXECUTE PROCEDURE check_greenhouse_count(); " +
+                    "CREATE TRIGGER gfp_check_count BEFORE INSERT ON gfp " +
+                    "    FOR EACH ROW EXECUTE PROCEDURE check_greenhouse_count();");
+
+            statement.close();
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }

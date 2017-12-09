@@ -22,7 +22,7 @@ class TransactionImpl implements Transaction {
     public void commit() {
         try {
             //logger.debug(String.format("trying to commit connection %s", connection));
-            System.err.println(String.format("-------- COMMIT TRANSACTION (%s) --------", reason));
+            //logger.debug(String.format("-------- COMMIT TRANSACTION (%s) --------", reason));
             connection.commit();
             connection.close();
             //logger.debug(String.format("committed connection %s", connection));
@@ -36,7 +36,7 @@ class TransactionImpl implements Transaction {
     public void rollback() {
         try {
             //logger.debug(String.format("trying to rollback connection %s", connection));
-            System.err.println(String.format("------------------- ROLLBACK TRANSACTION (%s)-------------------", reason));
+            logger.debug(String.format("------------------- ROLLBACK TRANSACTION (%s)-------------------", reason));
             connection.rollback();
             connection.close();
             //logger.debug(String.format("rolled back connection %s", connection));
@@ -46,17 +46,6 @@ class TransactionImpl implements Transaction {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    protected void finalize() throws Throwable
-    {
-        /* try { connection.close();
-            logger.debug(String.format("closed connection %s in finalizer", connection));
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }*/
-        super.finalize();
     }
 
     public boolean hasBeenRolledBack() {

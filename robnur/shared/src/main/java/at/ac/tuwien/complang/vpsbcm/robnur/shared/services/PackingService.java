@@ -31,7 +31,7 @@ public abstract class PackingService {
 
     public abstract void putFlower(Flower flower);
 
-    public abstract void putVegetable(Vegetable vegetable);
+    public abstract void putVegetable(Vegetable vegetable,Transaction transaction);
 
     public abstract Flower getFlower(String flowerId, Transaction transaction);
 

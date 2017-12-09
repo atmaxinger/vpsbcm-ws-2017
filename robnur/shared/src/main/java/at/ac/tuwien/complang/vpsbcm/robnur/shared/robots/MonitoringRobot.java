@@ -8,6 +8,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.CultivationInformation;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.GreenhouseService;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -48,8 +49,43 @@ public class MonitoringRobot extends Robot {
         return missing;
     }
 
+    private List<String> getDoubleIds(List<String> list){
+        List<String> copy = new ArrayList<>();
+        List<String> restult = new ArrayList<>();
+
+        for (String s: list) {
+            if(!copy.contains(s)){
+                copy.add(s);
+            }
+            else {
+              restult.add(s);
+            }
+        }
+
+        return restult;
+    }
+
     private void outputStatistics() {
-        System.out.println("--- MISSING VEGETABLES: " + formatList(getMissingIds(takenVegetableIds, putVegetableIds)));
+        if(getMissingIds(takenVegetableIds, putVegetableIds).size() > 0){
+            logger.error("--- MISSING VEGETABLES: " + formatList(getMissingIds(takenVegetableIds, putVegetableIds)));
+        }
+        if(getDoubleIds(putVegetableIds).size() > 0) {
+            logger.error("--- Double Vegetables in putVegetableIds: " + formatList(getDoubleIds(putVegetableIds)));
+        }
+        if(getDoubleIds(takenVegetableIds).size() > 0) {
+            logger.error("--- Double Vegetables in takenVegetablesIds: " + formatList(getDoubleIds(takenVegetableIds)));
+        }
+        if(takenVegetableIds.size() != putVegetableIds.size()){
+            logger.error("takenVegetableIds != putVegetableIds");
+            logger.error("takenVegetableIds");
+            for (String s:takenVegetableIds) {
+                logger.error(s);
+            }
+            logger.error("putVegetableIds");
+            for (String s:putVegetableIds) {
+                logger.error(s);
+            }
+        }
     }
 
     public MonitoringRobot(GreenhouseService greenhouseService, TransactionService transactionService) {
@@ -77,7 +113,10 @@ public class MonitoringRobot extends Robot {
             t.rollback();
             return;
         }
-        vegs.stream().map(v -> takenVegetableIds.add(v.getId()));
+
+        for (VegetablePlant v:vegs) {
+            takenVegetableIds.add(v.getId());
+        }
 
         // grow
         for(VegetablePlant p : vegs) {
@@ -129,6 +168,9 @@ public class MonitoringRobot extends Robot {
     public void monitorGreenhouse() {
 
         while (true) {
+            takenVegetableIds.clear();
+            putVegetableIds.clear();
+
             monitorVegetables();
             monitorFlowers();
 

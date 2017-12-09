@@ -63,8 +63,8 @@ public abstract class PackingServiceTest {
         packingService.putFlower(flower1);
         packingService.putFlower(flower2);
 
-        packingService.putVegetable(vegetable1);
-        packingService.putVegetable(vegetable2);
+        packingService.putVegetable(vegetable1,null);
+        packingService.putVegetable(vegetable2,null);
     }
 
     @Test

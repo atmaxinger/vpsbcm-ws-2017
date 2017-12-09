@@ -72,6 +72,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         /*if (readAllFlowerPlants(transaction).size() + readAllVegetablePlants(transaction).size() >= 20) {
             return false;
         }*/
+        logger.info(String.format("plant vegetable; id: %s, remainingHarvests: %d, threadid = %s, growth = %s",vegetablePlant.getId(),vegetablePlant.getCultivationInformation().getRemainingNumberOfHarvests(),Thread.currentThread().getId(), vegetablePlant.getGrowth()));
         return ServiceUtil.writeItem(vegetablePlant, GREENHOUSE_VEGETABLE_PLANT_TABLE, transaction);
     }
 
@@ -156,7 +157,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             }
         } catch (SQLException | IOException e) {
             result = null;
-            System.err.println("getHarvestableVegetablePlant - select and delete - returning null");
+            logger.fatal("getHarvestableVegetablePlant - select and delete - returning null");
             e.printStackTrace();
         }
 
