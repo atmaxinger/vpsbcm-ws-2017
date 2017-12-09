@@ -45,7 +45,7 @@ public class ConfigServiceImpl extends ConfigService {
 
     @Override
     public FlowerPlantCultivationInformation readFlowerPlantCultivationInformation(FlowerType flowerType, Transaction transaction) {
-        return ServiceUtil.readItemByParameter("flowerType",flowerType.name(),CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE,FlowerPlantCultivationInformation.class,transaction);
+        return ServiceUtil.readItemByParameter("'flowerType'",flowerType.name(),CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE,FlowerPlantCultivationInformation.class,transaction);
     }
 
     public VegetablePlantCultivationInformation getVegetablePlantCultivationInformation(String id, Transaction transaction) {
@@ -54,7 +54,7 @@ public class ConfigServiceImpl extends ConfigService {
 
     @Override
     public VegetablePlantCultivationInformation readVegetablePlantCultivationInformation(VegetableType vegetableType, Transaction transaction) {
-        return ServiceUtil.readItemByParameter("flowerType",vegetableType.name(),CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE,VegetablePlantCultivationInformation.class,transaction);
+        return ServiceUtil.readItemByParameter("'vegetableType'",vegetableType.name(), CONFIG_VEGETABLE_PLANT_CULTIVATION_INFORMATION_TABLE,VegetablePlantCultivationInformation.class,transaction);
     }
 
     public void deleteFlowerPlantCultivationInformation(String id, Transaction transaction) {

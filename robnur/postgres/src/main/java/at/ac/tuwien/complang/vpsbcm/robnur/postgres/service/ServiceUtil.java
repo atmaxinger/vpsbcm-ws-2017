@@ -119,11 +119,16 @@ public class ServiceUtil {
 
             Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
 
-            ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE (data " + prepareArrow(parameterName) + " %s)::text = '%s'", table, parameterName, parameterValue));
+            String query = String.format("SELECT * FROM %s WHERE (data " + prepareArrow(parameterName) + " %s)::text = '%s'", table, parameterName, parameterValue);
+            System.out.println("QUERY: " + query);
+            ResultSet rs = statement.executeQuery(query);
 
-            rs.next();
-            String data = rs.getString("data");
-            result = mapper.readValue(data, resultClass);
+            if(rs.next()) {
+                String data = rs.getString("data");
+                result = mapper.readValue(data, resultClass);
+            } else {
+                System.out.println("No results for query " + query);
+            }
 
             statement.close();
 

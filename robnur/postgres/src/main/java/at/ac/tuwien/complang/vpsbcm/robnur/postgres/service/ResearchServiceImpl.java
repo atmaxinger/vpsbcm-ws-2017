@@ -76,26 +76,24 @@ public class ResearchServiceImpl extends ResearchService {
 
     public void registerResearchRobot(ResearchRobot researchRobot) {
 
-        /*PGNotificationListener listener = new PGNotificationListener() {
-            @Override
-            public void notification(int processId, String channelName, String payload) {
-                String table = ServiceUtil.getTableName(channelName, payload);
-                if(ServiceUtil.getOperation(channelName, payload) == ServiceUtil.DBOPERATION.INSERT) {
-                    switch (table) {
-                        case RESEARCH_FLOWER_TABLE:
-                            researchRobot.tryUpgradeFlowerPlant();
-                            break;
-                        case RESEARCH_VEGETABLE_TABLE:
-                            researchRobot.tryUpgradeVegetablePlant();
-                            break;
-                    }
+        try {
+            Listener flowerListener = new Listener(RESEARCH_FLOWER_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    researchRobot.tryUpgradeFlowerPlant();
                 }
-            }
-        };
+            };
+            flowerListener.start();
 
-        PostgresHelper.getConnection().addNotificationListener(listener);
-
-        PostgresHelper.setUpListen(RESEARCH_FLOWER_TABLE);
-        PostgresHelper.setUpListen(RESEARCH_VEGETABLE_TABLE);*/
+            Listener vegetableListener = new Listener(RESEARCH_VEGETABLE_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    researchRobot.tryUpgradeVegetablePlant();
+                }
+            };
+            vegetableListener.start();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

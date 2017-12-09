@@ -36,7 +36,12 @@ public class ResearchRobot extends Robot {
         for (FlowerType flowerType : FlowerType.values()) {
 
             // check if upgrade level of flower-type is already at a maximum
-            if (configService.readFlowerPlantCultivationInformation(flowerType, transaction).getUpgradeLevel() >= 5) {
+            FlowerPlantCultivationInformation cultivationInformation = configService.readFlowerPlantCultivationInformation(flowerType, transaction);
+            if(cultivationInformation == null) {
+                System.err.println("CultivationInformation for " + flowerType + " is null!");
+                return;
+            }
+            if (cultivationInformation.getUpgradeLevel() >= 5) {
                 transaction.commit();
                 return;
             }
@@ -69,6 +74,7 @@ public class ResearchRobot extends Robot {
                 // put the flowers on the compost
                 for (Flower f : upgradableFlowersOfSameType) {
                     logger.info(String.format("ResearchRobot %s: put flower(%s) on the compost", this.getId(), f.getId()));
+                    f.setCompostRobot(getId());
                     compostService.putFlower(f);
                 }
 
@@ -91,7 +97,12 @@ public class ResearchRobot extends Robot {
         for (VegetableType vegetableType : VegetableType.values()) {
 
             // check if upgrade level of flower-type is already at a maximum
-            if (configService.readVegetablePlantCultivationInformation(vegetableType, transaction).getUpgradeLevel() >= 5) {
+            VegetablePlantCultivationInformation cultivationInformation = configService.readVegetablePlantCultivationInformation(vegetableType, transaction);
+            if(cultivationInformation == null) {
+                System.err.println("CultivationInformation for " + vegetableType + " is null!");
+                return;
+            }
+            if (cultivationInformation.getUpgradeLevel() >= 5) {
                 return;
             }
 
@@ -122,9 +133,10 @@ public class ResearchRobot extends Robot {
                 return;
 
             }else {
-                // put the flowers on the compost
+                // put the vegetables on the compost
                 for (Vegetable v : upgradableVegetablesOfSameType) {
                     logger.info(String.format("ResearchRobot %s: put vegetable(%s) on the compost", this.getId(), v.getId()));
+                    v.setCompostRobot(getId());
                     compostService.putVegetable(v);
                 }
 
@@ -142,7 +154,10 @@ public class ResearchRobot extends Robot {
         Transaction transaction = transactionService.beginTransaction(-1);
 
         FlowerPlantCultivationInformation flowerPlantCultivationInformation = configService.readFlowerPlantCultivationInformation(flowerType,transaction);
-
+        if(flowerPlantCultivationInformation == null) {
+            System.err.println("Cultivation information for " + flowerType + " is null!");
+            return false;
+        }
         if (flowerPlantCultivationInformation.getUpgradeLevel() >= 5) {
             // maximum upgrade level reached
             return false;
@@ -167,7 +182,10 @@ public class ResearchRobot extends Robot {
         Transaction transaction = transactionService.beginTransaction(-1);
 
         VegetablePlantCultivationInformation vegetablePlantCultivationInformation = configService.readVegetablePlantCultivationInformation(vegetableType,transaction);
-
+        if(vegetablePlantCultivationInformation == null) {
+            System.err.println("Cultivation information for " + vegetableType + " is null!");
+            return false;
+        }
         if (vegetablePlantCultivationInformation.getUpgradeLevel() >= 5) {
             // maximum upgrade level reached
             return false;
