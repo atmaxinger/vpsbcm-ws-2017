@@ -11,7 +11,7 @@ public class TransactionServiceImpl implements TransactionService {
     final static Logger logger = Logger.getLogger(TransactionService.class);
     final static Logger loggerTransaction = Logger.getLogger(TransactionImpl.class);
 
-    public static TransactionReference getTransactionReference(Transaction transaction) {
+    public synchronized static TransactionReference getTransactionReference(Transaction transaction) {
         if(transaction != null && transaction instanceof TransactionImpl) {
             return ((TransactionImpl) transaction).ref;
         }
@@ -70,12 +70,12 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Transaction beginTransaction(long timeoutMillis) {
+    public synchronized Transaction beginTransaction(long timeoutMillis) {
         return beginTransaction(timeoutMillis, "");
     }
 
     @Override
-    public Transaction beginTransaction(long timeoutMillis, String reason) {
+    public synchronized Transaction beginTransaction(long timeoutMillis, String reason) {
         if(timeoutMillis < 0) {
             timeoutMillis = MzsConstants.TransactionTimeout.INFINITE;
         }

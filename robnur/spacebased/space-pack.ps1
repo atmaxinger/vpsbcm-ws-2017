@@ -5,4 +5,4 @@ param(
 
 $Host.UI.RawUI.WindowTitle = "Space Based Packing Robot " + $id
 
-mvn compile exec:java -D"exec.mainClass"="at.ac.tuwien.complang.vpsbcm.robnur.spacebased.robots.SpacePackRobot" -D"exec.args"="pa$id $space"
+mvn exec:java -D"exec.mainClass"="at.ac.tuwien.complang.vpsbcm.robnur.spacebased.robots.SpacePackRobot" -D"exec.args"="pa$id $space"

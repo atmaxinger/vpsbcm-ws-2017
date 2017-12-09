@@ -7,4 +7,4 @@ param(
 
 $Host.UI.RawUI.WindowTitle = "Space Based Plant and Harvest Robot " + $id
 
-mvn compile exec:java -D"exec.mainClass"="at.ac.tuwien.complang.vpsbcm.robnur.spacebased.robots.SpacePlantAndHarvestRobot" -D"exec.args"="ph$id $space $plantTimeout $harvestTimeout"
+mvn exec:java -D"exec.mainClass"="at.ac.tuwien.complang.vpsbcm.robnur.spacebased.robots.SpacePlantAndHarvestRobot" -D"exec.args"="ph$id $space $plantTimeout $harvestTimeout"

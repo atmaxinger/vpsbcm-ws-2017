@@ -13,11 +13,11 @@ import java.util.List;
 
 public class ServiceUtil {
 
-    public static <T extends Serializable> T getItemById(String id, ContainerReference containerReference, Transaction transaction, Capi capi) {
+    public synchronized static <T extends Serializable> T getItemById(String id, ContainerReference containerReference, Transaction transaction, Capi capi) {
         return getItemByParameter("id",id,containerReference,transaction,capi);
     }
 
-    public static <T extends Serializable> T getItemByParameter(String parameterName, String parameterValue, ContainerReference containerReference, Transaction transaction, Capi capi) {
+    public synchronized static <T extends Serializable> T getItemByParameter(String parameterName, String parameterValue, ContainerReference containerReference, Transaction transaction, Capi capi) {
         TransactionReference transactionReference = TransactionServiceImpl.getTransactionReference(transaction);
 
         Query query = new Query();
@@ -29,7 +29,9 @@ public class ServiceUtil {
 
         try {
             result = capi.take(containerReference,selectors,MzsConstants.RequestTimeout.DEFAULT,transactionReference);
-            return result.get(0);
+            if(result != null && result.size() > 0) {
+                return result.get(0);
+            }
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -37,7 +39,7 @@ public class ServiceUtil {
         return null;
     }
 
-    public static <T extends Serializable> void writeItem(T item, ContainerReference containerReference, Transaction transaction, Capi capi){
+    public synchronized static <T extends Serializable> void writeItem(T item, ContainerReference containerReference, Transaction transaction, Capi capi){
         TransactionReference transactionReference = TransactionServiceImpl.getTransactionReference(transaction);
 
         try {
@@ -47,7 +49,7 @@ public class ServiceUtil {
         }
     }
 
-    public static void writeItem(Entry entry, ContainerReference containerReference, Transaction transaction, Capi capi){
+    public synchronized static void writeItem(Entry entry, ContainerReference containerReference, Transaction transaction, Capi capi){
         TransactionReference transactionReference = TransactionServiceImpl.getTransactionReference(transaction);
 
         try {
@@ -57,7 +59,7 @@ public class ServiceUtil {
         }
     }
 
-    public static <T extends Serializable> List<T> readAllItems(ContainerReference containerReference, Selector selector, Transaction transaction,Capi capi) {
+    public synchronized static <T extends Serializable> List<T> readAllItems(ContainerReference containerReference, Selector selector, Transaction transaction,Capi capi) {
         TransactionReference transactionReference = TransactionServiceImpl.getTransactionReference(transaction);
 
         List<T> result = null;
@@ -69,12 +71,12 @@ public class ServiceUtil {
         return result;
     }
 
-    public static <T extends Serializable> List<T> readAllItems(ContainerReference containerReference, Transaction transaction,Capi capi) {
+    public synchronized static <T extends Serializable> List<T> readAllItems(ContainerReference containerReference, Transaction transaction,Capi capi) {
 
         return readAllItems(containerReference, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), transaction,capi);
     }
 
-    public static void deleteItemById(String id, ContainerReference containerReference, Transaction transaction, Capi capi) {
+    public synchronized static void deleteItemById(String id, ContainerReference containerReference, Transaction transaction, Capi capi) {
         TransactionReference transactionReference = TransactionServiceImpl.getTransactionReference(transaction);
 
         Query query = new Query();
@@ -90,7 +92,7 @@ public class ServiceUtil {
         }
     }
 
-    public static <T extends Serializable> T readItem(Selector selector, ContainerReference containerReference, Transaction transaction, Capi capi) {
+    public synchronized static <T extends Serializable> T readItem(Selector selector, ContainerReference containerReference, Transaction transaction, Capi capi) {
 
         TransactionReference transactionReference = TransactionServiceImpl.getTransactionReference(transaction);
 
@@ -98,7 +100,9 @@ public class ServiceUtil {
 
         try {
             result = capi.read(containerReference,selector,MzsConstants.RequestTimeout.DEFAULT,transactionReference);
-            return result.get(0);
+            if(result != null && result.size() > 0) {
+                return result.get(0);
+            }
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
