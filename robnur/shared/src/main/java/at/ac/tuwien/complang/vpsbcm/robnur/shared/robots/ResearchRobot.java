@@ -67,6 +67,7 @@ public class ResearchRobot extends Robot {
                 // cultivation information was updated to level 5 (max level) by another research
                 for (Flower f : upgradableFlowersOfSameType) {
                     logger.info(String.format("ResearchRobot %s: put back flower(%s) to research-queue", this.getId(), f.getId()));
+                    f.addPutResearchRobot(getId());
                     researchService.putFlower(f);
                 }
 
@@ -128,6 +129,7 @@ public class ResearchRobot extends Robot {
                 // cultivation information was updated to level 5 (max level) by another research
                 for (Vegetable v : upgradableVegetablesOfSameType) {
                     logger.info(String.format("ResearchRobot %s: put vegetable(%s) back in research-queue", this.getId(), v.getId()));
+                    v.addPutResearchRobot(getId());
                     researchService.putVegetable(v);
                 }
                 return;

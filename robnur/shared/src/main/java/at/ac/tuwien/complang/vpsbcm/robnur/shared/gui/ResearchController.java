@@ -19,14 +19,29 @@ public class ResearchController {
     public TableColumn<Vegetable, String> tcVegetablesId;
     public TableColumn<Vegetable, String> tcVegetablesPlantId;
     public TableColumn<Vegetable, String> tcVegetablesType;
+    public TableColumn<Vegetable, String> tcVegetablesRobots;
 
     public TableView<Flower> tvFlowers;
     public TableColumn<Flower, Integer> tcFlowersIndex;
     public TableColumn<Flower, String> tcFlowersId;
     public TableColumn<Flower, String> tcFlowersPlantId;
     public TableColumn<Flower, String> tcFlowersType;
+    public TableColumn<Flower, String> tcFlowersRobots;
 
     private ResearchService researchService = RobNurGUI.researchService;
+
+    private String formatList(List<String> list) {
+        String s="";
+
+        for(int i=0; i<list.size(); i++) {
+            s += list.get(i);
+            if(i < list.size()-1) {
+                s += ", ";
+            }
+        }
+
+        return s;
+    }
 
     @FXML
     public void initialize() {
@@ -54,6 +69,7 @@ public class ResearchController {
         tcVegetablesId.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getId()));
         tcVegetablesPlantId.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getParentPlant().getId()));
         tcVegetablesType.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getParentPlant().getTypeName()));
+        tcVegetablesRobots.setCellValueFactory(column -> new ReadOnlyStringWrapper(formatList(column.getValue().getPutResearchRobots())));
 
         updateVegetableData(researchService.readAllVegetables(null));
 
@@ -67,6 +83,7 @@ public class ResearchController {
         tcFlowersId.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getId()));
         tcFlowersPlantId.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getParentPlant().getId()));
         tcFlowersType.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getParentPlant().getTypeName()));
+        tcFlowersRobots.setCellValueFactory(column -> new ReadOnlyStringWrapper(formatList(column.getValue().getPutResearchRobots())));
 
         updateFlowerData(researchService.readAllFlowers(null));
 

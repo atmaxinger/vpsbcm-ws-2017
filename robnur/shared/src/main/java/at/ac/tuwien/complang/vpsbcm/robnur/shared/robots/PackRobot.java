@@ -41,6 +41,7 @@ public class PackRobot extends Robot {
                 return;
             }
 
+            flower.addPutResearchRobot(getId());
             researchService.putFlower(flower);
             logger.info(String.format("PackRobot %s: forward flower (id = %s) to research department",this.getId(),flower.getId()));
 
@@ -167,6 +168,7 @@ public class PackRobot extends Robot {
                 return;
             }
 
+            vegetable.addPutResearchRobot(getId());
             researchService.putVegetable(vegetable);
             logger.info(String.format("PackRobot %s: forward vegetable(%s) to research department.",this.getId(),vegetable.getId()));
 
