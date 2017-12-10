@@ -105,38 +105,41 @@ public class MonitoringRobot extends Robot {
 
     void monitorVegetables() {
 
+        logger.debug("MONITOR VEGETABLES ");
         // get all available plants
         Transaction t = transactionService.beginTransaction(-1);
 
         List<VegetablePlant> vegs = greenhouseService.getAllVegetablePlants(t);
         if(vegs == null || vegs.isEmpty()) {
+            logger.error("vegetables is empty");
             t.rollback();
             return;
         }
 
-        for (VegetablePlant v:vegs) {
+        /*for (VegetablePlant v:vegs) {
             takenVegetableIds.add(v.getId());
-        }
+        }*/
 
         // grow
         for(VegetablePlant p : vegs) {
+            logger.debug("growing vegetables");
             doGrow(p, p.getCultivationInformation());
         }
 
         // write back plant
-        for(VegetablePlant p : vegs) {
-            if(!greenhouseService.plant(p, t)) {
-                System.err.println("could not put plant back - rollback");
-                t.rollback();
-                return;
-            }
-
-            putVegetableIds.add(p.getId());
+        if(!greenhouseService.plantVegetables(vegs, t)) {
+            logger.error("could not put plant back - rollback");
+            t.rollback();
+            return;
         }
+
+        /*for(VegetablePlant p : vegs) {
+            putVegetableIds.add(p.getId());
+        }*/
 
         t.commit();
 
-        outputStatistics();
+        //outputStatistics();
     }
 
     void monitorFlowers() {
@@ -154,13 +157,19 @@ public class MonitoringRobot extends Robot {
             doGrow(p, p.getCultivationInformation());
         }
 
-        for(FlowerPlant p : flos) {
+        if(!greenhouseService.plantFlowers(flos, t)) {
+            System.err.println("could not put plant back - rollback");
+            t.rollback();
+            return;
+        }
+
+        /*for(FlowerPlant p : flos) {
             if(!greenhouseService.plant(p, t)) {
                 System.err.println("could not put plant back - rollback");
                 t.rollback();
                 return;
             }
-        }
+        }*/
 
         t.commit();
     }

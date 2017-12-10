@@ -54,13 +54,13 @@ public abstract class CompostService {
         }
     }
 
-    public abstract void putFlowerPlant(FlowerPlant flowerPlant);
+    public abstract void putFlowerPlant(FlowerPlant flowerPlant, Transaction transaction);
 
-    public abstract void putVegetablePlant(VegetablePlant vegetablePlant);
+    public abstract void putVegetablePlant(VegetablePlant vegetablePlant, Transaction transaction);
 
-    public abstract void putFlower(Flower flower);
+    public abstract void putFlower(Flower flower, Transaction transaction);
 
-    public abstract void putVegetable(Vegetable vegetable);
+    public abstract void putVegetable(Vegetable vegetable, Transaction transaction);
 
     public abstract List<FlowerPlant> readAllFlowerPlants();
 

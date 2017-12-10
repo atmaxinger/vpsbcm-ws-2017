@@ -2,6 +2,7 @@ package at.ac.tuwien.complang.vpsbcm.robnur.postgres.service;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.MarketService;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -36,15 +37,15 @@ public class MarketServiceImpl extends MarketService {
         }
     }
 
-    public void putBouquet(Bouquet bouquet) {
-        ServiceUtil.writeItem(bouquet,MARKET_BOUQUET_TABLE);
+    public void putBouquet(Bouquet bouquet, Transaction transaction) {
+        ServiceUtil.writeItem(bouquet,MARKET_BOUQUET_TABLE, transaction);
     }
 
     public int getAmountOfBouquets() {
         return readAllBouquets().size();
     }
 
-    public void putVegetableBasket(VegetableBasket vegetableBasket) {
+    public void putVegetableBasket(VegetableBasket vegetableBasket, Transaction transaction) {
         ServiceUtil.writeItem(vegetableBasket,MARKET_VEGETABLE_BASKET_TABLE);
     }
 

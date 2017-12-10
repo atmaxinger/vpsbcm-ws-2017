@@ -22,11 +22,11 @@ public abstract class MarketService {
         }
     }
 
-    public abstract void putBouquet(Bouquet bouquet);
+    public abstract void putBouquet(Bouquet bouquet, Transaction transaction);
 
     public abstract int getAmountOfBouquets();
 
-    public abstract void putVegetableBasket(VegetableBasket vegetableBasket);
+    public abstract void putVegetableBasket(VegetableBasket vegetableBasket, Transaction transaction);
 
     public abstract int getAmountOfVegetableBaskets();
 

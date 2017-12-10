@@ -18,6 +18,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -68,20 +69,39 @@ public class GreenhouseServiceImpl extends GreenhouseService {
     }
 
     @Override
+    public boolean plantVegetables(List<VegetablePlant> vegetablePlants, Transaction transaction) {
+        for(VegetablePlant vegetablePlant : vegetablePlants) {
+            if(!ServiceUtil.writeItem(vegetablePlant, GREENHOUSE_VEGETABLE_PLANT_TABLE, transaction)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean plantFlowers(List<FlowerPlant> flowerPlants, Transaction transaction) {
+        for(FlowerPlant flowerPlant : flowerPlants) {
+            if(!ServiceUtil.writeItem(flowerPlant, GREENHOUSE_FLOWER_PLANT_TABLE, transaction)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
     public boolean plant(VegetablePlant vegetablePlant, Transaction transaction) {
         /*if (readAllFlowerPlants(transaction).size() + readAllVegetablePlants(transaction).size() >= 20) {
             return false;
         }*/
         logger.info(String.format("plant vegetable; id: %s, remainingHarvests: %d, threadid = %s, growth = %s",vegetablePlant.getId(),vegetablePlant.getCultivationInformation().getRemainingNumberOfHarvests(),Thread.currentThread().getId(), vegetablePlant.getGrowth()));
-        return ServiceUtil.writeItem(vegetablePlant, GREENHOUSE_VEGETABLE_PLANT_TABLE, transaction);
+        return plantVegetables(Collections.singletonList(vegetablePlant), transaction);
     }
 
     @Override
     public boolean plant(FlowerPlant flowerPlant, Transaction transaction) {
-        if (readAllFlowerPlants(transaction).size() + readAllVegetablePlants(transaction).size() >= 20) {
-            return false;
-        }
-        return ServiceUtil.writeItem(flowerPlant, GREENHOUSE_FLOWER_PLANT_TABLE, transaction);
+        return plantFlowers(Collections.singletonList(flowerPlant), transaction);
     }
 
     @Override

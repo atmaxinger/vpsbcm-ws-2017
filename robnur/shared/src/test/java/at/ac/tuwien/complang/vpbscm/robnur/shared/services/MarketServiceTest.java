@@ -76,11 +76,11 @@ public abstract class MarketServiceTest{
 
         /* Market */
 
-        marketService.putBouquet(bouquet1);
-        marketService.putBouquet(bouquet2);
+        marketService.putBouquet(bouquet1, null);
+        marketService.putBouquet(bouquet2, null);
 
-        marketService.putVegetableBasket(vegetableBasket1);
-        marketService.putVegetableBasket(vegetableBasket2);
+        marketService.putVegetableBasket(vegetableBasket1, null);
+        marketService.putVegetableBasket(vegetableBasket2, null);
     }
 
     @Test

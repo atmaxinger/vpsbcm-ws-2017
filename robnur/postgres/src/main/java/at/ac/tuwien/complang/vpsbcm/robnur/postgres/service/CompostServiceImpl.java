@@ -5,6 +5,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.CompostService;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -57,20 +58,20 @@ public class CompostServiceImpl extends CompostService {
         }
     }
 
-    public void putFlowerPlant(FlowerPlant flowerPlant) {
-        ServiceUtil.writeItem(flowerPlant, COMPOST_FLOWER_PLANT_TABLE);
+    public void putFlowerPlant(FlowerPlant flowerPlant, Transaction transaction) {
+        ServiceUtil.writeItem(flowerPlant, COMPOST_FLOWER_PLANT_TABLE, transaction);
     }
 
-    public void putVegetablePlant(VegetablePlant vegetablePlant) {
-        ServiceUtil.writeItem(vegetablePlant, COMPOST_VEGETABLE_PLANT_TABLE);
+    public void putVegetablePlant(VegetablePlant vegetablePlant, Transaction transaction) {
+        ServiceUtil.writeItem(vegetablePlant, COMPOST_VEGETABLE_PLANT_TABLE, transaction);
     }
 
-    public void putFlower(Flower flower) {
-        ServiceUtil.writeItem(flower, COMPOST_FLOWER_TABLE);
+    public void putFlower(Flower flower, Transaction transaction) {
+        ServiceUtil.writeItem(flower, COMPOST_FLOWER_TABLE, transaction);
     }
 
-    public void putVegetable(Vegetable vegetable) {
-        ServiceUtil.writeItem(vegetable, COMPOST_VEGETABLE_TABLE);
+    public void putVegetable(Vegetable vegetable, Transaction transaction) {
+        ServiceUtil.writeItem(vegetable, COMPOST_VEGETABLE_TABLE, transaction);
     }
 
     public List<FlowerPlant> readAllFlowerPlants() {

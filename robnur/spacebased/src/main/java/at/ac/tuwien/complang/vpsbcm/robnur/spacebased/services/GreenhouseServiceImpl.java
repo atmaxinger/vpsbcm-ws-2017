@@ -1,5 +1,6 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services;
 
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Flower;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Plant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
@@ -13,10 +14,7 @@ import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class GreenhouseServiceImpl extends GreenhouseService {
     final static Logger logger = Logger.getLogger(GreenhouseServiceImpl.class);
@@ -67,7 +65,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
     public void registerPlantAndHarvestRobot(PlantAndHarvestRobot robot) {
         try {
             notificationManager.createNotification(greenhouseContainer, (notification, operation, list) -> {
-                logger.debug("notify at.ac.tuwien.complang.vpsbcm.robnur.postgres.robot - greenhouseContainer " + operation.name());
+                logger.debug("notify plantandharvest - greenhouseContainer " + operation.name());
                 robot.tryHarvestPlant();
                 robot.tryPlant();
             }, Operation.WRITE, Operation.TAKE, Operation.DELETE);
@@ -79,13 +77,39 @@ public class GreenhouseServiceImpl extends GreenhouseService {
     }
 
     @Override
-    public boolean plant(VegetablePlant vegetablePlant, Transaction transaction) {
+    public boolean plantVegetables(List<VegetablePlant> vegetablePlants, Transaction transaction) {
         TransactionReference ref = TransactionServiceImpl.getTransactionReference(transaction);
 
-        Entry entry = new Entry(vegetablePlant, LabelCoordinator.newCoordinationData(VEGETABLE_LABEL));
+        List<Entry> entries = new LinkedList<>();
+        for(VegetablePlant vegetablePlant : vegetablePlants) {
+            entries.add(new Entry(vegetablePlant, LabelCoordinator.newCoordinationData(VEGETABLE_LABEL)));
+        }
         try {
-            capi.write(greenhouseContainer, MzsConstants.RequestTimeout.DEFAULT, ref, entry);
+            capi.write(entries, greenhouseContainer, MzsConstants.RequestTimeout.DEFAULT, ref);
             return true;
+        } catch (ContainerFullException e) {
+            System.out.println("CONTAINER FULL " + e.getMessage());
+            return false;
+        }
+        catch (MzsCoreException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean plantFlowers(List<FlowerPlant> flowerPlants, Transaction transaction) {
+        TransactionReference ref = TransactionServiceImpl.getTransactionReference(transaction);
+
+        List<Entry> entries = new LinkedList<>();
+        for(FlowerPlant flowerPlant : flowerPlants) {
+            entries.add(new Entry(flowerPlant, LabelCoordinator.newCoordinationData(FLOWER_LABEL)));
+        }
+
+        try {
+            capi.write(entries, greenhouseContainer, MzsConstants.RequestTimeout.DEFAULT, ref);
+            return true;
+
         } catch (ContainerFullException e) {
             return false;
         }
@@ -96,21 +120,13 @@ public class GreenhouseServiceImpl extends GreenhouseService {
     }
 
     @Override
+    public boolean plant(VegetablePlant vegetablePlant, Transaction transaction) {
+        return plantVegetables(Collections.singletonList(vegetablePlant), transaction);
+    }
+
+    @Override
     public boolean plant(FlowerPlant flowerPlant, Transaction transaction) {
-        TransactionReference ref = TransactionServiceImpl.getTransactionReference(transaction);
-
-        Entry entry = new Entry(flowerPlant, LabelCoordinator.newCoordinationData(FLOWER_LABEL));
-        try {
-            capi.write(greenhouseContainer, MzsConstants.RequestTimeout.DEFAULT, ref, entry);
-            return true;
-
-        } catch (ContainerFullException e) {
-            return false;
-        }
-        catch (MzsCoreException e) {
-            e.printStackTrace();
-            return false;
-        }
+        return plantFlowers(Collections.singletonList(flowerPlant), transaction);
     }
 
     @Override
@@ -121,7 +137,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             List<Selector> selectors = Arrays.asList(
                     LabelCoordinator.newSelector(VEGETABLE_LABEL, MzsConstants.Selecting.COUNT_MAX)
             );
-
+            capi.lockContainer(greenhouseContainer, transactionReference);
             ArrayList<VegetablePlant> vegetablePlants = capi.take(greenhouseContainer, selectors, MzsConstants.RequestTimeout.DEFAULT, transactionReference);
 
             return vegetablePlants;
@@ -140,6 +156,8 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             List<Selector> selectors = Arrays.asList(
                     LabelCoordinator.newSelector(FLOWER_LABEL, MzsConstants.Selecting.COUNT_MAX)
             );
+
+            capi.lockContainer(greenhouseContainer, tref);
 
             ArrayList<FlowerPlant> ps = capi.take(greenhouseContainer, selectors, MzsConstants.RequestTimeout.DEFAULT, tref);
             return ps;

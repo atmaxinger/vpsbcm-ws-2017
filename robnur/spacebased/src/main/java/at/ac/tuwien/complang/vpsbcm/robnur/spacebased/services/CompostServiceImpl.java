@@ -5,6 +5,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.CompostService;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import org.mozartspaces.capi3.AnyCoordinator;
 import org.mozartspaces.capi3.Coordinator;
 import org.mozartspaces.core.*;
@@ -51,23 +52,23 @@ public class CompostServiceImpl extends CompostService {
     }
 
     @Override
-    public void putFlowerPlant(FlowerPlant flowerPlant) {
-        ServiceUtil.writeItem(flowerPlant,flowerPlantContainer,null,capi);
+    public void putFlowerPlant(FlowerPlant flowerPlant, Transaction transaction) {
+        ServiceUtil.writeItem(flowerPlant,flowerPlantContainer,transaction,capi);
     }
 
     @Override
-    public void putVegetablePlant(VegetablePlant vegetablePlant) {
-        ServiceUtil.writeItem(vegetablePlant,vegetablePlantContainer,null,capi);
+    public void putVegetablePlant(VegetablePlant vegetablePlant, Transaction transaction) {
+        ServiceUtil.writeItem(vegetablePlant,vegetablePlantContainer,transaction,capi);
     }
 
     @Override
-    public void putFlower(Flower flower) {
-        ServiceUtil.writeItem(flower,flowerContainer,null,capi);
+    public void putFlower(Flower flower, Transaction transaction) {
+        ServiceUtil.writeItem(flower,flowerContainer,transaction,capi);
     }
 
     @Override
-    public void putVegetable(Vegetable vegetable) {
-        ServiceUtil.writeItem(vegetable,vegetableContainer,null,capi);
+    public void putVegetable(Vegetable vegetable, Transaction transaction) {
+        ServiceUtil.writeItem(vegetable,vegetableContainer,transaction,capi);
     }
 
     @Override

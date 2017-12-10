@@ -39,8 +39,8 @@ public class PackingServiceImpl extends PackingService {
         }
     }
 
-    public void putFlower(Flower flower) {
-        ServiceUtil.writeItem(flower,PACKING_FLOWER_TABLE);
+    public void putFlower(Flower flower, Transaction transaction) {
+        ServiceUtil.writeItem(flower,PACKING_FLOWER_TABLE, transaction);
     }
 
     @Override

@@ -56,14 +56,14 @@ public abstract class CompostServiceTest {
         vegetable2 = new Vegetable();
         vegetable2.setParentVegetablePlant(vegetablePlant2);
 
-        compostService.putFlowerPlant(flowerPlant1);
-        compostService.putFlowerPlant(flowerPlant2);
-        compostService.putFlower(flower1);
-        compostService.putFlower(flower2);
-        compostService.putVegetablePlant(vegetablePlant1);
-        compostService.putVegetablePlant(vegetablePlant2);
-        compostService.putVegetable(vegetable1);
-        compostService.putVegetable(vegetable2);
+        compostService.putFlowerPlant(flowerPlant1, null);
+        compostService.putFlowerPlant(flowerPlant2, null);
+        compostService.putFlower(flower1, null);
+        compostService.putFlower(flower2, null);
+        compostService.putVegetablePlant(vegetablePlant1, null);
+        compostService.putVegetablePlant(vegetablePlant2, null);
+        compostService.putVegetable(vegetable1, null);
+        compostService.putVegetable(vegetable2, null);
     }
 
     @Test

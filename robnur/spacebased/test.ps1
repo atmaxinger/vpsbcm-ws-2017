@@ -2,7 +2,7 @@ param(
         [int]$count=3
 )
 
-start powershell .\space-server.ps1
+#start powershell .\space-server.ps1
 start powershell .\space-gui.ps1
 start powershell .\space-monitoring.ps1
 

@@ -11,8 +11,9 @@ public abstract class GreenhouseService {
         this.greenhouseChanged = greenhouseChanged;
     }
 
+    public abstract boolean plantVegetables(List<VegetablePlant> vegetablePlants, Transaction transaction);
+    public abstract boolean plantFlowers(List<FlowerPlant> flowerPlants, Transaction transaction);
     public abstract boolean plant(VegetablePlant vegetablePlant, Transaction transaction);
-
     public abstract boolean plant(FlowerPlant flowerPlant, Transaction transaction);
 
 

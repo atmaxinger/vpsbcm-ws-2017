@@ -3,6 +3,7 @@ package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Bouquet;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableBasket;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.MarketService;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import org.mozartspaces.capi3.AnyCoordinator;
 import org.mozartspaces.capi3.Coordinator;
 import org.mozartspaces.capi3.QueryCoordinator;
@@ -47,12 +48,8 @@ public class MarketServiceImpl extends MarketService {
     }
 
     @Override
-    public void putBouquet(Bouquet bouquet) {
-        try {
-            capi.write(bouquetContainer,new Entry(bouquet));
-        } catch (MzsCoreException e) {
-            e.printStackTrace();
-        }
+    public void putBouquet(Bouquet bouquet, Transaction transaction) {
+        ServiceUtil.writeItem(new Entry(bouquet), bouquetContainer, transaction, capi);
     }
 
     @Override
@@ -61,12 +58,8 @@ public class MarketServiceImpl extends MarketService {
     }
 
     @Override
-    public void putVegetableBasket(VegetableBasket vegetableBasket) {
-        try {
-            capi.write(vegetableBasketContainer,new Entry(vegetableBasket));
-        } catch (MzsCoreException e) {
-            e.printStackTrace();
-        }
+    public void putVegetableBasket(VegetableBasket vegetableBasket, Transaction transaction) {
+        ServiceUtil.writeItem(new Entry(vegetableBasket), vegetableBasketContainer, transaction, capi);
     }
 
     @Override
@@ -98,7 +91,7 @@ public class MarketServiceImpl extends MarketService {
 
             for (Bouquet b: bouquets) {
                 if(!b.equals(bouquet)){
-                    putBouquet(b);
+                    putBouquet(b, null);
                 }
             }
 
@@ -143,7 +136,7 @@ public class MarketServiceImpl extends MarketService {
 
             for (VegetableBasket vb: vegetableBaskets) {
                 if(!vb.equals(vegetableBasket)){
-                    putVegetableBasket(vb);
+                    putVegetableBasket(vb, null);
                 }
             }
 

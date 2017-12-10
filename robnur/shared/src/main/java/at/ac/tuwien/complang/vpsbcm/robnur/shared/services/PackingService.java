@@ -29,7 +29,7 @@ public abstract class PackingService {
         }
     }
 
-    public abstract void putFlower(Flower flower);
+    public abstract void putFlower(Flower flower, Transaction transaction);
 
     public abstract void putVegetable(Vegetable vegetable,Transaction transaction);
 

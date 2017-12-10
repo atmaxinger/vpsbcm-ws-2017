@@ -77,7 +77,7 @@ public class ResearchRobot extends Robot {
                 for (Flower f : upgradableFlowersOfSameType) {
                     logger.info(String.format("ResearchRobot %s: put flower(%s) on the compost", this.getId(), f.getId()));
                     f.setCompostRobot(getId());
-                    compostService.putFlower(f);
+                    compostService.putFlower(f, transaction);
                 }
 
                 tryUpgradeFlowerPlant();  // try to upgrade another flower plant
@@ -140,7 +140,7 @@ public class ResearchRobot extends Robot {
                 for (Vegetable v : upgradableVegetablesOfSameType) {
                     logger.info(String.format("ResearchRobot %s: put vegetable(%s) on the compost", this.getId(), v.getId()));
                     v.setCompostRobot(getId());
-                    compostService.putVegetable(v);
+                    compostService.putVegetable(v, transaction);
                 }
 
                 tryUpgradeVegetablePlant();  // try to upgrade another plant

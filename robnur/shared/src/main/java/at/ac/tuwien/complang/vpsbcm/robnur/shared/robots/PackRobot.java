@@ -142,7 +142,8 @@ public class PackRobot extends Robot {
             bouquet.setFlowers(flowersForBouquet);
             bouquet.setPackingRobotId(getId());
 
-            marketService.putBouquet(bouquet);
+            // TODO: do we need transaction here?
+            marketService.putBouquet(bouquet, null);
             logger.info(String.format("PackRobot %s: created bouquet(%s) and put it into basket",this.getId(),bouquet.getId()));
 
             tryCreateBouquet();    // try to create another bouquet
@@ -239,7 +240,8 @@ public class PackRobot extends Robot {
 
                     waitPackingTime();
 
-                    marketService.putVegetableBasket(vegetableBasket);
+                    // TODO: do we need transaction here?
+                    marketService.putVegetableBasket(vegetableBasket, null);
                     logger.info(String.format("PackRobot %s: created vegetable basket(%s) and put it into basket",this.getId(),vegetableBasket.getId()));
 
                     tryCreateVegetableBasket(); // try to create another vegetable basket
