@@ -62,6 +62,16 @@ public class ResearchServiceImpl extends ResearchService {
         }
     }
 
+    @Override
+    public List<Flower> getAllFlowers(Transaction transaction) {
+        throw new IllegalArgumentException("NOT IMPLEMENTED YET");
+    }
+
+    @Override
+    public List<Vegetable> getAllVegetables(Transaction transaction) {
+        throw new IllegalArgumentException("NOT IMPLEMENTED YET");
+    }
+
     public List<Flower> readAllFlowers(Transaction transaction) {
         return ServiceUtil.readAllItems(RESEARCH_FLOWER_TABLE,Flower.class);
     }

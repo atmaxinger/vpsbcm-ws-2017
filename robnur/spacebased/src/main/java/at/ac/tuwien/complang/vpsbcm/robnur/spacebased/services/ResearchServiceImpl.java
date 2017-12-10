@@ -67,6 +67,16 @@ public class ResearchServiceImpl extends ResearchService {
     }
 
     @Override
+    public List<Flower> getAllFlowers(Transaction transaction) {
+        return ServiceUtil.getAllItems(flowerContainer,transaction,capi);
+    }
+
+    @Override
+    public List<Vegetable> getAllVegetables(Transaction transaction) {
+        return ServiceUtil.getAllItems(vegetableContainer,transaction,capi);
+    }
+
+    @Override
     public List<Flower> readAllFlowers(Transaction transaction) {
         return ServiceUtil.readAllItems(flowerContainer,transaction,capi);
     }

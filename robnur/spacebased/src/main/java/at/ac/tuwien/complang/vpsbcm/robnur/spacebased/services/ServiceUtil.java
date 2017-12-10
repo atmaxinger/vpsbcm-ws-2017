@@ -1,5 +1,6 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services;
 
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Flower;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlantCultivationInformation;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
@@ -92,14 +93,14 @@ public class ServiceUtil {
         }
     }
 
-    public synchronized static <T extends Serializable> T readItem(Selector selector, ContainerReference containerReference, Transaction transaction, Capi capi) {
+    public synchronized static <T extends Serializable> T getItem(Selector selector, ContainerReference containerReference, Transaction transaction, Capi capi) {
 
         TransactionReference transactionReference = TransactionServiceImpl.getTransactionReference(transaction);
 
         List<T> result = null;
 
         try {
-            result = capi.read(containerReference,selector,MzsConstants.RequestTimeout.DEFAULT,transactionReference);
+            result = capi.take(containerReference,selector,MzsConstants.RequestTimeout.DEFAULT,transactionReference);
             if(result != null && result.size() > 0) {
                 return result.get(0);
             }
@@ -108,5 +109,21 @@ public class ServiceUtil {
         }
 
         return null;
+    }
+
+    public synchronized static <T extends Serializable> List<T> getAllItems(ContainerReference containerReference, Selector selector, Transaction transaction,Capi capi) {
+        TransactionReference transactionReference = TransactionServiceImpl.getTransactionReference(transaction);
+
+        List<T> result = null;
+        try {
+            result = capi.take(containerReference, selector,MzsConstants.RequestTimeout.DEFAULT,transactionReference);
+        } catch (MzsCoreException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    public static <T extends Serializable> List<T> getAllItems(ContainerReference containerReference, Transaction transaction, Capi capi) {
+        return getAllItems(containerReference, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), transaction,capi);
     }
 }

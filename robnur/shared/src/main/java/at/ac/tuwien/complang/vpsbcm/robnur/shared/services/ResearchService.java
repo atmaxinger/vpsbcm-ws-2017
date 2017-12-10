@@ -37,6 +37,10 @@ public abstract class ResearchService {
 
     public abstract void deleteVegetable(Vegetable vegetable,Transaction transaction);
 
+    public abstract List<Flower> getAllFlowers(Transaction transaction);
+
+    public abstract List<Vegetable> getAllVegetables(Transaction transaction);
+
     public abstract List<Flower> readAllFlowers(Transaction transaction);
 
     public abstract List<Vegetable> readAllVegetables(Transaction transaction);

@@ -33,11 +33,9 @@ public abstract class ConfigService {
     }
     public abstract FlowerPlantCultivationInformation getFlowerPlantCultivationInformation(String id, Transaction transaction);
 
-    public abstract FlowerPlantCultivationInformation readFlowerPlantCultivationInformation(FlowerType flowerType, Transaction transaction);
+    public abstract FlowerPlantCultivationInformation getFlowerPlantCultivationInformation(FlowerType flowerType, Transaction transaction);
 
-    public abstract VegetablePlantCultivationInformation getVegetablePlantCultivationInformation(String id, Transaction transaction);
-
-    public abstract VegetablePlantCultivationInformation readVegetablePlantCultivationInformation(VegetableType vegetableType, Transaction transaction);
+    public abstract VegetablePlantCultivationInformation getVegetablePlantCultivationInformation(VegetableType type, Transaction transaction);
 
     public abstract void deleteFlowerPlantCultivationInformation(String id, Transaction transaction);
 

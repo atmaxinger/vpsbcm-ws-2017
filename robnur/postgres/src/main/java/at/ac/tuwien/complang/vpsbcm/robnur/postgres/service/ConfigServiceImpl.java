@@ -44,17 +44,13 @@ public class ConfigServiceImpl extends ConfigService {
     }
 
     @Override
-    public FlowerPlantCultivationInformation readFlowerPlantCultivationInformation(FlowerType flowerType, Transaction transaction) {
-        return ServiceUtil.readItemByParameter("'flowerType'",flowerType.name(),CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE,FlowerPlantCultivationInformation.class,transaction);
-    }
-
-    public VegetablePlantCultivationInformation getVegetablePlantCultivationInformation(String id, Transaction transaction) {
-        return ServiceUtil.getItemById(id,CONFIG_VEGETABLE_PLANT_CULTIVATION_INFORMATION_TABLE,VegetablePlantCultivationInformation.class,transaction);
+    public FlowerPlantCultivationInformation getFlowerPlantCultivationInformation(FlowerType flowerType, Transaction transaction) {
+        return ServiceUtil.getItemByParameter("'flowerType'",flowerType.name(),CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE,FlowerPlantCultivationInformation.class,transaction);
     }
 
     @Override
-    public VegetablePlantCultivationInformation readVegetablePlantCultivationInformation(VegetableType vegetableType, Transaction transaction) {
-        return ServiceUtil.readItemByParameter("'vegetableType'",vegetableType.name(), CONFIG_VEGETABLE_PLANT_CULTIVATION_INFORMATION_TABLE,VegetablePlantCultivationInformation.class,transaction);
+    public VegetablePlantCultivationInformation getVegetablePlantCultivationInformation(VegetableType vegetableType, Transaction transaction) {
+        return ServiceUtil.getItemByParameter("'vegetableType'",vegetableType.name(), CONFIG_VEGETABLE_PLANT_CULTIVATION_INFORMATION_TABLE,VegetablePlantCultivationInformation.class,transaction);
     }
 
     public void deleteFlowerPlantCultivationInformation(String id, Transaction transaction) {
