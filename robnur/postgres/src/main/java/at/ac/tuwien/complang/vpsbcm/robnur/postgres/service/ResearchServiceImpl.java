@@ -64,12 +64,12 @@ public class ResearchServiceImpl extends ResearchService {
 
     @Override
     public List<Flower> getAllFlowers(Transaction transaction) {
-        throw new IllegalArgumentException("NOT IMPLEMENTED YET");
+        return ServiceUtil.getAllItems(RESEARCH_FLOWER_TABLE,Flower.class,transaction);
     }
 
     @Override
     public List<Vegetable> getAllVegetables(Transaction transaction) {
-        throw new IllegalArgumentException("NOT IMPLEMENTED YET");
+        return ServiceUtil.getAllItems(RESEARCH_VEGETABLE_TABLE,Vegetable.class,transaction);
     }
 
     public List<Flower> readAllFlowers(Transaction transaction) {

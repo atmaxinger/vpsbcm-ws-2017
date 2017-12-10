@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-class TransactionImpl implements Transaction {
+public class TransactionImpl implements Transaction {
     final static Logger logger = Logger.getLogger(TransactionService.class);
 
     private Connection connection;

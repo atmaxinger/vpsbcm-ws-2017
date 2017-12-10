@@ -14,6 +14,7 @@ import java.sql.*;
 import java.util.List;
 
 public class InitDb {
+
     public static void main(String args[]) {
 
         createTables(CompostServiceImpl.getTables());
@@ -55,7 +56,7 @@ public class InitDb {
 
     private static void createTables(List<String> tables){
 
-        Connection connection = PostgresHelper.getNewConnection("create table");
+        Connection connection = PostgresHelper.getNewConnection("create table",-1);
 
         for (String t:tables) {
             try {
@@ -77,7 +78,7 @@ public class InitDb {
 
     private static void createNotifyFunction(List<String> tables) {
 
-        Connection connection = PostgresHelper.getNewConnection("create notify");
+        Connection connection = PostgresHelper.getNewConnection("create notify",-1);
 
         for (String table : tables) {
 
@@ -118,7 +119,7 @@ public class InitDb {
     }
 
     private static void createWaterTrigger(String waterTable) {
-        Connection connection = PostgresHelper.getNewConnection("create water trigger");
+        Connection connection = PostgresHelper.getNewConnection("create water trigger",-1);
 
         try {
             Statement statement = connection.createStatement();
@@ -150,7 +151,9 @@ public class InitDb {
     }
 
     private static void createGreenhouseTrigger(){
-        Connection connection = PostgresHelper.getNewConnection("greenhouseTrigger");
+        System.out.println("creating greenhouse trigger...");
+
+        Connection connection = PostgresHelper.getNewConnection("greenhouseTrigger",-1);
         try {
             Statement statement = connection.createStatement();
 

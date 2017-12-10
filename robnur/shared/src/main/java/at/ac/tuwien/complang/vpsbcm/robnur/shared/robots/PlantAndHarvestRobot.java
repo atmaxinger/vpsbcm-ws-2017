@@ -159,7 +159,7 @@ public class PlantAndHarvestRobot extends Robot {
                 // 2017-12-09 19:32:39 ERROR PlantAndHarvestRobot - cnt + plant.getCultivationInformation().getRemainingNumberOfHarvests() != 3;  3 + 1 != 3; before was: 2; plantId: 9a54918c-eb4a-411f-b3d2-802726849d9f
                 // 2017-12-09 19:32:34 ERROR PlantAndHarvestRobot - cnt + plant.getCultivationInformation().getRemainingNumberOfHarvests() != 3;  2 + 2 != 3; before was: 3; plantId: 9a54918c-eb4a-411f-b3d2-802726849d9f
 
-                if(plantCount.size() != 0) {
+                /*if(plantCount.size() != 0) {
                     int cnt = plantCount.get(plant.getId());
                     if (cnt + plant.getCultivationInformation().getRemainingNumberOfHarvests() != 3) {
                         logger.error(String.format("cnt + plant.getCultivationInformation().getRemainingNumberOfHarvests() != 3;  %d + %d != 3; before was: %d; plantId: %s, threadid: %s, growth: %d", cnt, plant.getCultivationInformation().getRemainingNumberOfHarvests(), before, plant.getId(), Thread.currentThread().getId(), plant.getGrowth()));
@@ -168,7 +168,7 @@ public class PlantAndHarvestRobot extends Robot {
                 }
                 {
                     logger.error(String.format("plant with id %s has not been planted with this robot.", plant.getId()));
-                }
+                }*/
 
             } else {
                 plant.setCompostRobot(getId());

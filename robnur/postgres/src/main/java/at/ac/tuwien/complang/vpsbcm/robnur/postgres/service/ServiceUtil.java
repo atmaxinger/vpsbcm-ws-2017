@@ -1,5 +1,6 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.postgres.service;
 
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Flower;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -117,6 +118,44 @@ public class ServiceUtil {
     public static <T extends Serializable> List<T> readAllItems(String table, Class<T> resultClass) {
         Transaction t = transactionService.beginTransaction(-1,"READ ALL ITEMS " + table);
         List<T> l = readAllItems(table, resultClass, t);
+        t.commit();
+
+        return l;
+    }
+
+    public static <T extends Serializable> List<T> getAllItems(String table, Class<T> resultClass, Transaction transaction) {
+        List<T> result = new ArrayList<T>();
+
+        try {
+            ObjectMapper mapper = new ObjectMapper()
+                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+
+            Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
+
+            ResultSet rs = statement.executeQuery("SELECT * FROM " + table);
+
+            while (rs.next()) {
+                String data = rs.getString("data");
+                T t = mapper.readValue(data, resultClass);
+                result.add(t);
+            }
+
+            statement.execute("DELETE FROM " + table);
+
+            statement.close();
+        } catch (SQLException | IOException e) {
+            result = null;
+            System.err.println("getAllItems - return null");
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+    public static <T extends Serializable> List<T> getAllItems(String table, Class<T> resultClass) {
+        Transaction t = transactionService.beginTransaction(-1,"READ ALL ITEMS " + table);
+        List<T> l = getAllItems(table, resultClass, t);
         t.commit();
 
         return l;

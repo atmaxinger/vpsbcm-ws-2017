@@ -33,7 +33,7 @@ public class PostgresHelper {
         return null;
     }
 
-    public synchronized static Connection getNewConnection(String reason){
+    public synchronized static Connection getNewConnection(String reason, int timeoutMillis){
         String server = readProperty("db.server");
         int port = Integer.parseInt(readProperty("db.port"));
         String database = readProperty("db.database");
@@ -44,6 +44,9 @@ public class PostgresHelper {
         Properties props = new Properties();
         props.setProperty("user", user);
         props.setProperty("password", password);
+        if(timeoutMillis > 0) {
+            props.setProperty("socketTimeout", ""+timeoutMillis/1000);
+        }
         try {
             Connection connection = DriverManager.getConnection(url, props);
             //logger.debug("NEW CONNECTION: " + connection + " reason: " + reason);

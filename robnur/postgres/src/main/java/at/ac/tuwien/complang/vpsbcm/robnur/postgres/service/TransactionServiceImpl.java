@@ -16,7 +16,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         try {
 
-            connection = PostgresHelper.getNewConnection("begin transaction, reason: " + reason);
+            connection = PostgresHelper.getNewConnection("begin transaction, reason: " + reason, (int) timoutMillis);
             //logger.debug("NEW CONNECTION: " + connection + " reason: " + reason);
             connection.setAutoCommit(false);
             connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);

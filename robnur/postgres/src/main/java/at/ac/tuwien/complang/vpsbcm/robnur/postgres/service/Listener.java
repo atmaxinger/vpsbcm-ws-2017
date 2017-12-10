@@ -21,7 +21,7 @@ abstract class Listener extends Thread {
     public enum DBMETHOD { INSERT, DELETE, UNKNOWN }
 
     Listener(String listenerName) throws SQLException {
-        conn = PostgresHelper.getNewConnection("create listener");
+        conn = PostgresHelper.getNewConnection("create listener",-1);
         Statement stmt = conn.createStatement();
         stmt.execute(String.format("LISTEN %s_notify", listenerName));
         stmt.close();
