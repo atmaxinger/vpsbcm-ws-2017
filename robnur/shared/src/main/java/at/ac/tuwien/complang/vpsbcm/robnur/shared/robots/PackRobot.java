@@ -33,11 +33,18 @@ public class PackRobot extends Robot {
         Transaction transaction = transactionService.beginTransaction(TRANSACTION_TIMEOUT); // TODO change timeout
         List<Flower> flowers = packingService.readAllFlowers(transaction);
 
+        if(flowers == null) {
+            transaction.rollback();
+            return;
+        }
+
         int put = 0;
         for(int i=0; i<Math.min(flowers.size(), 10); i++) {
             Flower flower = packingService.getFlower(flowers.get(i).getId(),transaction);
             if(flower == null) {
                 transaction.rollback();
+
+                tryPutFlowersIntoResearch();
                 return;
             }
 
@@ -124,7 +131,8 @@ public class PackRobot extends Robot {
             }else{
                 // not enough flowers
                 logger.debug(String.format("PackRobot %s: not enough flowers to create bouquet",this.getId()));
-                transaction.commit();
+                transaction.rollback();
+                tryCreateBouquet();
                 return;
             }
 
@@ -161,11 +169,18 @@ public class PackRobot extends Robot {
         Transaction transaction = transactionService.beginTransaction(TRANSACTION_TIMEOUT);
         List<Vegetable> vegetables = packingService.readAllVegetables(transaction);
 
+        if(vegetables == null) {
+            transaction.rollback();
+            return;
+        }
+
         int put = 0;
         for(int i=0; i<Math.min(vegetables.size(), 10); i++) {
             Vegetable vegetable = packingService.getVegetable(vegetables.get(i).getId(),transaction);
             if(vegetable == null) {
                 transaction.rollback();
+
+                tryPutVegetablesIntoResearch();
                 return;
             }
 
@@ -229,6 +244,8 @@ public class PackRobot extends Robot {
                         if(vegetable == null) {
                             System.err.println("Did not get vegetable -- rollback");
                             transaction.rollback();
+
+                            tryCreateVegetableBasket();
                             return;
                         }
                         vegetablesForVegetableBasket.add(vegetable);
