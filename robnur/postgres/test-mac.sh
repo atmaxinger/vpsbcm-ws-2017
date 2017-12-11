@@ -18,7 +18,7 @@ do
 done
 
 # start research robots
-#for i in $(seq 1 $numberOfRobots);
-#do
-#    sh run-script-mac.sh "pwsh pg-research.ps1 -id $i"
-#done
+for i in $(seq 1 $numberOfRobots);
+do
+    sh run-script-mac.sh "pwsh pg-research.ps1 -id $i"
+done

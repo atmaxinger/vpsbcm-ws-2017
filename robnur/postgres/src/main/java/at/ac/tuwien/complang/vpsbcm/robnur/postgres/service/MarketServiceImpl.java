@@ -38,6 +38,10 @@ public class MarketServiceImpl extends MarketService {
     }
 
     public void putBouquet(Bouquet bouquet, Transaction transaction) {
+        if(transaction == null) {
+            ServiceUtil.writeItem(bouquet,MARKET_BOUQUET_TABLE);
+            return;
+        }
         ServiceUtil.writeItem(bouquet,MARKET_BOUQUET_TABLE, transaction);
     }
 
@@ -46,7 +50,11 @@ public class MarketServiceImpl extends MarketService {
     }
 
     public void putVegetableBasket(VegetableBasket vegetableBasket, Transaction transaction) {
-        ServiceUtil.writeItem(vegetableBasket,MARKET_VEGETABLE_BASKET_TABLE);
+        if(transaction == null) {
+            ServiceUtil.writeItem(vegetableBasket,MARKET_VEGETABLE_BASKET_TABLE);
+            return;
+        }
+        ServiceUtil.writeItem(vegetableBasket,MARKET_VEGETABLE_BASKET_TABLE, transaction);
     }
 
     public int getAmountOfVegetableBaskets() {
