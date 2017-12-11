@@ -22,8 +22,12 @@ public class PostgresHelper {
         try {
             String home = System.getProperty("user.home");
             File f = new File(home + "/robnur/postgres.properties");
+            FileReader reader = new FileReader(f);
 
-            prop.load(new FileReader(f));
+            prop.load(reader);
+
+            reader.close();
+
 
             return prop.getProperty(property);
         } catch (IOException e) {

@@ -119,7 +119,7 @@ public class InitDb {
     }
 
     private static void createWaterTrigger(String waterTable) {
-        Connection connection = PostgresHelper.getNewConnection("create water trigger",-1);
+        Connection connection = PostgresHelper.getNewConnection("asdfcreate water trigger",-1);
 
         try {
             Statement statement = connection.createStatement();
@@ -127,7 +127,7 @@ public class InitDb {
             statement.execute(
                     String.format("CREATE OR REPLACE FUNCTION put_back_water() RETURNS TRIGGER AS $$" +
                             " BEGIN " +
-                           // " PERFORM pg_sleep(1); " +
+                            " PERFORM pg_sleep(1); " +
                             " INSERT INTO %s(data) VALUES('{\"amount\":250,\"id\":\"49c660b6-b9e9-4a47-9922-2bfeefaef67c\"}'); " +
                             " RETURN NULL; " +
                             " END; " +
