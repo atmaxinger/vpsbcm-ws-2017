@@ -90,6 +90,9 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         } catch (ContainerFullException e) {
             System.out.println("CONTAINER FULL " + e.getMessage());
             return false;
+        } catch (MzsTimeoutException e) {
+            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            return false;
         }
         catch (MzsCoreException e) {
             e.printStackTrace();
@@ -111,6 +114,9 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             return true;
 
         } catch (ContainerFullException e) {
+            return false;
+        }catch (MzsTimeoutException e) {
+            TransactionServiceImpl.setTransactionTimedOut(transaction);
             return false;
         }
         catch (MzsCoreException e) {
@@ -141,7 +147,9 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             ArrayList<VegetablePlant> vegetablePlants = capi.take(greenhouseContainer, selectors, MzsConstants.RequestTimeout.DEFAULT, transactionReference);
 
             return vegetablePlants;
-        } catch (MzsCoreException e) {
+        } catch (MzsTimeoutException e) {
+            TransactionServiceImpl.setTransactionTimedOut(transaction);
+        }catch (MzsCoreException e) {
             e.printStackTrace();
         }
 
@@ -161,7 +169,9 @@ public class GreenhouseServiceImpl extends GreenhouseService {
 
             ArrayList<FlowerPlant> ps = capi.take(greenhouseContainer, selectors, MzsConstants.RequestTimeout.DEFAULT, tref);
             return ps;
-        } catch (MzsCoreException e) {
+        } catch (MzsTimeoutException e) {
+            TransactionServiceImpl.setTransactionTimedOut(transaction);
+        }catch (MzsCoreException e) {
             e.printStackTrace();
         }
 
@@ -175,7 +185,9 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         List<VegetablePlant> vegetablePlants = null;
         try {
             vegetablePlants = capi.read(greenhouseContainer, LabelCoordinator.newSelector(VEGETABLE_LABEL, LabelCoordinator.LabelSelector.COUNT_MAX), MzsConstants.RequestTimeout.DEFAULT, tref);
-        } catch (MzsCoreException e) {
+        } catch (MzsTimeoutException e) {
+            TransactionServiceImpl.setTransactionTimedOut(transaction);
+        }catch (MzsCoreException e) {
             e.printStackTrace();
         }
         return vegetablePlants;
@@ -187,7 +199,9 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         List<FlowerPlant> flowerPlants = null;
         try {
             flowerPlants = capi.read(greenhouseContainer, LabelCoordinator.newSelector(FLOWER_LABEL, LabelCoordinator.LabelSelector.COUNT_MAX), MzsConstants.RequestTimeout.DEFAULT, tref);
-        } catch (MzsCoreException e) {
+        } catch (MzsTimeoutException e) {
+            TransactionServiceImpl.setTransactionTimedOut(transaction);
+        }catch (MzsCoreException e) {
             e.printStackTrace();
         }
         return flowerPlants;
@@ -212,7 +226,9 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             if (vegetablePlants.size() > 0) {
                 return vegetablePlants.get(0);
             }
-        } catch (MzsCoreException e) {
+        } catch (MzsTimeoutException e) {
+            TransactionServiceImpl.setTransactionTimedOut(t);
+        }catch (MzsCoreException e) {
             e.printStackTrace();
         }
 
@@ -237,7 +253,9 @@ public class GreenhouseServiceImpl extends GreenhouseService {
                 return ps.get(0);
 
             }
-        } catch (MzsCoreException e) {
+        } catch (MzsTimeoutException e) {
+            TransactionServiceImpl.setTransactionTimedOut(t);
+        }catch (MzsCoreException e) {
             e.printStackTrace();
         }
 

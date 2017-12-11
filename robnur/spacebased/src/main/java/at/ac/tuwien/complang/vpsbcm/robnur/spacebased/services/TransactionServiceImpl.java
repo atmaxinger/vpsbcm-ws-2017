@@ -19,6 +19,14 @@ public class TransactionServiceImpl implements TransactionService {
         return null;
     }
 
+    public synchronized static void setTransactionTimedOut(Transaction transaction) {
+        if(transaction != null) {
+            logger.error(String.format("Transaction %s timed out", ((TransactionImpl)transaction).ref.getId()));
+
+            ((TransactionImpl) transaction).setTimeOut(true);
+        }
+    }
+
     class TransactionImpl implements Transaction {
 
         TransactionReference ref;
@@ -26,30 +34,40 @@ public class TransactionServiceImpl implements TransactionService {
 
         private boolean rolledBack = false;
 
+        private boolean timeOut = false;
+
+        public void setTimeOut(boolean timeOut) {
+            this.timeOut = timeOut;
+        }
+
         @Override
         public void commit() {
-            try {
-                loggerTransaction.debug(String.format("Trying to commit transaction %s", ref.getId()));
-                capi.commitTransaction(ref);
-                loggerTransaction.debug(String.format("Committed transaction %s", ref.getId()));
-            } catch (MzsCoreException e) {
-                logger.debug(String.format("Error committing transaction %s", ref.getId()));
-                e.printStackTrace();
+            if(!timeOut) {
+                try {
+                    loggerTransaction.debug(String.format("Trying to commit transaction %s", ref.getId()));
+                    capi.commitTransaction(ref);
+                    loggerTransaction.debug(String.format("Committed transaction %s", ref.getId()));
+                } catch (MzsCoreException e) {
+                    logger.debug(String.format("Error committing transaction %s", ref.getId()));
+                    e.printStackTrace();
+                }
             }
         }
 
         @Override
         public void rollback() {
-            try {
-                loggerTransaction.debug(String.format("Trying to roll back transaction %s", ref.getId()));
-                capi.rollbackTransaction(ref);
-                rolledBack = true;
-                loggerTransaction.debug(String.format("Rolled back transaction %s", ref.getId()));
+            if(!timeOut) {
+                try {
+                    loggerTransaction.debug(String.format("Trying to roll back transaction %s", ref.getId()));
+                    capi.rollbackTransaction(ref);
+                    rolledBack = true;
+                    loggerTransaction.debug(String.format("Rolled back transaction %s", ref.getId()));
 
-            } catch (MzsCoreException e) {
-                logger.debug(String.format("Error rolling back transaction %s", ref.getId()));
+                } catch (MzsCoreException e) {
+                    logger.debug(String.format("Error rolling back transaction %s", ref.getId()));
 
-                e.printStackTrace();
+                    e.printStackTrace();
+                }
             }
         }
 

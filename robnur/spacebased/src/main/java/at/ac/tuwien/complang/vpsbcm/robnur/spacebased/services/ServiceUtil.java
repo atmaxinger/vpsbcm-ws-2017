@@ -33,7 +33,11 @@ public class ServiceUtil {
             if(result != null && result.size() > 0) {
                 return result.get(0);
             }
-        } catch (MzsCoreException e) {
+        }
+        catch (MzsTimeoutException e) {
+            TransactionServiceImpl.setTransactionTimedOut(transaction);
+        }
+        catch (MzsCoreException e) {
             e.printStackTrace();
         }
 
@@ -45,7 +49,9 @@ public class ServiceUtil {
 
         try {
             capi.write(new Entry(item),containerReference,MzsConstants.RequestTimeout.DEFAULT,transactionReference);
-        } catch (MzsCoreException e) {
+        } catch (MzsTimeoutException e) {
+            TransactionServiceImpl.setTransactionTimedOut(transaction);
+        }catch (MzsCoreException e) {
             e.printStackTrace();
         }
     }
@@ -55,7 +61,9 @@ public class ServiceUtil {
 
         try {
             capi.write(entry,containerReference,MzsConstants.RequestTimeout.DEFAULT,transactionReference);
-        } catch (MzsCoreException e) {
+        } catch (MzsTimeoutException e) {
+            TransactionServiceImpl.setTransactionTimedOut(transaction);
+        }catch (MzsCoreException e) {
             e.printStackTrace();
         }
     }
@@ -66,7 +74,9 @@ public class ServiceUtil {
         List<T> result = null;
         try {
             result = capi.read(containerReference, selector,MzsConstants.RequestTimeout.DEFAULT,transactionReference);
-        } catch (MzsCoreException e) {
+        } catch (MzsTimeoutException e) {
+            TransactionServiceImpl.setTransactionTimedOut(transaction);
+        }catch (MzsCoreException e) {
             e.printStackTrace();
         }
         return result;
@@ -88,7 +98,9 @@ public class ServiceUtil {
 
         try {
             capi.delete(containerReference,selectors,MzsConstants.RequestTimeout.DEFAULT,transactionReference);
-        } catch (MzsCoreException e) {
+        } catch (MzsTimeoutException e) {
+            TransactionServiceImpl.setTransactionTimedOut(transaction);
+        }catch (MzsCoreException e) {
             e.printStackTrace();
         }
     }
@@ -104,6 +116,8 @@ public class ServiceUtil {
             if(result != null && result.size() > 0) {
                 return result.get(0);
             }
+        } catch (MzsTimeoutException e) {
+            TransactionServiceImpl.setTransactionTimedOut(transaction);
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -117,7 +131,9 @@ public class ServiceUtil {
         List<T> result = null;
         try {
             result = capi.take(containerReference, selector,MzsConstants.RequestTimeout.DEFAULT,transactionReference);
-        } catch (MzsCoreException e) {
+        } catch (MzsTimeoutException e) {
+            TransactionServiceImpl.setTransactionTimedOut(transaction);
+        }catch (MzsCoreException e) {
             e.printStackTrace();
         }
         return result;

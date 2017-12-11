@@ -242,6 +242,7 @@ public class ServiceUtil {
     }
 
     public static <T extends Serializable> List<T> getItemsByParameter(String parameterName, String parameterValue, String table, Class<T> resultClass, Transaction transaction) {
+        logger.debug(String.format("getItemsByParameter(\"%s\",\"%s\",\"%s\",%s,%s)", parameterName, parameterValue, table, resultClass, transaction));
 
         List<T> result = new ArrayList<>();
 
@@ -260,7 +261,10 @@ public class ServiceUtil {
 
         ResultSet rs = null;
         try {
-            rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE (data " + prepareArrow(parameterName) + " %s)::text = '%s'", table, parameterName, parameterValue));
+            String query = String.format("SELECT * FROM %s WHERE (data " + prepareArrow(parameterName) + " %s)::text = '%s'", table, parameterName, parameterValue);
+            logger.debug("QUERY: " + query);
+            rs = statement.executeQuery(query);
+
 
             while (rs.next()) {
                 String data = rs.getString("data");
@@ -289,6 +293,9 @@ public class ServiceUtil {
     }
 
     public static void deleteItemByParameter(String parameterName, String parameterValue, String table, Transaction transaction) throws SQLException {
+
+        logger.debug(String.format("deleteItemByParameter(\"%s\",\"%s\",\"%s\",%s", parameterName, parameterValue, table, transaction));
+
 
         try {
             Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();

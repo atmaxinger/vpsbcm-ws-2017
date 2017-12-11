@@ -85,8 +85,13 @@ public abstract class StorageService {
      * @return seed that can be planted or null
      */
     public VegetablePlant tryGetSeed(VegetableType type, Transaction transaction) {
+        System.err.println("TRY GET SEED VEGETABLE TYPE: " + type);
+
         List<VegetablePlant> availableSeeds = getSeeds(type, transaction);
+        System.err.println("GOT AVAILABLE VEGETABLE SEEDS");
+
         List<VegetableFertilizer> vegetableFertilizers = readAllVegetableFertilizer(transaction);
+        System.err.println("GOT AVAILABLE VEGETABLE FERTILIZERS");
 
         if(availableSeeds == null) {
             return null;
@@ -125,8 +130,13 @@ public abstract class StorageService {
      * @return seed that can be planted or null
      */
     public FlowerPlant tryGetSeed(FlowerType type, Transaction transaction) {
+        System.err.println("TRY GET SEED FLOWER TYPE: " + type);
+
         List<FlowerPlant> availableSeeds = getSeeds(type, transaction);
+        System.err.println("GOT AVAILABLE FLOWER SEEDS");
+
         List<FlowerFertilizer> flowerFertilizers = readAllFlowerFertilizer(transaction);
+        System.err.println("GOT AVAILABLE FLOWER FERTILIZERS");
 
         if(availableSeeds == null) {
             return null;
