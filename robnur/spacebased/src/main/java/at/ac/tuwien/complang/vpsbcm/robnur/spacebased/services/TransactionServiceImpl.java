@@ -41,27 +41,31 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         @Override
-        public void commit() {
+        public boolean commit() {
             if(!timeOut) {
                 try {
                     loggerTransaction.debug(String.format("Trying to commit transaction %s", ref.getId()));
                     capi.commitTransaction(ref);
                     loggerTransaction.debug(String.format("Committed transaction %s", ref.getId()));
+                    return true;
                 } catch (MzsCoreException e) {
                     logger.debug(String.format("Error committing transaction %s", ref.getId()));
                     e.printStackTrace();
                 }
             }
+
+            return false;
         }
 
         @Override
-        public void rollback() {
+        public boolean rollback() {
             if(!timeOut) {
                 try {
                     loggerTransaction.debug(String.format("Trying to roll back transaction %s", ref.getId()));
                     capi.rollbackTransaction(ref);
                     rolledBack = true;
                     loggerTransaction.debug(String.format("Rolled back transaction %s", ref.getId()));
+                    return true;
 
                 } catch (MzsCoreException e) {
                     logger.debug(String.format("Error rolling back transaction %s", ref.getId()));
@@ -69,6 +73,8 @@ public class TransactionServiceImpl implements TransactionService {
                     e.printStackTrace();
                 }
             }
+
+            return false;
         }
 
         @Override
