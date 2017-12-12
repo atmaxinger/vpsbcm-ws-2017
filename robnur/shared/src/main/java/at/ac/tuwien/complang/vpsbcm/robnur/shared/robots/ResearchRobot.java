@@ -89,7 +89,7 @@ public class ResearchRobot extends Robot {
         transaction.commit();
     }*/
 
-    public void tryUpgradeFlowerPlant() {
+    public synchronized void tryUpgradeFlowerPlant() {
 
         logger.info(String.format("ResearchRobot %s: looking for flowers to upgrade", this.getId()));
         // try to find a flower-plant to upgrade
@@ -144,7 +144,7 @@ public class ResearchRobot extends Robot {
         }
     }
 
-    public void tryUpgradeVegetablePlant() {
+    public synchronized void tryUpgradeVegetablePlant() {
 
         logger.info(String.format("ResearchRobot %s: looking for vegetables to upgrade", this.getId()));
         // try to find a vegetable-plant to upgrade

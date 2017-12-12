@@ -60,14 +60,18 @@ public class PackRobot extends Robot {
         }
 
         logger.debug(String.format("%s.commit()", transaction));
-        transaction.commit();
+        if(!transaction.commit()) {
+            logger.debug("committing was not successful -> retrying operation");
+            transaction.rollback();
+            tryPutFlowersIntoResearch();
+        }
 
         // If we have packed 10 into research, chances are good there are more...
         if(put == 10) {
             tryPutFlowersIntoResearch();
         }
     }
-    public void tryCreateBouquet(){
+    public synchronized void tryCreateBouquet(){
         logger.debug(String.format("PackRobot %s: try to create bouquet",this.getId()));
 
         // check if there are already enough bouquets in the market
@@ -196,7 +200,10 @@ public class PackRobot extends Robot {
             put++;
         }
 
-        transaction.commit();
+        if(!transaction.commit()) {
+            logger.error("committing not successful -> retrying");
+            tryPutVegetablesIntoResearch();
+        }
 
         // If we have packed 10 into research, chances are good there are more...
         if(put == 10) {
@@ -204,7 +211,7 @@ public class PackRobot extends Robot {
         }
     }
 
-    public void tryCreateVegetableBasket(){
+    public synchronized void tryCreateVegetableBasket(){
         logger.debug(String.format("PackRobot %s: try to create vegetable basket",this.getId()));
 
         if(marketService.getAmountOfVegetableBaskets() >= 3)
