@@ -48,7 +48,7 @@ public class TransactionServiceImpl implements TransactionService {
                     capi.commitTransaction(ref);
                     loggerTransaction.debug(String.format("Committed transaction %s", ref.getId()));
                     return true;
-                } catch (MzsCoreException e) {
+                } catch (TransactionException | MzsCoreException e) {
                     logger.debug(String.format("Error committing transaction %s", ref.getId()));
                     e.printStackTrace();
                 }
@@ -66,10 +66,8 @@ public class TransactionServiceImpl implements TransactionService {
                     rolledBack = true;
                     loggerTransaction.debug(String.format("Rolled back transaction %s", ref.getId()));
                     return true;
-
-                } catch (MzsCoreException e) {
-                    logger.debug(String.format("Error rolling back transaction %s", ref.getId()));
-
+                } catch (TransactionException | MzsCoreException e) {
+                    logger.debug(String.format("Error committing transaction %s", ref.getId()));
                     e.printStackTrace();
                 }
             }
