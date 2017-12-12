@@ -148,7 +148,7 @@ public class StorageServiceImpl extends StorageService {
         List<FlowerPlant> plants = null;
 
         try {
-            plants = capi.take(flowerSeedContainer, Collections.singletonList(LabelCoordinator.newSelector(type.name(), MzsConstants.Selecting.COUNT_MAX)), MzsConstants.RequestTimeout.INFINITE, tref);
+            plants = capi.take(flowerSeedContainer, Collections.singletonList(LabelCoordinator.newSelector(type.name(), MzsConstants.Selecting.COUNT_MAX)), MzsConstants.RequestTimeout.DEFAULT, tref);
         } catch (MzsTimeoutException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
         }catch (MzsCoreException e) {
@@ -164,7 +164,7 @@ public class StorageServiceImpl extends StorageService {
         List<VegetablePlant> plants = null;
 
         try {
-            plants = capi.take(vegetableSeedContainer, Collections.singletonList(LabelCoordinator.newSelector(type.name(), MzsConstants.Selecting.COUNT_MAX)), MzsConstants.RequestTimeout.INFINITE, tref);
+            plants = capi.take(vegetableSeedContainer, Collections.singletonList(LabelCoordinator.newSelector(type.name(), MzsConstants.Selecting.COUNT_MAX)), MzsConstants.RequestTimeout.DEFAULT, tref);
         } catch (MzsTimeoutException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
         }catch (MzsCoreException e) {

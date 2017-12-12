@@ -30,6 +30,7 @@ public class PackRobot extends Robot {
 
 
     private void tryPutFlowersIntoResearch() {
+        logger.debug("putFLowersIntoResearch");
         Transaction transaction = transactionService.beginTransaction(TRANSACTION_TIMEOUT); // TODO change timeout
         List<Flower> flowers = packingService.readAllFlowers(transaction);
 
@@ -40,8 +41,10 @@ public class PackRobot extends Robot {
 
         int put = 0;
         for(int i=0; i<Math.min(flowers.size(), 10); i++) {
+            logger.debug(String.format("packingService.getFlower(%s,%s)", flowers.get(i).getId(), transaction));
             Flower flower = packingService.getFlower(flowers.get(i).getId(),transaction);
             if(flower == null) {
+                logger.debug(String.format("%s.rollback()", transaction));
                 transaction.rollback();
 
                 tryPutFlowersIntoResearch();
@@ -49,12 +52,14 @@ public class PackRobot extends Robot {
             }
 
             flower.addPutResearchRobot(getId());
+            logger.debug(String.format("researchService.putFlower(%s,%s)", flower, transaction));
             researchService.putFlower(flower, transaction);
             logger.info(String.format("PackRobot %s: forward flower (id = %s) to research department",this.getId(),flower.getId()));
 
             put++;
         }
 
+        logger.debug(String.format("%s.commit()", transaction));
         transaction.commit();
 
         // If we have packed 10 into research, chances are good there are more...
