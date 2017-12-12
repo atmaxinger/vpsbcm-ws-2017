@@ -17,6 +17,8 @@ public class SpaceServer {
         MzsCore core = DefaultMzsCore.newInstance();
         Capi capi = new Capi(core);
 
+        System.out.println("uri: " + core.getConfig().getSpaceUri());
+
         ConfigService configService = null;
         configService = new ConfigServiceImpl(core.getConfig().getSpaceUri());
 
