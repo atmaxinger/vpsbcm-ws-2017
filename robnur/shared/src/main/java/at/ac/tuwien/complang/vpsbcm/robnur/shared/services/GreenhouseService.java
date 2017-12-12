@@ -22,14 +22,14 @@ public abstract class GreenhouseService {
 
 
 
+    public abstract List<VegetablePlant> readAllVegetablePlants(Transaction transaction);
     public List<VegetablePlant> readAllVegetablePlants() {
         return readAllVegetablePlants(null);
     }
-    public abstract List<VegetablePlant> readAllVegetablePlants(Transaction transaction);
+    public abstract List<FlowerPlant> readAllFlowerPlants(Transaction transaction);
     public List<FlowerPlant> readAllFlowerPlants() {
         return readAllFlowerPlants(null);
     }
-    public abstract List<FlowerPlant> readAllFlowerPlants(Transaction transaction);
 
 
 

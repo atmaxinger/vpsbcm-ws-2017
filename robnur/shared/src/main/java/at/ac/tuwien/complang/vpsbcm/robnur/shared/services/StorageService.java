@@ -90,12 +90,12 @@ public abstract class StorageService {
         List<VegetablePlant> availableSeeds = getSeeds(type, transaction);
         System.err.println("GOT AVAILABLE VEGETABLE SEEDS");
 
-        List<VegetableFertilizer> vegetableFertilizers = readAllVegetableFertilizer(transaction);
-        System.err.println("GOT AVAILABLE VEGETABLE FERTILIZERS");
-
         if(availableSeeds == null) {
             return null;
         }
+
+        List<VegetableFertilizer> vegetableFertilizers = readAllVegetableFertilizer(transaction);
+        System.err.println("GOT AVAILABLE VEGETABLE FERTILIZERS");
 
         if(vegetableFertilizers == null){
             return  null;
@@ -135,12 +135,12 @@ public abstract class StorageService {
         List<FlowerPlant> availableSeeds = getSeeds(type, transaction);
         System.err.println("GOT AVAILABLE FLOWER SEEDS");
 
-        List<FlowerFertilizer> flowerFertilizers = readAllFlowerFertilizer(transaction);
-        System.err.println("GOT AVAILABLE FLOWER FERTILIZERS");
-
         if(availableSeeds == null) {
             return null;
         }
+
+        List<FlowerFertilizer> flowerFertilizers = readAllFlowerFertilizer(transaction);
+        System.err.println("GOT AVAILABLE FLOWER FERTILIZERS");
 
         if(flowerFertilizers == null){
             return null;
@@ -149,6 +149,7 @@ public abstract class StorageService {
         int numberOfFertilizers = flowerFertilizers.size();
         int soilAmount = availableSoilAmount(transaction);
 
+        // find a seed that can be planted
         for (FlowerPlant plant : availableSeeds) {
             if (plant.getCultivationInformation().getFlowerType() == type) {
                 if (numberOfFertilizers >= plant.getCultivationInformation().getFertilizerAmount()) {
