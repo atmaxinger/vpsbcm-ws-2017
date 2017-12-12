@@ -147,7 +147,12 @@ public class PackRobot extends Robot {
 
             /* remove flowers from packing-queue */
             for (Flower f:flowersForBouquet) {
-                packingService.getFlower(f.getId(),transaction);
+                Flower flower = packingService.getFlower(f.getId(),transaction);
+                if(flower == null){
+                    transaction.rollback();
+                    tryCreateBouquet();
+                    return;
+                }
                 logger.info(String.format("PackRobot %s: remove flower(%s) from packing-queue",this.getId(), f.getId()));
             }
 

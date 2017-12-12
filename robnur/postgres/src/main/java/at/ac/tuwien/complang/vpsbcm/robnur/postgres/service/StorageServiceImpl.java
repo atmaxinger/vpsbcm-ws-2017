@@ -129,14 +129,7 @@ public class StorageServiceImpl extends StorageService {
 
     @Override
     protected List<SoilPackage> getAllSoilPackages(Transaction transaction) {
-        List<SoilPackage> soilPackages = ServiceUtil.readAllItems(STORAGE_SOIL_TABLE,SoilPackage.class,transaction);
-        for (SoilPackage sp:soilPackages) {
-            try {
-                ServiceUtil.deleteItemById(sp.getId(),STORAGE_SOIL_TABLE,transaction);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+        List<SoilPackage> soilPackages = ServiceUtil.getAllItems(STORAGE_SOIL_TABLE,SoilPackage.class,transaction);
         return soilPackages;
     }
 

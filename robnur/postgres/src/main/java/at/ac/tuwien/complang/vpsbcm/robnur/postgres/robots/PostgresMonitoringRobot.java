@@ -5,7 +5,6 @@ import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.PostgresHelper;
 import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.TransactionImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.TransactionServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.MonitoringRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.GreenhouseService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
