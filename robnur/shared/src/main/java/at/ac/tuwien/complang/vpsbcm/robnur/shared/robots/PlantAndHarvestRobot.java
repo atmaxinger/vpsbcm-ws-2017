@@ -267,6 +267,8 @@ public class PlantAndHarvestRobot extends Robot {
      */
     private <P extends Plant, E extends Enum<E>> P tryToGetNextSeed(List<P> plantedPlants, E[] types, Transaction t) {
 
+        logger.info("try To Get Next Seed");
+
         List<PlantCount<E>> counts = new LinkedList<>();
 
         // Step 1: count how many times a plant with the type has been planted
@@ -313,7 +315,7 @@ public class PlantAndHarvestRobot extends Robot {
             }
 
             if (plant != null) {
-                logger.info(String.format("PlantAndHarvestRobot %s: Got a plant(%s, %s) to plant", getId(), plant.getTypeName(), plant.getId()));
+                //logger.info(String.format("PlantAndHarvestRobot %s: Got a plant(%s, %s) to plant", getId(), plant.getTypeName(), plant.getId()));
                 return (P) plant;
             }
         }
@@ -340,7 +342,7 @@ public class PlantAndHarvestRobot extends Robot {
             // Step 2: try to get the amount of soil needed for the plant
             if (!storageService.tryGetExactAmountOfSoil(nextSeed.getCultivationInformation().getSoilAmount(), transaction)) {
                 logger.info(String.format("PlantAndHarvestRobot %s: did not get exact amount of soil(%d) for seed(%s, %s)", this.getId(), nextSeed.getCultivationInformation().getSoilAmount(), nextSeed.getTypeName(), nextSeed.getId()));
-                transaction.rollback();
+                transaction.rollback();printallSeeds(nextSeed,null);
                 return false;
             }
 
@@ -354,9 +356,11 @@ public class PlantAndHarvestRobot extends Robot {
             if (fertilizers == null || fertilizers.isEmpty()) {
                 logger.info(String.format("PlantAndHarvestRobot %s: did not get enough fertilizer(%d) for seed(%s, %s)", this.getId(), nextSeed.getCultivationInformation().getFertilizerAmount(), nextSeed.getTypeName(), nextSeed.getId()));
                 transaction.rollback();
+                printallSeeds(nextSeed,null);
                 return false;
             }
 
+            logger.info("about to access water");
             // Step 4: get the water needed for the plant
             storageService.getWater(nextSeed.getCultivationInformation().getWaterAmount());
 
@@ -367,6 +371,7 @@ public class PlantAndHarvestRobot extends Robot {
                 if(!greenhouseService.plant((VegetablePlant) nextSeed, transaction)) {
                     logger.info(String.format("PlantAndHarvestRobot %s: could not plant seed(%s, %s)", this.getId(), nextSeed.getTypeName(), nextSeed.getId()));
                     transaction.rollback();
+                    printallSeeds(nextSeed,null);
                     return false;
                 }
                 logger.debug(String.format("tryPlantPlant - planted vegetable %s", nextSeed.getTypeName()));
@@ -374,16 +379,20 @@ public class PlantAndHarvestRobot extends Robot {
                 if(!greenhouseService.plant((FlowerPlant) nextSeed, transaction)) {
                     logger.info(String.format("PlantAndHarvestRobot %s: could not plant seed(%s, %s)", this.getId(), nextSeed.getTypeName(), nextSeed.getId()));
                     transaction.rollback();
+                    printallSeeds(nextSeed,null);
                     return false;
                 }
 
             } else {
                 logger.error(String.format("tryPlantPlant - not planted - unknown plant"));
                 transaction.rollback();
+                printallSeeds(nextSeed,null);
                 return false;
             }
 
+
             transaction.commit();
+            logger.debug(String.format("-- planted plant %s %s", nextSeed.getId(), nextSeed.getTypeName()));
 
             if(plantCount.containsKey(nextSeed.getId())){
                 logger.error("Again planted seed " + nextSeed.getId());
@@ -413,6 +422,33 @@ public class PlantAndHarvestRobot extends Robot {
         @Override
         public int compareTo(Object o) {
             return Integer.compare(count, ((PlantCount) o).count);
+        }
+    }
+
+    private synchronized void printallSeeds(Plant plant, Transaction transaction) {
+        if(plant instanceof FlowerPlant) {
+            FlowerType type = ((FlowerPlant) plant).cultivationInformation.getFlowerType();
+            List<FlowerPlant> flowerSeeds = storageService.getSeeds(type, transaction);
+            storageService.putFlowerSeeds(flowerSeeds, transaction);
+
+            String s = "";
+            for (FlowerPlant seed : flowerSeeds) {
+                s += String.format("%s(%s),", seed.getTypeName(), seed.getId());
+            }
+            logger.debug(String.format("AVAILABLE FLOWER SEEDS (%d): %s", flowerSeeds.size(), s));
+
+            boolean containsType = false;
+
+            for (FlowerPlant seed : flowerSeeds) {
+                if (seed.getTypeName().contains(plant.getTypeName())) {
+                    containsType = true;
+                    break;
+                }
+            }
+
+            if (!containsType) {
+                logger.fatal("NO FLOWERS OF SAME TYPE FOUND");
+            }
         }
     }
 }

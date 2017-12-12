@@ -120,6 +120,7 @@ public class StorageServiceImpl extends StorageService {
             capi.write(entries, vegetableSeedContainer, MzsConstants.RequestTimeout.INFINITE, tref);
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
+            e.printStackTrace();
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -131,19 +132,21 @@ public class StorageServiceImpl extends StorageService {
 
         try {
             List<Entry> entries = new LinkedList<>();
+            logger.info("put " + plants.size() + "flower seeds into storage");
             for(FlowerPlant plant : plants) {
                 entries.add(new Entry(plant, LabelCoordinator.newCoordinationData(plant.getTypeName())));
             }
             capi.write(entries, flowerSeedContainer, MzsConstants.RequestTimeout.INFINITE, tref);
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
+            e.printStackTrace();
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    protected List<FlowerPlant> getSeeds(FlowerType type, Transaction transaction) {
+    public List<FlowerPlant> getSeeds(FlowerType type, Transaction transaction) {
         TransactionReference tref = TransactionServiceImpl.getTransactionReference(transaction);
         List<FlowerPlant> plants = null;
 
@@ -151,6 +154,7 @@ public class StorageServiceImpl extends StorageService {
             plants = capi.take(flowerSeedContainer, Collections.singletonList(LabelCoordinator.newSelector(type.name(), MzsConstants.Selecting.COUNT_MAX)), MzsConstants.RequestTimeout.DEFAULT, tref);
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
+            e.printStackTrace();
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -167,6 +171,7 @@ public class StorageServiceImpl extends StorageService {
             plants = capi.take(vegetableSeedContainer, Collections.singletonList(LabelCoordinator.newSelector(type.name(), MzsConstants.Selecting.COUNT_MAX)), MzsConstants.RequestTimeout.DEFAULT, tref);
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
+            e.printStackTrace();
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -188,6 +193,7 @@ public class StorageServiceImpl extends StorageService {
             plants = capi.read(flowerSeedContainer, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), MzsConstants.RequestTimeout.ZERO, tref);
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
+            e.printStackTrace();
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -204,6 +210,7 @@ public class StorageServiceImpl extends StorageService {
             plants = capi.read(vegetableSeedContainer, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), MzsConstants.RequestTimeout.ZERO, tref);
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
+            e.printStackTrace();
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -221,6 +228,7 @@ public class StorageServiceImpl extends StorageService {
             soilPackages = capi.take(soilContainer, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), 1000, tref);
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
+            e.printStackTrace();
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -246,6 +254,7 @@ public class StorageServiceImpl extends StorageService {
             capi.write(entries, soilContainer, MzsConstants.RequestTimeout.DEFAULT, tref);
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
+            e.printStackTrace();
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -260,6 +269,7 @@ public class StorageServiceImpl extends StorageService {
             packages = capi.read(soilContainer, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), MzsConstants.RequestTimeout.ZERO, tref);
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
+            e.printStackTrace();
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -277,6 +287,7 @@ public class StorageServiceImpl extends StorageService {
             flowerFertilizers = capi.take(flowerFertilizerContainer, AnyCoordinator.newSelector(amount), MzsConstants.RequestTimeout.DEFAULT, tref);
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
+            e.printStackTrace();
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -308,6 +319,7 @@ public class StorageServiceImpl extends StorageService {
             capi.write(entries, flowerFertilizerContainer, MzsConstants.RequestTimeout.INFINITE, tref);
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(t);
+            e.printStackTrace();
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -322,6 +334,7 @@ public class StorageServiceImpl extends StorageService {
             flowerFertilizers = capi.read(flowerFertilizerContainer, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), MzsConstants.RequestTimeout.ZERO, tref);
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
+            e.printStackTrace();
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -338,6 +351,7 @@ public class StorageServiceImpl extends StorageService {
             vegetableFertilizers = capi.take(vegetableFertilizerContainer, AnyCoordinator.newSelector(amount), MzsConstants.RequestTimeout.DEFAULT, tref);
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
+            e.printStackTrace();
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -368,6 +382,7 @@ public class StorageServiceImpl extends StorageService {
             capi.write(entries, vegetableFertilizerContainer, MzsConstants.RequestTimeout.INFINITE, tref);
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(t);
+            e.printStackTrace();
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -382,6 +397,7 @@ public class StorageServiceImpl extends StorageService {
             vegetableFertilizers = capi.read(vegetableFertilizerContainer, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), MzsConstants.RequestTimeout.ZERO, tref);
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
+            e.printStackTrace();
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }

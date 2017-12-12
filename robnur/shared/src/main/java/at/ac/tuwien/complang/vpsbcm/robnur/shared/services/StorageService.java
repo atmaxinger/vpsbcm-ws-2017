@@ -19,6 +19,8 @@ public abstract class StorageService {
         void handle(T data);
     }
 
+    private org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(StorageService.class);
+
 
     private Callback<List<FlowerPlant>> flowerSeedsChanged;
     private Callback<List<VegetablePlant>> vegetableSeedChanged;
@@ -28,6 +30,7 @@ public abstract class StorageService {
 
     protected void notifyFlowerSeedsChanged(List<FlowerPlant> list) {
         if(flowerSeedsChanged != null) {
+            logger.debug("notify FlowerSeeds Changed");
             flowerSeedsChanged.handle(list);
         }
     }
@@ -40,12 +43,14 @@ public abstract class StorageService {
 
     protected void notifySoilPackagesChanged(List<SoilPackage> list) {
         if(soilPackagesChanged != null) {
+            logger.debug("notify SoilPackages Changed");
             soilPackagesChanged.handle(list);
         }
     }
 
     protected void notifyFlowerFertilizerChanged(List<FlowerFertilizer> list) {
         if(flowerFertilizerChanged != null) {
+            logger.debug("notify FlowerFertilizer Changed");
             flowerFertilizerChanged.handle(list);
         }
     }
@@ -85,21 +90,26 @@ public abstract class StorageService {
      * @return seed that can be planted or null
      */
     public VegetablePlant tryGetSeed(VegetableType type, Transaction transaction) {
-        System.err.println("TRY GET SEED VEGETABLE TYPE: " + type);
+        logger.info("try to get VEGETABLE seed of type: " + type);
 
         List<VegetablePlant> availableSeeds = getSeeds(type, transaction);
-        System.err.println("GOT AVAILABLE VEGETABLE SEEDS");
 
         if(availableSeeds == null) {
+            logger.info("vegetable seed was null");
             return null;
         }
 
+        logger.info("got "+ availableSeeds.size() +" Vegetableseeds");
+
         List<VegetableFertilizer> vegetableFertilizers = readAllVegetableFertilizer(transaction);
-        System.err.println("GOT AVAILABLE VEGETABLE FERTILIZERS");
 
         if(vegetableFertilizers == null){
+            logger.info("vegetable vertilizer was null");
             return  null;
         }
+
+        logger.info("got " + vegetableFertilizers.size() + "vegetable vertilizers");
+
 
         int numberOfFertilizers = vegetableFertilizers.size();
         int soilAmount = availableSoilAmount(transaction);
@@ -130,23 +140,28 @@ public abstract class StorageService {
      * @return seed that can be planted or null
      */
     public FlowerPlant tryGetSeed(FlowerType type, Transaction transaction) {
-        System.err.println("TRY GET SEED FLOWER TYPE: " + type);
+        logger.info("try to get FLOWER seed of type: " + type);
 
         List<FlowerPlant> availableSeeds = getSeeds(type, transaction);
-        System.err.println("GOT AVAILABLE FLOWER SEEDS");
 
         if(availableSeeds == null) {
+            logger.info("flower seed was null");
             return null;
         }
+
+        logger.info("got "+ availableSeeds.size() +" FLOWERseeds");
 
         List<FlowerFertilizer> flowerFertilizers = readAllFlowerFertilizer(transaction);
-        System.err.println("GOT AVAILABLE FLOWER FERTILIZERS");
 
         if(flowerFertilizers == null){
+            logger.info("flower vertilizer was null");
             return null;
         }
 
+        logger.info("got " + flowerFertilizers.size() + "flower vertilizers");
+
         int numberOfFertilizers = flowerFertilizers.size();
+
         int soilAmount = availableSoilAmount(transaction);
 
         // find a seed that can be planted
@@ -157,16 +172,18 @@ public abstract class StorageService {
                         availableSeeds.remove(plant);
                         // Put remaining seeds back
                         putFlowerSeeds(availableSeeds, transaction);
+                        logger.info(String.format("return seed for planting (%s) id: %s", plant.getTypeName(), plant.getId()));
                         return plant;
                     }
                 }
             }
         }
 
+        logger.info("return NO seed for planting");
         return null;
     }
 
-    protected abstract List<FlowerPlant> getSeeds(FlowerType type, Transaction transaction);
+    public abstract List<FlowerPlant> getSeeds(FlowerType type, Transaction transaction);
     protected abstract List<VegetablePlant> getSeeds(VegetableType type, Transaction transaction);
 
     public abstract void putSeed(FlowerPlant plant, Transaction transaction);
@@ -191,13 +208,16 @@ public abstract class StorageService {
     public abstract void putSoilPackages(List<SoilPackage> soilPackage, Transaction transaction);
 
 
-    public int availableSoilAmount(Transaction t) {
-        List<SoilPackage> soilPackages = readAllSoilPackage(null);
+    public int availableSoilAmount(Transaction transaction) {
+        logger.info("get available SoilAmount");
+        List<SoilPackage> soilPackages = readAllSoilPackage(transaction);
         int available = 0;
 
         for(SoilPackage soilPackage : soilPackages) {
             available += soilPackage.getAmount();
         }
+
+        logger.info(available+" Soil");
 
         return available;
     }
@@ -210,7 +230,7 @@ public abstract class StorageService {
 
     public abstract void putFlowerFertilizer(FlowerFertilizer flowerFertilizer);
     public abstract void putFlowerFertilizers(List<FlowerFertilizer> flowerFertilizers);
-    public abstract void putFlowerFertilizers(List<FlowerFertilizer> flowerFertilizers, Transaction t);
+    public abstract void putFlowerFertilizers(List<FlowerFertilizer> flowerFertilizers, Transaction transaction);
 
 
     public List<FlowerFertilizer> readAllFlowerFertilizer() {
