@@ -49,13 +49,13 @@ public class ResearchController {
         initializeFlowersTable();
     }
 
-    private void updateVegetableData(List<Vegetable> vegetableList) {
+    private synchronized void updateVegetableData(List<Vegetable> vegetableList) {
         ObservableList<Vegetable> obs = tvVegetables.getItems();
         obs.clear();
         obs.addAll(vegetableList);
     }
 
-    private void updateFlowerData(List<Flower> flowers) {
+    private synchronized void updateFlowerData(List<Flower> flowers) {
         ObservableList<Flower> obs = tvFlowers.getItems();
         obs.clear();
         obs.addAll(flowers);

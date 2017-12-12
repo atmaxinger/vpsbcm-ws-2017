@@ -56,7 +56,7 @@ public class CompostController {
         initVegetablesTable();
     }
 
-    private void setFlowerPlantsTableData(List<FlowerPlant> plants) {
+    private synchronized void setFlowerPlantsTableData(List<FlowerPlant> plants) {
         ObservableList<FlowerPlant> obs = tvFlowerPlants.getItems();
         obs.clear();
         obs.addAll(plants);
@@ -74,7 +74,7 @@ public class CompostController {
         tcFlowerPlantsCompostRobot.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getCompostRobot()));
     }
 
-    private void setFlowersTableData(List<Flower> flowers) {
+    private synchronized void setFlowersTableData(List<Flower> flowers) {
         ObservableList<Flower> obs = tvFlowers.getItems();
         obs.clear();
         obs.addAll(flowers);
@@ -96,7 +96,7 @@ public class CompostController {
     }
 
 
-    private void setVegetablePlantsTableData(List<VegetablePlant> plants) {
+    private synchronized void setVegetablePlantsTableData(List<VegetablePlant> plants) {
         ObservableList<VegetablePlant> obs = tvVegetablePlants.getItems();
         obs.clear();
         obs.addAll(plants);
@@ -115,7 +115,7 @@ public class CompostController {
         tcVegetablePlantsCompostRobot.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getCompostRobot()));
     }
 
-    private void setVegetablesTableData(List<Vegetable> Vegetables) {
+    private synchronized void setVegetablesTableData(List<Vegetable> Vegetables) {
         ObservableList<Vegetable> obs = tvVegetables.getItems();
         obs.clear();
         obs.addAll(Vegetables);

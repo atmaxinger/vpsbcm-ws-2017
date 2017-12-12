@@ -57,7 +57,7 @@ public class StorageController {
         abstract void buyAction(int amount);
     }
 
-    public void showAndWaitForBuyDialog(Buyable buyable, String name) {
+    public synchronized void showAndWaitForBuyDialog(Buyable buyable, String name) {
         Dialog<Integer> dialog = new Dialog<>();
 
         dialog.setTitle("Resource Kaufen");
@@ -104,7 +104,7 @@ public class StorageController {
         initResourcesTableView();
     }
 
-    private int getCountOfFlowerSeed(List<Plant> allSeeds, FlowerType type) {
+    private synchronized int getCountOfFlowerSeed(List<Plant> allSeeds, FlowerType type) {
         int count=0;
 
         for(Plant p : allSeeds) {
@@ -118,7 +118,7 @@ public class StorageController {
         return count;
     }
 
-    private int getCountOfVeggiSeeds(List<Plant> allSeeds, VegetableType type) {
+    private synchronized int getCountOfVeggiSeeds(List<Plant> allSeeds, VegetableType type) {
         int count=0;
 
         for(Plant p : allSeeds) {
@@ -133,7 +133,7 @@ public class StorageController {
     }
 
 
-    private void initSeedsData() {
+    private synchronized void initSeedsData() {
         List<Plant> allSeeds = new LinkedList<>();
         allSeeds.addAll(storageService.readAllVegetableSeeds());
         allSeeds.addAll(storageService.readAllFlowerSeeds());
@@ -199,7 +199,7 @@ public class StorageController {
         }
     }
 
-    private void initSeedsTableView() {
+    private synchronized void initSeedsTableView() {
         initSeedsData();
 
         storageService.onFlowerSeedChanged(data -> {
@@ -248,7 +248,7 @@ public class StorageController {
     }
 
 
-    private void initResourcesData() {
+    private synchronized void initResourcesData() {
         ObservableList<ResourceTableDataModel> obs = tvResources.getItems();
         obs.clear();
 

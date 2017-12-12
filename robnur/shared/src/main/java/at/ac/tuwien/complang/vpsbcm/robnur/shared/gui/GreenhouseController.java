@@ -25,7 +25,7 @@ public class GreenhouseController {
     private GreenhouseService greenhouseService = RobNurGUI.greenhouseService;
 
 
-    void updateData(List<Plant> data) {
+    private synchronized void updateData(List<Plant> data) {
         ObservableList<Plant> plants = greenHouse.getItems();
         plants.clear();
         plants.addAll(data);
