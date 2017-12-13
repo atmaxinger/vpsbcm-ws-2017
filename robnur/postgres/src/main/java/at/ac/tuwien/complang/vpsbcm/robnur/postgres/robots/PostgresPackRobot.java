@@ -32,6 +32,10 @@ public class PostgresPackRobot {
         ResearchService researchService = new ResearchServiceImpl();
         TransactionService transactionService = new TransactionServiceImpl();
 
+        exitables.add(packingService);
+        exitables.add(marketService);
+        exitables.add(researchService);
+
         PackRobot packRobot = new PackRobot(args[0], packingService,marketService,researchService,transactionService);
         packingService.registerPackRobot(packRobot);
 
