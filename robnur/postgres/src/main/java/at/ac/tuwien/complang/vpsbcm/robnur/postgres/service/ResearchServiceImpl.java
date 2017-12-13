@@ -8,12 +8,32 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ResearchServiceImpl extends ResearchService {
 
     private static final String RESEARCH_FLOWER_TABLE = "rf";
     private static final String RESEARCH_VEGETABLE_TABLE = "rv";
+
+    private List<Listener> listeners = new LinkedList<>();
+
+    private boolean exit = false;
+
+    @Override
+    public boolean isExit() {
+        return exit;
+    }
+
+    @Override
+    public void setExit(boolean exit) {
+        this.exit = exit;
+        if(exit == true) {
+            for(Listener listener : listeners) {
+                listener.shutdown();
+            }
+        }
+    }
 
     public ResearchServiceImpl() {
 
@@ -33,6 +53,9 @@ public class ResearchServiceImpl extends ResearchService {
                 }
             };
             vegetableListener.start();
+
+            listeners.add(flowerListener);
+            listeners.add(vegetableListener);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -88,6 +111,9 @@ public class ResearchServiceImpl extends ResearchService {
                 }
             };
             vegetableListener.start();
+
+            listeners.add(flowerListener);
+            listeners.add(vegetableListener);
         } catch (SQLException e) {
             e.printStackTrace();
         }

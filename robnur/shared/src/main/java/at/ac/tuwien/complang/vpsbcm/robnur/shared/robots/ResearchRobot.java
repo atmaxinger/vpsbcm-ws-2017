@@ -26,6 +26,10 @@ public class ResearchRobot extends Robot {
     }
 
     public synchronized void tryUpgradeFlowerPlant() {
+        if (researchService.isExit()) {
+            logger.info("exiting...");
+            return;
+        }
 
         logger.info(String.format("ResearchRobot %s: looking for flowers to upgrade", this.getId()));
         // try to find a flower-plant to upgrade
@@ -34,7 +38,7 @@ public class ResearchRobot extends Robot {
             List<Flower> flowers = researchService.getAllFlowers(transaction);
 
             FlowerPlantCultivationInformation cultivationInformation = configService.getFlowerPlantCultivationInformation(flowerType, transaction);
-            if(cultivationInformation == null) {
+            if (cultivationInformation == null) {
                 logger.fatal(String.format("CultivationInformation for %s is null!", flowerType));
                 transaction.rollback();
                 continue;
@@ -59,7 +63,7 @@ public class ResearchRobot extends Robot {
 
             // put back non used flowers
             for (Flower f : flowers) {
-                if(!upgradableFlowersOfSameType.contains(f)) {
+                if (!upgradableFlowersOfSameType.contains(f)) {
                     researchService.putFlower(f, transaction);
                 }
             }
@@ -81,6 +85,10 @@ public class ResearchRobot extends Robot {
     }
 
     public synchronized void tryUpgradeVegetablePlant() {
+        if (researchService.isExit()) {
+            logger.info("exiting...");
+            return;
+        }
 
         logger.info(String.format("ResearchRobot %s: looking for vegetables to upgrade", this.getId()));
         // try to find a vegetable-plant to upgrade
@@ -89,7 +97,7 @@ public class ResearchRobot extends Robot {
             List<Vegetable> vegetables = researchService.getAllVegetables(transaction);
 
             VegetablePlantCultivationInformation cultivationInformation = configService.getVegetablePlantCultivationInformation(vegetableType, transaction);
-            if(cultivationInformation == null) {
+            if (cultivationInformation == null) {
                 logger.fatal(String.format("CultivationInformation for %s is null!", vegetableType));
                 transaction.rollback();
                 continue;
@@ -114,7 +122,7 @@ public class ResearchRobot extends Robot {
 
             // put back not used vegetables
             for (Vegetable v : vegetables) {
-                if(!upgradableVegetablesOfSameType.contains(v)) {
+                if (!upgradableVegetablesOfSameType.contains(v)) {
                     researchService.putVegetable(v, transaction);
                 }
             }

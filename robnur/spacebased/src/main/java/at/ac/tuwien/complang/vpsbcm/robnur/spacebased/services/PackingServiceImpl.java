@@ -13,6 +13,7 @@ import org.mozartspaces.notifications.Operation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.net.URI;
 
@@ -24,8 +25,28 @@ public class PackingServiceImpl extends PackingService {
     private ContainerReference flowerContainer;
     private NotificationManager notificationManager;
 
-    private List<Notification> notifications = new ArrayList<>();
+    List<Notification> notifications = new LinkedList<>();
 
+    boolean exit = false;
+
+    @Override
+    public boolean isExit() {
+        return exit;
+    }
+
+    @Override
+    public void setExit(boolean exit) {
+        this.exit = exit;
+        if(exit == true) {
+            for(Notification n : notifications) {
+                try {
+                    n.destroy();
+                } catch (MzsCoreException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
     public PackingServiceImpl(URI spaceUri) {
         MzsCore core = DefaultMzsCore.newInstanceWithoutSpace();
@@ -39,8 +60,8 @@ public class PackingServiceImpl extends PackingService {
             flowerContainer = CapiUtil.lookupOrCreateContainer("packingFlowerContainer", spaceUri, coordinators, null, capi);
 
             try {
-                notificationManager.createNotification(vegetableContainer, (notification, operation, list) -> raiseVegetablesChanged(), Operation.DELETE, Operation.TAKE, Operation.WRITE);
-                notificationManager.createNotification(flowerContainer, (notification, operation, list) -> raiseFlowersChanged(), Operation.DELETE, Operation.TAKE, Operation.WRITE);
+                notifications.add(notificationManager.createNotification(vegetableContainer, (notification, operation, list) -> raiseVegetablesChanged(), Operation.DELETE, Operation.TAKE, Operation.WRITE));
+                notifications.add(notificationManager.createNotification(flowerContainer, (notification, operation, list) -> raiseFlowersChanged(), Operation.DELETE, Operation.TAKE, Operation.WRITE));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -81,7 +102,7 @@ public class PackingServiceImpl extends PackingService {
         return ServiceUtil.readAllItems(vegetableContainer,selector,transaction,capi);
     }
 
-    public List<Notification> registerPackRobot(PackRobot packRobot){
+    public void registerPackRobot(PackRobot packRobot){
         try {
             Notification notificationFlowerContainer = notificationManager.createNotification(flowerContainer, (notification, operation, list) -> packRobot.tryCreateBouquet(),Operation.WRITE);
             Notification notificationVegetableContainer = notificationManager.createNotification(vegetableContainer, (notification, operation, list) -> packRobot.tryCreateVegetableBasket(),Operation.WRITE);
@@ -89,23 +110,10 @@ public class PackingServiceImpl extends PackingService {
             notifications.add(notificationFlowerContainer);
             notifications.add(notificationVegetableContainer);
 
-            return notifications;
         } catch (MzsCoreException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-        return null;
-    }
-
-    @Override
-    public boolean isExit(){
-        for (Notification n:notifications) {
-            if(n.isActive()){
-                return true;
-            }
-        }
-        return false;
     }
 }

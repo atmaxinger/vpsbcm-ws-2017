@@ -316,7 +316,7 @@ public class InitDb {
             //connection.setAutoCommit(true);
             Statement statement = connection.createStatement();
 
-            statement.execute(String.format("INSERT INTO %s (data) VALUES ('{}')","wt"));//StorageServiceImpl.STORAGE_WATER_ACCESS_TABLE));
+            statement.execute(String.format("INSERT INTO %s (data) VALUES ('{}')","wt"));
 
         } catch (SQLException e) {
             e.printStackTrace();

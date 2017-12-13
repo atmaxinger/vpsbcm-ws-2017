@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class StorageServiceImpl extends StorageService {
@@ -36,6 +37,24 @@ public class StorageServiceImpl extends StorageService {
 
     final static Logger logger = Logger.getLogger(StorageServiceImpl.class);
 
+    private List<Listener> listeners = new LinkedList<>();
+
+    private boolean exit = false;
+
+    @Override
+    public boolean isExit() {
+        return exit;
+    }
+
+    @Override
+    public void setExit(boolean exit) {
+        this.exit = exit;
+        if(exit == true) {
+            for(Listener listener : listeners) {
+                listener.shutdown();
+            }
+        }
+    }
 
     public StorageServiceImpl() {
         try {
@@ -104,6 +123,13 @@ public class StorageServiceImpl extends StorageService {
                 }
             };
             accessWaterListener.start();
+
+            listeners.add(flowerSeedListener);
+            listeners.add(vegetableSeedListener);
+            listeners.add(flowerFertilizerListener);
+            listeners.add(vegetableSeedListener);
+            listeners.add(soilListener);
+            listeners.add(accessWaterListener);
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -291,7 +317,7 @@ public class StorageServiceImpl extends StorageService {
     @Override
     public Water accessTap(String robotId) {
 
-        logger.info("in accessTap");
+        logger.debug("in accessTap");
 
 
         try {
@@ -316,7 +342,7 @@ public class StorageServiceImpl extends StorageService {
 
 
             connection.setAutoCommit(true);
-            logger.info(robotId + " write name into waterAccessContainer");
+            logger.debug(robotId + " write name into waterAccessContainer");
             statement.execute(String.format("INSERT INTO %s (data) VALUES ('{}')",STORAGE_WATER_ACCESS_TABLE,robotId));
 
             logger.info(robotId + " wait for water");
@@ -325,17 +351,17 @@ public class StorageServiceImpl extends StorageService {
             Water water = new Water();
             water.setAmount(250);
 
-            logger.info(robotId + " create water");
+            logger.debug(robotId + " create water");
 
-            logger.info(robotId + " remove name");
+            logger.debug(robotId + " remove name");
 
-            ///statement.execute("DELETE FROM " + STORAGE_WATER_ACCESS_TABLE);
+            statement.execute("DELETE FROM " + STORAGE_WATER_ACCESS_TABLE);
 
-            logger.info(robotId + " put back token");
+            logger.debug(robotId + " put back token");
 
-            ///statement.execute(String.format("INSERT INTO %s (data) VALUES ('{}')",STORAGE_WATER_TOKEN_TABLE));
+            statement.execute(String.format("INSERT INTO %s (data) VALUES ('{}')",STORAGE_WATER_TOKEN_TABLE));
 
-            logger.info(robotId + " return water");
+            logger.debug(robotId + " return water");
 
 
             return water;
@@ -412,6 +438,12 @@ public class StorageServiceImpl extends StorageService {
             };
             waterListener.start();
 
+            listeners.add(flowerSeedListener);
+            listeners.add(vegetableSeedListener);
+            listeners.add(flowerFertilizerListener);
+            listeners.add(vegetableVerbalizeListener);
+            listeners.add(soilListener);
+            listeners.add(waterListener);
         } catch (SQLException e) {
             e.printStackTrace();
         }

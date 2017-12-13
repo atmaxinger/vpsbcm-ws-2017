@@ -3,10 +3,13 @@ package at.ac.tuwien.complang.vpsbcm.robnur.postgres.robots;
 import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.*;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PlantAndHarvestRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.CompostService;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Exitable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.PackingService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
 
 import java.net.URISyntaxException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Scanner;
 
 public class PostgresPlantAndHarvestRobot {
@@ -27,12 +30,18 @@ public class PostgresPlantAndHarvestRobot {
             harvestTransactionTimeout = Integer.parseInt(args[2]);
         }
 
+        List<Exitable> exitables = new LinkedList<>();
+
         StorageServiceImpl storageService = new StorageServiceImpl();
         PackingService packingService = new PackingServiceImpl();
         GreenhouseServiceImpl greenhouseService = new GreenhouseServiceImpl();
         TransactionService transactionService = new TransactionServiceImpl();
         CompostService compostService = new CompostServiceImpl();
 
+        exitables.add(storageService);
+        exitables.add(packingService);
+        exitables.add(greenhouseService);
+        exitables.add(compostService);
 
         PlantAndHarvestRobot robot = new PlantAndHarvestRobot(args[0], plantTransactionTimeout, harvestTransactionTimeout, storageService, greenhouseService, transactionService, packingService, compostService);
 
@@ -40,11 +49,10 @@ public class PostgresPlantAndHarvestRobot {
         storageService.registerPlantAndHarvestRobot(robot);
 
         Scanner scanner = new Scanner(System.in);
-        while(true) {
-            String command = scanner.nextLine();
-            if(command.toLowerCase().equals("exit")) {
-                System.exit(0);
-            }
+        scanner.next("exit");
+
+        for(Exitable exitable : exitables) {
+            exitable.setExit(true);
         }
     }
 }

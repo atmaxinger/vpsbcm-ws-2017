@@ -16,6 +16,7 @@ import org.mozartspaces.notifications.Operation;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ResearchServiceImpl extends ResearchService {
@@ -25,6 +26,29 @@ public class ResearchServiceImpl extends ResearchService {
     ContainerReference flowerContainer;
     ContainerReference vegetableContainer;
     NotificationManager notificationManager;
+
+    List<Notification> notifications = new LinkedList<>();
+
+    boolean exit = false;
+
+    @Override
+    public boolean isExit() {
+        return exit;
+    }
+
+    @Override
+    public void setExit(boolean exit) {
+        this.exit = exit;
+        if(exit == true) {
+            for(Notification n : notifications) {
+                try {
+                    n.destroy();
+                } catch (MzsCoreException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
     public ResearchServiceImpl(URI spaceUri) {
 
@@ -38,8 +62,8 @@ public class ResearchServiceImpl extends ResearchService {
             flowerContainer = CapiUtil.lookupOrCreateContainer("researchFlowerContainer",spaceUri,coordinators,null,capi);
             vegetableContainer = CapiUtil.lookupOrCreateContainer("researchVegetableContainer",spaceUri,coordinators,null,capi);
 
-            notificationManager.createNotification(flowerContainer, (notification, operation, list) -> notifyFlowersChanged(readAllFlowers(null)), Operation.WRITE, Operation.DELETE, Operation.TAKE);
-            notificationManager.createNotification(vegetableContainer, (notification, operation, list) -> notifyVegetablesChanged(readAllVegetables(null)), Operation.WRITE, Operation.DELETE, Operation.TAKE);
+            notifications.add(notificationManager.createNotification(flowerContainer, (notification, operation, list) -> notifyFlowersChanged(readAllFlowers(null)), Operation.WRITE, Operation.DELETE, Operation.TAKE));
+            notifications.add(notificationManager.createNotification(vegetableContainer, (notification, operation, list) -> notifyVegetablesChanged(readAllVegetables(null)), Operation.WRITE, Operation.DELETE, Operation.TAKE));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -78,23 +102,17 @@ public class ResearchServiceImpl extends ResearchService {
         return ServiceUtil.readAllItems(vegetableContainer,transaction,capi);
     }
 
-    public List<Notification> registerResearchRobot(ResearchRobot researchRobot){
+    public void registerResearchRobot(ResearchRobot researchRobot){
         try {
-            List<Notification> notifications = new ArrayList<>();
-
             Notification notificationFlowerContainer = notificationManager.createNotification(flowerContainer, (notification, operation, list) -> researchRobot.tryUpgradeFlowerPlant(), Operation.WRITE);
             Notification notificationVegetableContainer = notificationManager.createNotification(vegetableContainer, (notification, operation, list) -> researchRobot.tryUpgradeVegetablePlant(),Operation.WRITE);
 
             notifications.add(notificationFlowerContainer);
             notifications.add(notificationVegetableContainer);
-
-            return notifications;
         } catch (MzsCoreException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-        return null;
     }
 }

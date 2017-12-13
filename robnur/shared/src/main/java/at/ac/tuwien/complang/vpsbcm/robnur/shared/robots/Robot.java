@@ -4,9 +4,8 @@ import org.apache.log4j.Logger;
 
 public abstract class Robot {
 
-    private String id;
-
     final static Logger logger = Logger.getLogger(Robot.class);
+    private String id;
 
     public String getId() {
         return id;

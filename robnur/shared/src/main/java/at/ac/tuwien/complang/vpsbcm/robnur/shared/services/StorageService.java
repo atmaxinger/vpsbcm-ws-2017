@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class StorageService {
+public abstract class StorageService implements Exitable {
 
     public interface Callback<T> {
         void handle(T data);
@@ -463,10 +463,4 @@ public abstract class StorageService {
      * @param water water to put
      */
     public abstract void putWater(Water water);
-
-    /**
-     * checks if notifications are stopped
-     * @return true if notifications are stopped else false
-     */
-    public abstract boolean isExit();
 }

@@ -9,6 +9,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class CompostServiceImpl extends CompostService {
@@ -18,6 +19,24 @@ public class CompostServiceImpl extends CompostService {
     private static final String COMPOST_FLOWER_TABLE = "cf";
     private static final String COMPOST_VEGETABLE_TABLE = "cv";
 
+    private List<Listener> listeners = new LinkedList<>();
+
+    private boolean exit = false;
+
+    @Override
+    public boolean isExit() {
+        return exit;
+    }
+
+    @Override
+    public void setExit(boolean exit) {
+        this.exit = exit;
+        if(exit == true) {
+            for(Listener listener : listeners) {
+                listener.shutdown();
+            }
+        }
+    }
 
     public CompostServiceImpl() {
         try {
@@ -52,6 +71,11 @@ public class CompostServiceImpl extends CompostService {
                 }
             };
             vegetablesListener.start();
+
+            listeners.add(flowerPlantListener);
+            listeners.add(flowersListener);
+            listeners.add(vegetablePlantListener);
+            listeners.add(vegetablesListener);
 
         } catch (SQLException e) {
             e.printStackTrace();

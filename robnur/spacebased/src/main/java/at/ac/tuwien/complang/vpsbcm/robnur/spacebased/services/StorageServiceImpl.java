@@ -39,6 +39,28 @@ public class StorageServiceImpl extends StorageService {
     private ContainerReference waterAccessContainer;
     private URI spaceUri;
 
+    List<Notification> notifications = new LinkedList<>();
+
+    boolean exit = false;
+
+    @Override
+    public boolean isExit() {
+        return exit;
+    }
+
+    @Override
+    public void setExit(boolean exit) {
+        this.exit = exit;
+        if(exit == true) {
+            for(Notification n : notifications) {
+                try {
+                    n.destroy();
+                } catch (MzsCoreException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
     public StorageServiceImpl(URI spaceUri) throws MzsCoreException, URISyntaxException {
 
@@ -62,21 +84,21 @@ public class StorageServiceImpl extends StorageService {
         waterAccessContainer = CapiUtil.lookupOrCreateContainer("waterAccessContainer", spaceUri, Arrays.asList(new AnyCoordinator()), null, capi);
 
         try {
-            notificationManager.createNotification(flowerSeedContainer, (notification, operation, list) -> notifyFlowerSeedsChanged(readAllFlowerSeeds()), Operation.DELETE, Operation.TAKE, Operation.WRITE);
-            notificationManager.createNotification(vegetableSeedContainer, (notification, operation, list) -> notifyVegetableSeedsChanged(readAllVegetableSeeds()), Operation.DELETE, Operation.TAKE, Operation.WRITE);
+            notifications.add(notificationManager.createNotification(flowerSeedContainer, (notification, operation, list) -> notifyFlowerSeedsChanged(readAllFlowerSeeds()), Operation.DELETE, Operation.TAKE, Operation.WRITE));
+            notifications.add(notificationManager.createNotification(vegetableSeedContainer, (notification, operation, list) -> notifyVegetableSeedsChanged(readAllVegetableSeeds()), Operation.DELETE, Operation.TAKE, Operation.WRITE));
 
-            notificationManager.createNotification(soilContainer, (notification, operation, list) -> notifySoilPackagesChanged(readAllSoilPackage()), Operation.DELETE, Operation.TAKE, Operation.WRITE);
-            notificationManager.createNotification(flowerFertilizerContainer, (notification, operation, list) -> notifyFlowerFertilizerChanged(readAllFlowerFertilizer()), Operation.DELETE, Operation.TAKE, Operation.WRITE);
-            notificationManager.createNotification(vegetableFertilizerContainer, (notification, operation, list) -> notifyVegetableFertilizerChanged(readAllVegetableFertilizer()), Operation.DELETE, Operation.TAKE, Operation.WRITE);
+            notifications.add(notificationManager.createNotification(soilContainer, (notification, operation, list) -> notifySoilPackagesChanged(readAllSoilPackage()), Operation.DELETE, Operation.TAKE, Operation.WRITE));
+            notifications.add(notificationManager.createNotification(flowerFertilizerContainer, (notification, operation, list) -> notifyFlowerFertilizerChanged(readAllFlowerFertilizer()), Operation.DELETE, Operation.TAKE, Operation.WRITE));
+            notifications.add(notificationManager.createNotification(vegetableFertilizerContainer, (notification, operation, list) -> notifyVegetableFertilizerChanged(readAllVegetableFertilizer()), Operation.DELETE, Operation.TAKE, Operation.WRITE));
 
-            notificationManager.createNotification(waterAccessContainer, (notification, operation, list) -> {
+            notifications.add(notificationManager.createNotification(waterAccessContainer, (notification, operation, list) -> {
                 if(operation == Operation.WRITE) {
                     Entry e = (Entry)list.get(0);
                     notifyWaterRobotChanged((String)e.getValue());
                 } else if (operation == Operation.TAKE) {
                     notifyWaterRobotChanged(null);
                 }
-            }, Operation.TAKE, Operation.WRITE);
+            }, Operation.TAKE, Operation.WRITE));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -84,9 +106,6 @@ public class StorageServiceImpl extends StorageService {
 
     public List<Notification> registerPlantAndHarvestRobot(PlantAndHarvestRobot robot) {
         try {
-
-            List<Notification> notifications = new ArrayList<>();
-
             Notification notificationFlowerSeedContainer = notificationManager.createNotification(flowerSeedContainer, (notification, operation, list) -> {
                 logger.debug("at.ac.tuwien.complang.vpsbcm.robnur.postgres.robot notify - got notification on flowerSeedContainer");
                 robot.tryHarvestPlant();

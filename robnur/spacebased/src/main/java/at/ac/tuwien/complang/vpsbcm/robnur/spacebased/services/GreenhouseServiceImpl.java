@@ -38,6 +38,30 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         }
     }
 
+    List<Notification> notifications = new LinkedList<>();
+
+    boolean exit = false;
+
+    @Override
+    public boolean isExit() {
+        return exit;
+    }
+
+    @Override
+    public void setExit(boolean exit) {
+        this.exit = exit;
+        if(exit == true) {
+            for(Notification n : notifications) {
+                try {
+                    n.destroy();
+                } catch (MzsCoreException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+
     public GreenhouseServiceImpl(URI spaceUri) throws MzsCoreException, InterruptedException {
         this.spaceUri = spaceUri;
 
@@ -61,10 +85,10 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             }
         }*/
 
-        notificationManager.createNotification(greenhouseContainer, (notification, operation, list) -> raiseChangedEvent(), Operation.DELETE, Operation.TAKE, Operation.WRITE);
+        notifications.add(notificationManager.createNotification(greenhouseContainer, (notification, operation, list) -> raiseChangedEvent(), Operation.DELETE, Operation.TAKE, Operation.WRITE));
     }
 
-    public List<Notification> registerPlantAndHarvestRobot(PlantAndHarvestRobot robot) {
+    public void registerPlantAndHarvestRobot(PlantAndHarvestRobot robot) {
         try {
             Notification notificationGreenhouseContainer = notificationManager.createNotification(greenhouseContainer, (notification, operation, list) -> {
                 logger.debug("notify plantandharvest - greenhouseContainer " + operation.name());
@@ -72,16 +96,12 @@ public class GreenhouseServiceImpl extends GreenhouseService {
                 robot.tryPlant();
             }, Operation.WRITE, Operation.TAKE, Operation.DELETE);
 
-            List list = new ArrayList();
-            list.add(notificationGreenhouseContainer);
-
-            return list;
+           notifications.add(notificationGreenhouseContainer);
         } catch (MzsCoreException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return null;
     }
 
     @Override

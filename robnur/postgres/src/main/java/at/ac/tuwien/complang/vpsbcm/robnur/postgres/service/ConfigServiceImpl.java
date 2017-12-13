@@ -9,12 +9,32 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ConfigServiceImpl extends ConfigService {
 
     private static final String CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE = "cfpci";
     private static final String CONFIG_VEGETABLE_PLANT_CULTIVATION_INFORMATION_TABLE = "cvpci";
+
+    private List<Listener> listeners = new LinkedList<>();
+
+    private boolean exit = false;
+
+    @Override
+    public boolean isExit() {
+        return exit;
+    }
+
+    @Override
+    public void setExit(boolean exit) {
+        this.exit = exit;
+        if(exit == true) {
+            for(Listener listener : listeners) {
+                listener.shutdown();
+            }
+        }
+    }
 
     public ConfigServiceImpl() {
         try {
@@ -33,6 +53,9 @@ public class ConfigServiceImpl extends ConfigService {
                 }
             };
             flowersListener.start();
+
+            listeners.add(flowerPlantListener);
+            listeners.add(flowersListener);
 
         } catch (SQLException e) {
             e.printStackTrace();

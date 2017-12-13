@@ -14,6 +14,25 @@ public class MarketServiceImpl extends MarketService {
     private static final String MARKET_BOUQUET_TABLE = "mbt";
     private static final String MARKET_VEGETABLE_BASKET_TABLE = "mvb";
 
+    private List<Listener> listeners = new LinkedList<>();
+
+    private boolean exit = false;
+
+    @Override
+    public boolean isExit() {
+        return exit;
+    }
+
+    @Override
+    public void setExit(boolean exit) {
+        this.exit = exit;
+        if(exit == true) {
+            for(Listener listener : listeners) {
+                listener.shutdown();
+            }
+        }
+    }
+
     public MarketServiceImpl() {
         try {
             Listener flowerListener = new Listener(MARKET_BOUQUET_TABLE) {
@@ -32,6 +51,8 @@ public class MarketServiceImpl extends MarketService {
             };
             vegetableListener.start();
 
+            listeners.add(flowerListener);
+            listeners.add(vegetableListener);
         } catch (SQLException e) {
             e.printStackTrace();
         }

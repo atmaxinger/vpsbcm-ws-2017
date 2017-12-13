@@ -30,6 +30,25 @@ public class GreenhouseServiceImpl extends GreenhouseService {
     private static final String GREENHOUSE_FLOWER_PLANT_TABLE = "gfp";
     private static final String GREENHOUSE_VEGETABLE_PLANT_TABLE = "gvp";
 
+    private List<Listener> listeners = new LinkedList<>();
+
+    private boolean exit = false;
+
+    @Override
+    public boolean isExit() {
+        return exit;
+    }
+
+    @Override
+    public void setExit(boolean exit) {
+        this.exit = exit;
+        if(exit == true) {
+            for(Listener listener : listeners) {
+                listener.shutdown();
+            }
+        }
+    }
+
     public GreenhouseServiceImpl() {
 
         try {
@@ -63,6 +82,8 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             };
             vegetableListener.start();
 
+            listeners.add(flowerListener);
+            listeners.add(vegetableListener);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -254,6 +275,9 @@ public class GreenhouseServiceImpl extends GreenhouseService {
                 }
             };
             vegetableListener.start();
+
+            listeners.add(flowerListener);
+            listeners.add(vegetableListener);
         } catch (SQLException e) {
             e.printStackTrace();
         }

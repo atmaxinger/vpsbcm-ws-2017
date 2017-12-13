@@ -2,6 +2,7 @@ package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.robots;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PlantAndHarvestRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.CompostService;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Exitable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.PackingService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.*;
@@ -10,6 +11,7 @@ import org.mozartspaces.notifications.Notification;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -34,6 +36,8 @@ public class SpacePlantAndHarvestRobot {
         System.out.println(String.format("Starting with plant timeout: %d", plantTransactionTimeout));
         System.out.println(String.format("Starting with harvest timeout: %d", harvestTransactionTimeout));
 
+        List<Exitable> exitables = new LinkedList<>();
+
         URI uri = new URI(args[1]);
         StorageServiceImpl storageService = new StorageServiceImpl(uri);
         PackingService packingService = new PackingServiceImpl(uri);
@@ -41,16 +45,21 @@ public class SpacePlantAndHarvestRobot {
         TransactionService transactionService = new TransactionServiceImpl(uri);
         CompostService compostService = new CompostServiceImpl(uri);
 
+        exitables.add(storageService);
+        exitables.add(packingService);
+        exitables.add(greenhouseService);
+        exitables.add(compostService);
+
         PlantAndHarvestRobot robot = new PlantAndHarvestRobot(args[0], -1, -1, storageService, greenhouseService, transactionService, packingService, compostService);
 
-        List<Notification> notifications = greenhouseService.registerPlantAndHarvestRobot(robot);
-        notifications.addAll(storageService.registerPlantAndHarvestRobot(robot));
+        greenhouseService.registerPlantAndHarvestRobot(robot);
+        storageService.registerPlantAndHarvestRobot(robot);
 
         Scanner scanner = new Scanner(System.in);
         scanner.next("exit");
 
-        for (Notification n:notifications) {
-            n.destroy();
+        for(Exitable exitable : exitables) {
+            exitable.setExit(true);
         }
 
         System.out.println("SpacePlantAndHarvestRobot stopped");

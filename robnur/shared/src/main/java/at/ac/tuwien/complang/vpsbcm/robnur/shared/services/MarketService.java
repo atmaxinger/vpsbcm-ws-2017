@@ -5,7 +5,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableBasket;
 
 import java.util.List;
 
-public abstract class MarketService {
+public abstract class MarketService implements Exitable {
 
     public interface Callback<T1,T2> {
         void handle(T1 p1, T2 p2);
@@ -71,10 +71,4 @@ public abstract class MarketService {
      * @param vegetableBasket to sell
      */
     public abstract void sellVegetableBasket(VegetableBasket vegetableBasket);
-
-    /**
-     * checks if notifications are stopped
-     * @return true if notifications are stopped else false
-     */
-    public abstract boolean isExit();
 }

@@ -9,11 +9,13 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import org.mozartspaces.capi3.AnyCoordinator;
 import org.mozartspaces.capi3.Coordinator;
 import org.mozartspaces.core.*;
+import org.mozartspaces.notifications.Notification;
 import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class CompostServiceImpl extends CompostService {
@@ -25,6 +27,29 @@ public class CompostServiceImpl extends CompostService {
     ContainerReference flowerContainer;
     ContainerReference vegetablePlantContainer;
     ContainerReference vegetableContainer;
+
+    List<Notification> notifications = new LinkedList<>();
+
+    boolean exit = false;
+
+    @Override
+    public boolean isExit() {
+        return exit;
+    }
+
+    @Override
+    public void setExit(boolean exit) {
+        this.exit = exit;
+        if(exit == true) {
+            for(Notification n : notifications) {
+                try {
+                    n.destroy();
+                } catch (MzsCoreException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
     public CompostServiceImpl(URI spaceUri) {
 
@@ -40,10 +65,10 @@ public class CompostServiceImpl extends CompostService {
             vegetablePlantContainer = CapiUtil.lookupOrCreateContainer("compostVegetablePlantContainer",spaceUri,coordinators,null,capi);
             vegetableContainer = CapiUtil.lookupOrCreateContainer("compostVegetableContainer",spaceUri,coordinators,null,capi);
 
-            notificationManager.createNotification(flowerPlantContainer, (notification, operation, list) -> notifyFlowerPlantsChanged(readAllFlowerPlants()), Operation.WRITE, Operation.TAKE, Operation.DELETE);
-            notificationManager.createNotification(flowerContainer, (notification, operation, list) -> notifyFlowersChanged(readAllFlowers()), Operation.WRITE, Operation.TAKE, Operation.DELETE);
-            notificationManager.createNotification(vegetablePlantContainer, (notification, operation, list) -> notifyVegetablePlantsChanged(readAllVegetablePlants()), Operation.WRITE, Operation.TAKE, Operation.DELETE);
-            notificationManager.createNotification(vegetableContainer, (notification, operation, list) -> notifyVegetablesChanged(readAllVegetables()), Operation.WRITE, Operation.TAKE, Operation.DELETE);
+            notifications.add(notificationManager.createNotification(flowerPlantContainer, (notification, operation, list) -> notifyFlowerPlantsChanged(readAllFlowerPlants()), Operation.WRITE, Operation.TAKE, Operation.DELETE));
+            notifications.add(notificationManager.createNotification(flowerContainer, (notification, operation, list) -> notifyFlowersChanged(readAllFlowers()), Operation.WRITE, Operation.TAKE, Operation.DELETE));
+            notifications.add(notificationManager.createNotification(vegetablePlantContainer, (notification, operation, list) -> notifyVegetablePlantsChanged(readAllVegetablePlants()), Operation.WRITE, Operation.TAKE, Operation.DELETE));
+            notifications.add(notificationManager.createNotification(vegetableContainer, (notification, operation, list) -> notifyVegetablesChanged(readAllVegetables()), Operation.WRITE, Operation.TAKE, Operation.DELETE));
         } catch (MzsCoreException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -90,4 +115,5 @@ public class CompostServiceImpl extends CompostService {
     public List<Vegetable> readAllVegetables() {
         return ServiceUtil.readAllItems(vegetableContainer,null,capi);
     }
+
 }

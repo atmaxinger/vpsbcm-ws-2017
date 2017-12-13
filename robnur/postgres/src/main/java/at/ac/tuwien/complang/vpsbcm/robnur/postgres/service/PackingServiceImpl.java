@@ -8,6 +8,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class PackingServiceImpl extends PackingService {
@@ -15,7 +16,24 @@ public class PackingServiceImpl extends PackingService {
     private static final String PACKING_FLOWER_TABLE = "paf";
     private static final String PACKING_VEGETABLE_TABLE = "pav";
 
+    private List<Listener> listeners = new LinkedList<>();
 
+    private boolean exit = false;
+
+    @Override
+    public boolean isExit() {
+        return exit;
+    }
+
+    @Override
+    public void setExit(boolean exit) {
+        this.exit = exit;
+        if(exit == true) {
+            for(Listener listener : listeners) {
+                listener.shutdown();
+            }
+        }
+    }
     public PackingServiceImpl() {
         try {
             Listener flowerListener = new Listener(PACKING_FLOWER_TABLE) {
@@ -33,6 +51,9 @@ public class PackingServiceImpl extends PackingService {
                 }
             };
             vegetableListener.start();
+
+            listeners.add(flowerListener);
+            listeners.add(vegetableListener);
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -93,6 +114,9 @@ public class PackingServiceImpl extends PackingService {
                 }
             };
             vegetableListener.start();
+
+            listeners.add(flowerListener);
+            listeners.add(vegetableListener);
 
         } catch (SQLException e) {
             e.printStackTrace();

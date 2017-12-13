@@ -7,7 +7,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableType;
 
 import java.util.List;
 
-public abstract class ConfigService {
+public abstract class ConfigService implements Exitable {
 
     private StorageService.Callback<List<FlowerPlantCultivationInformation>> flowerCultivationInformationChanged;
     private StorageService.Callback<List<VegetablePlantCultivationInformation>> vegetableCultivationInformationChanged;
@@ -75,10 +75,4 @@ public abstract class ConfigService {
      * @return all vegetable plant cultivation information, empty list if no vegetables were found, null if unsuccessful
      */
     public abstract List<VegetablePlantCultivationInformation> readAllVegetablePlantCultivationInformation(Transaction transaction);
-
-    /**
-     * checks if notifications are stopped
-     * @return true if notifications are stopped else false
-     */
-    public abstract boolean isExit();
 }

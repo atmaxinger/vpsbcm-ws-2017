@@ -7,7 +7,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
 
 import java.util.List;
 
-public abstract class CompostService {
+public abstract class CompostService implements Exitable {
 
     private StorageService.Callback<List<FlowerPlant>> flowerPlantsChanged;
     private StorageService.Callback<List<Flower>> flowersChanged;
@@ -105,10 +105,4 @@ public abstract class CompostService {
      * @return all vegetables that are in the compost, empty list if no vegetables were found, null if unsuccessful
      */
     public abstract List<Vegetable> readAllVegetables();
-
-    /**
-     * checks if notifications are stopped
-     * @return true if notifications are stopped else false
-     */
-    public abstract boolean isExit();
 }

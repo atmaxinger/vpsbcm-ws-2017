@@ -4,7 +4,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
 
 import java.util.List;
 
-public abstract class GreenhouseService {
+public abstract class GreenhouseService implements Exitable {
 
     protected StorageService.Callback<List<Plant>> greenhouseChanged;
     public void onGreenhouseChanged(StorageService.Callback<List<Plant>> greenhouseChanged) {
@@ -91,10 +91,4 @@ public abstract class GreenhouseService {
      * @return a flower plant that can be harvested, null if no harvestable flower plant was found
      */
     public abstract FlowerPlant getHarvestableFlowerPlant(Transaction transaction);
-
-    /**
-     * checks if notifications are stopped
-     * @return true if notifications are stopped else false
-     */
-    public abstract boolean isExit();
 }

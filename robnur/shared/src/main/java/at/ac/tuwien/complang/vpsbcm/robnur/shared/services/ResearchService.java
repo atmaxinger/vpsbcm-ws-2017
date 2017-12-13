@@ -5,7 +5,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
 
 import java.util.List;
 
-public abstract class ResearchService {
+public abstract class ResearchService implements Exitable {
     private StorageService.Callback<List<Flower>> flowersChanged;
     private StorageService.Callback<List<Vegetable>> vegetablesChanged;
 
@@ -70,10 +70,4 @@ public abstract class ResearchService {
      * @return all vegetables that are in the research department, empty list if no vegetables were found, null if unsuccessful
      */
     public abstract List<Vegetable> readAllVegetables(Transaction transaction);
-
-    /**
-     * checks if notifications are stopped
-     * @return true if notifications are stopped else false
-     */
-    public abstract boolean isExit();
 }
