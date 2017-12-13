@@ -3,6 +3,7 @@ package at.ac.tuwien.complang.vpsbcm.robnur.shared.gui;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Flower;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ResearchService;
+import com.sun.tools.javac.comp.Flow;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ObservableList;
@@ -20,6 +21,8 @@ public class ResearchController {
     public TableColumn<Vegetable, String> tcVegetablesPlantId;
     public TableColumn<Vegetable, String> tcVegetablesType;
     public TableColumn<Vegetable, String> tcVegetablesRobots;
+    public TableColumn<Vegetable, String> tcVegetablesPlantRobot;
+    public TableColumn<Vegetable, String> tcVegetablesHarvestRobot;
 
     public TableView<Flower> tvFlowers;
     public TableColumn<Flower, Integer> tcFlowersIndex;
@@ -27,6 +30,9 @@ public class ResearchController {
     public TableColumn<Flower, String> tcFlowersPlantId;
     public TableColumn<Flower, String> tcFlowersType;
     public TableColumn<Flower, String> tcFlowersRobots;
+    public TableColumn<Flower, String> tcFlowersPlantRobot;
+    public TableColumn<Flower, String> tcFlowersHarvestRobot;
+
 
     private ResearchService researchService = RobNurGUI.researchService;
 
@@ -70,6 +76,8 @@ public class ResearchController {
         tcVegetablesPlantId.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getParentPlant().getId()));
         tcVegetablesType.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getParentPlant().getTypeName()));
         tcVegetablesRobots.setCellValueFactory(column -> new ReadOnlyStringWrapper(formatList(column.getValue().getPutResearchRobots())));
+        tcVegetablesPlantRobot.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getParentPlant().getPlantRobot()));
+        tcVegetablesHarvestRobot.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getHarvestRobot()));
 
         updateVegetableData(researchService.readAllVegetables(null));
 
@@ -84,6 +92,8 @@ public class ResearchController {
         tcFlowersPlantId.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getParentPlant().getId()));
         tcFlowersType.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getParentPlant().getTypeName()));
         tcFlowersRobots.setCellValueFactory(column -> new ReadOnlyStringWrapper(formatList(column.getValue().getPutResearchRobots())));
+        tcFlowersPlantRobot.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getParentPlant().getPlantRobot()));
+        tcFlowersHarvestRobot.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getHarvestRobot()));
 
         updateFlowerData(researchService.readAllFlowers(null));
 
