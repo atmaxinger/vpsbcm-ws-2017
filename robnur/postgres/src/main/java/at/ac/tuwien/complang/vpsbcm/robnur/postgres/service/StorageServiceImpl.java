@@ -11,9 +11,14 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.Water;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PlantAndHarvestRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.StorageService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
+import org.apache.log4j.Logger;
+import org.postgresql.PGConnection;
 
 import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,6 +31,10 @@ public class StorageServiceImpl extends StorageService {
     private static final String STORAGE_FLOWER_FERTILIZER_TABLE = "sff";
     private static final String STORAGE_VEGETABLE_FERTILIZER_TABLE = "svf";
     private static final String STORAGE_WATER_TABLE = "sw";
+    private static final String STORAGE_WATER_TOKEN_TABLE = "wt";
+    private static final String STORAGE_WATER_ACCESS_TABLE = "wa";
+
+    final static Logger logger = Logger.getLogger(StorageServiceImpl.class);
 
 
     public StorageServiceImpl() {
@@ -69,6 +78,32 @@ public class StorageServiceImpl extends StorageService {
                 }
             };
             vegetableFertilizerListener.start();
+
+            Listener accessWaterListener = new Listener(STORAGE_WATER_ACCESS_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    if(method == DBMETHOD.INSERT){
+                        try {
+
+                            Connection connection = PostgresHelper.getNewConnection("water access",-1);
+                            connection.setAutoCommit(true);
+                            Statement statement = connection.createStatement();
+
+                            ResultSet resultSet = statement.executeQuery("SELECT * FROM " + STORAGE_WATER_ACCESS_TABLE);
+                            resultSet.next();
+                            String robotId = resultSet.getString("id");
+
+                            notifyWaterRobotChanged(robotId);
+
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                    } else if(method == DBMETHOD.DELETE){
+                        notifyWaterRobotChanged(null);
+                    }
+                }
+            };
+            accessWaterListener.start();
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -255,19 +290,51 @@ public class StorageServiceImpl extends StorageService {
 
     @Override
     public Water accessTap(String robotId) {
-        // TODO: !!!!!! NOT TRANSACTIONAL SECURE !!!!!!
-        // TODO: !!!!!! BUSY WAITING !!!!!!
-        while (true){
-            List<Water> waterList = ServiceUtil.readAllItems(STORAGE_WATER_TABLE,Water.class);
-            if(waterList.size() >= 1){
-                try {
-                    ServiceUtil.deleteItemById(waterList.get(0).getId(),STORAGE_WATER_TABLE);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-                return waterList.get(0);
+
+        logger.info("in accessTap");
+
+
+        try {
+            Connection connection = PostgresHelper.getNewConnection("water access",-1);
+            connection.setAutoCommit(true);
+            Statement statement = connection.createStatement();
+
+            List<String> tokens = null;
+            while (tokens == null || tokens.isEmpty()){
+                logger.info(robotId + " wait for water");
+                tokens = ServiceUtil.getAllItems(STORAGE_WATER_TOKEN_TABLE,String.class);
             }
+
+            logger.info(robotId + " write name into waterAccessContainer");
+            statement.execute(String.format("INSERT INTO %s (id) VALUES %s",STORAGE_WATER_ACCESS_TABLE,robotId));
+
+            logger.info(robotId + " wait for water");
+
+            Thread.sleep(1000);
+            Water water = new Water();
+            water.setAmount(250);
+
+            logger.info(robotId + " create water");
+
+            logger.info(robotId + " remove name");
+
+            statement.execute(String.format("DELETE FROM ",STORAGE_WATER_ACCESS_TABLE));
+
+            logger.info(robotId + " put back token");
+
+
+            statement.execute(String.format("INSERT INTO %s (id) VALUES 'TOKEN'",STORAGE_WATER_TOKEN_TABLE,robotId));
+            logger.info(robotId + " return water");
+
+            return water;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+
+        return null;
     }
 
     @Override
@@ -339,6 +406,6 @@ public class StorageServiceImpl extends StorageService {
     }
 
     public static List<String> getTables() {
-        return Arrays.asList(STORAGE_FLOWER_SEED_TABLE,STORAGE_VEGETABLE_SEED_TABLE,STORAGE_SOIL_TABLE,STORAGE_FLOWER_FERTILIZER_TABLE,STORAGE_VEGETABLE_FERTILIZER_TABLE,STORAGE_WATER_TABLE);
+        return Arrays.asList(STORAGE_FLOWER_SEED_TABLE,STORAGE_VEGETABLE_SEED_TABLE,STORAGE_SOIL_TABLE,STORAGE_FLOWER_FERTILIZER_TABLE,STORAGE_VEGETABLE_FERTILIZER_TABLE,STORAGE_WATER_TABLE,STORAGE_WATER_TOKEN_TABLE,STORAGE_WATER_ACCESS_TABLE);
     }
 }

@@ -72,7 +72,7 @@ public class StorageServiceImpl extends StorageService {
             notificationManager.createNotification(waterAccessContainer, (notification, operation, list) -> {
                 if(operation == Operation.WRITE) {
                     Entry e = (Entry)list.get(0);
-                   notifyWaterRobotChanged((String)e.getValue());
+                    notifyWaterRobotChanged((String)e.getValue());
                 } else if (operation == Operation.TAKE) {
                     notifyWaterRobotChanged(null);
                 }
