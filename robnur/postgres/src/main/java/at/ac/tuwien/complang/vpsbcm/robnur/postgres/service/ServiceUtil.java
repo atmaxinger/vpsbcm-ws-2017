@@ -199,7 +199,6 @@ public class ServiceUtil {
 
         T result = null;
 
-
         ObjectMapper mapper = new ObjectMapper()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
@@ -214,13 +213,14 @@ public class ServiceUtil {
 
         ResultSet rs = null;
         try {
-            rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE (data " + prepareArrow(parameterName) + " %s)::text = '%s'", table, parameterName, parameterValue));
+            rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE (data " + prepareArrow(parameterName) + " %s)::text = '%s' LIMIT 1", table, parameterName, parameterValue));
 
             rs.next();
             String data = rs.getString("data");
             result = mapper.readValue(data, resultClass);
+            long databaseId = rs.getLong("id");
 
-            deleteItemByParameter(parameterName, parameterValue, table, transaction);
+            deleteItemByDatabaseId(databaseId, table, transaction);
         } catch (SQLException | IOException e) {
             System.err.println("getItemByParameter - select and delete - returning null");
             result = null;
@@ -317,6 +317,20 @@ public class ServiceUtil {
         Transaction t = newTransaction();
         deleteItemById(id, table, t);
         t.commit();
+    }
+
+    public static void deleteItemByDatabaseId(long id, String table, Transaction transaction) throws SQLException {
+        logger.debug(String.format("deleteItemByDatabaseId(\"%s\",\"%s\",%s", id,table, transaction));
+
+        try {
+            Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
+            String query = String.format("DELETE FROM %s WHERE id = %d", table, id);
+            statement.execute(query);
+            statement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     public static String getTableName(String channel, String payload) {
