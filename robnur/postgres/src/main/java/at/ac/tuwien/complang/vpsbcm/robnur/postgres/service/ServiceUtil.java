@@ -56,6 +56,14 @@ public class ServiceUtil {
         } else return "->>";
     }
 
+    /**
+     * write an item to the database
+     * @param item the item to write
+     * @param table the name of the table
+     * @param transaction the transaction
+     * @param <T> type
+     * @return true if write was successful, false otherwise
+     */
     public static <T extends Serializable> boolean writeItem(T item, String table, Transaction transaction) {
         try {
             Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
@@ -74,6 +82,13 @@ public class ServiceUtil {
         return true;
     }
 
+    /**
+     * write an item to the database
+     * @param item the item to write
+     * @param table the name of the table
+     * @param <T> type
+     * @return true if write was successful, false otherwise
+     */
     public static <T extends Serializable> boolean writeItem(T item, String table) {
         boolean res = false;
         Transaction transaction = newTransaction();
@@ -87,6 +102,14 @@ public class ServiceUtil {
     }
 
 
+    /**
+     * read all items from table
+     * @param table the name of the table
+     * @param resultClass the expected class of the result
+     * @param transaction the transaction
+     * @param <T> type
+     * @return list of items if successful (may be of size 0), null if unsuccessful
+     */
     public static <T extends Serializable> List<T> readAllItems(String table, Class<T> resultClass, Transaction transaction) {
         List<T> result = new ArrayList<T>();
 
@@ -115,6 +138,13 @@ public class ServiceUtil {
         return result;
     }
 
+    /**
+     * read all items from table
+     * @param table the name of the table
+     * @param resultClass the expected class of the result
+     * @param <T> type
+     * @return list of items if successful (may be of size 0), null if unsuccessful
+     */
     public static <T extends Serializable> List<T> readAllItems(String table, Class<T> resultClass) {
         Transaction t = transactionService.beginTransaction(-1,"READ ALL ITEMS " + table);
         List<T> l = readAllItems(table, resultClass, t);
@@ -123,6 +153,14 @@ public class ServiceUtil {
         return l;
     }
 
+    /**
+     * get all items of a table (read + delete)
+     * @param table the name of the table
+     * @param resultClass the expected class of the result
+     * @param transaction the transaction
+     * @param <T> type
+     * @return list of items if successful (may be of size 0), null if unsuccessful
+     */
     public static <T extends Serializable> List<T> getAllItems(String table, Class<T> resultClass, Transaction transaction) {
         List<T> result = new ArrayList<T>();
 
@@ -153,6 +191,13 @@ public class ServiceUtil {
         return result;
     }
 
+    /**
+     * get all items of a table (read + delete)
+     * @param table the name of the table
+     * @param resultClass the expected class of the result
+     * @param <T> type
+     * @return list of items if successful (may be of size 0), null if unsuccessful
+     */
     public static <T extends Serializable> List<T> getAllItems(String table, Class<T> resultClass) {
         Transaction t = transactionService.beginTransaction(-1,"READ ALL ITEMS " + table);
         List<T> l = getAllItems(table, resultClass, t);
@@ -161,6 +206,16 @@ public class ServiceUtil {
         return l;
     }
 
+    /**
+     * read one item by parameter of the JSON
+     * @param parameterName the name of the JSON parameter
+     * @param parameterValue the value of the JSON parameter
+     * @param table the name of the table
+     * @param resultClass the expected class of the result
+     * @param transaction the transaction
+     * @param <T> type
+     * @return The item if successful, null if unsuccessful
+     */
     public static <T extends Serializable> T readItemByParameter(String parameterName, String parameterValue, String table, Class<T> resultClass, Transaction transaction) {
 
         T result = null;
@@ -194,7 +249,16 @@ public class ServiceUtil {
 
     }
 
-
+    /**
+     * get one item by parameter of the JSON (read + delete)
+     * @param parameterName the name of the JSON parameter
+     * @param parameterValue the value of the JSON parameter
+     * @param table the name of the table
+     * @param resultClass the expected class of the result
+     * @param transaction the transaction
+     * @param <T> type
+     * @return The item if successful, null if unsuccessful
+     */
     public static <T extends Serializable> T getItemByParameter(String parameterName, String parameterValue, String table, Class<T> resultClass, Transaction transaction) {
 
         T result = null;
@@ -237,10 +301,16 @@ public class ServiceUtil {
         return result;
     }
 
-    public static <T extends Serializable> List<T> getItemsById(String id, String table, Class<T> resultClass, Transaction transaction) {
-        return getItemsByParameter("'id'", id, table, resultClass, transaction);
-    }
-
+    /**
+     * get all items matching a parameter of the JSON (read + delete)
+     * @param parameterName the name of the JSON parameter
+     * @param parameterValue the value of the JSON parameter
+     * @param table the name of the table
+     * @param resultClass the expected class of the result
+     * @param transaction the transaction
+     * @param <T> type
+     * @return The list of items if successful (may be of size 0), null if unsuccessful
+     */
     public static <T extends Serializable> List<T> getItemsByParameter(String parameterName, String parameterValue, String table, Class<T> resultClass, Transaction transaction) {
         logger.debug(String.format("getItemsByParameter(\"%s\",\"%s\",\"%s\",%s,%s)", parameterName, parameterValue, table, resultClass, transaction));
 
@@ -288,10 +358,28 @@ public class ServiceUtil {
         return result;
     }
 
+    /**
+     * get one items by the id of the JSON (read + delete)
+     * @param id the id of the JSON
+     * @param table the name of the table
+     * @param resultClass the expected class of the result
+     * @param transaction the transaction
+     * @param <T> type
+     * @return The list of items if successful (may be of size 0), null if unsuccessful
+     */
     public static <T extends Serializable> T getItemById(String id, String table, Class<T> resultClass, Transaction transaction) {
         return getItemByParameter("'id'", id, table, resultClass, transaction);
     }
 
+
+    /**
+     * delete items that match this json parameter
+     * @param parameterName the json parameter
+     * @param parameterValue the value of the json parameter
+     * @param table the name of the table
+     * @param transaction the transaction
+     * @throws SQLException
+     */
     public static void deleteItemByParameter(String parameterName, String parameterValue, String table, Transaction transaction) throws SQLException {
 
         logger.debug(String.format("deleteItemByParameter(\"%s\",\"%s\",\"%s\",%s", parameterName, parameterValue, table, transaction));
@@ -309,17 +397,30 @@ public class ServiceUtil {
 
     }
 
+    /**
+     * delete items that matches this json id
+     * @param id the id
+     * @param table the name of the table
+     * @param transaction the transaction
+     * @throws SQLException
+     */
     public static void deleteItemById(String id, String table, Transaction transaction) throws SQLException {
         deleteItemByParameter("'id'", id, table, transaction);
     }
 
+    /**
+     * delete items that matches this json id
+     * @param id the id
+     * @param table the name of the table
+     * @throws SQLException
+     */
     public static void deleteItemById(String id, String table) throws SQLException {
         Transaction t = newTransaction();
         deleteItemById(id, table, t);
         t.commit();
     }
 
-    public static void deleteItemByDatabaseId(long id, String table, Transaction transaction) throws SQLException {
+    private static void deleteItemByDatabaseId(long id, String table, Transaction transaction) throws SQLException {
         logger.debug(String.format("deleteItemByDatabaseId(\"%s\",\"%s\",%s", id,table, transaction));
 
         try {
@@ -331,20 +432,5 @@ public class ServiceUtil {
             e.printStackTrace();
             throw e;
         }
-    }
-
-    public static String getTableName(String channel, String payload) {
-        return channel.substring(0, channel.indexOf("_"));
-    }
-
-    public static DBOPERATION getOperation(String channel, String payload) {
-        if (payload.equals("INSERT")) {
-            return DBOPERATION.INSERT;
-        } else if (payload.equals("DELETE")) {
-            return DBOPERATION.DELETE;
-        }
-
-
-        return DBOPERATION.UNKNOWN;
     }
 }
