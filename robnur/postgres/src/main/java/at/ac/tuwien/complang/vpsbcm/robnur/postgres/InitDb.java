@@ -57,7 +57,7 @@ public class InitDb {
         putInitialFlowerPlantCultivationInformation(configService);
         putInitialVegetablePlantCultivationInformation(configService);
 
-        logger.debug("FINISHED");
+        System.out.println("FINISHED - you can quit me now");
     }
 
     private static void createTables(List<String> tables){
