@@ -65,14 +65,14 @@ public abstract class ConfigService {
     /**
      * reads all flower plant cultivation information
      * @param transaction
-     * @return all flower plant cultivation information, empty list if no vegetables were found
+     * @return all flower plant cultivation information, empty list if no vegetables were found, null if unsuccessful
      */
     public abstract List<FlowerPlantCultivationInformation> readAllFlowerPlantCultivationInformation(Transaction transaction);
 
     /**
      * reads all vegetable plant cultivation information
      * @param transaction
-     * @return all vegetable plant cultivation information, empty list if no vegetables were found
+     * @return all vegetable plant cultivation information, empty list if no vegetables were found, null if unsuccessful
      */
     public abstract List<VegetablePlantCultivationInformation> readAllVegetablePlantCultivationInformation(Transaction transaction);
 }

@@ -46,14 +46,14 @@ public abstract class GreenhouseService {
     /**
      * takes all vegetable plants
      * @param transaction
-     * @return all vegetable plants, empty list if no vegetable plants were found
+     * @return all vegetable plants, empty list if no vegetable plants were found, null if unsuccessful
      */
     public abstract List<VegetablePlant> getAllVegetablePlants(Transaction transaction);
 
     /**
      * takes all flower plants
      * @param transaction
-     * @return all flower plants, empty list if no flower plants were found
+     * @return all flower plants, empty list if no flower plants were found, null if unsuccessful
      */
     public abstract List<FlowerPlant> getAllFlowerPlants(Transaction transaction);
 
@@ -61,7 +61,7 @@ public abstract class GreenhouseService {
     /**
      * read all vegetable plants
      * @param transaction
-     * @return all vegetable plants, empty list if no vegetable plants were found
+     * @return all vegetable plants, empty list if no vegetable plants were found, null if unsuccessful
      */
     public abstract List<VegetablePlant> readAllVegetablePlants(Transaction transaction);
     public List<VegetablePlant> readAllVegetablePlants() {
@@ -71,7 +71,7 @@ public abstract class GreenhouseService {
     /**
      * read all flower plants
      * @param transaction
-     * @return all flower plants, empty list if no flower plants were found
+     * @return all flower plants, empty list if no flower plants were found, null if unsuccessful
      */
     public abstract List<FlowerPlant> readAllFlowerPlants(Transaction transaction);
     public List<FlowerPlant> readAllFlowerPlants() {

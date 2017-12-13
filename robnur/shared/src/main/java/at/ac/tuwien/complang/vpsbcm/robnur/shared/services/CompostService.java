@@ -84,25 +84,25 @@ public abstract class CompostService {
 
     /**
      * reads all flower plants that are in the compost
-     * @return all flower plant that are in the compost, empty list if no flower plants were found
+     * @return all flower plant that are in the compost, empty list if no flower plants were found, null if unsuccessful
      */
     public abstract List<FlowerPlant> readAllFlowerPlants();
 
     /**
      * reads all vegetable plants that are in the compost
-     * @return all vegetable plant that are in the compost, empty list if no vegetable plants were found
+     * @return all vegetable plant that are in the compost, empty list if no vegetable plants were found, null if unsuccessful
      */
     public abstract List<VegetablePlant> readAllVegetablePlants();
 
     /**
      * reads all flowers that are in the compost
-     * @return all flowers that are in the compost, empty list if no flowers were found
+     * @return all flowers that are in the compost, empty list if no flowers were found, null if unsuccessful
      */
     public abstract List<Flower> readAllFlowers();
 
     /**
      * reads all vegetables that are in the compost
-     * @return all vegetables that are in the compost, empty list if no vegetables were found
+     * @return all vegetables that are in the compost, empty list if no vegetables were found, null if unsuccessful
      */
     public abstract List<Vegetable> readAllVegetables();
 }

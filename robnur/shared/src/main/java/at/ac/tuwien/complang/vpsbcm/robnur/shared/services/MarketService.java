@@ -50,7 +50,7 @@ public abstract class MarketService {
 
     /**
      * reads all bouquets that are in the market
-     * @return all bouquets that are in the market, empty list if no bouquets are in the market
+     * @return all bouquets that are in the market, empty list if no bouquets are in the market, null if unsuccessful
      */
     public abstract List<Bouquet> readAllBouquets();
 
@@ -62,7 +62,7 @@ public abstract class MarketService {
 
     /**
      * reads all vegetable baskets that are in the market
-     * @return all vegetable baskets that are in the market, empty list if no vegetable baskets are in the market
+     * @return all vegetable baskets that are in the market, empty list if no vegetable baskets are in the market, null if unsuccessful
      */
     public abstract List<VegetableBasket> readAllVegetableBaskets();
 

@@ -46,28 +46,28 @@ public abstract class ResearchService {
     /**
      * takes all flowers form the research department
      * @param transaction
-     * @return all flowers that are in the research department, empty list if no flowers were found
+     * @return all flowers that are in the research department, empty list if no flowers were found, null if unsuccessful
      */
     public abstract List<Flower> getAllFlowers(Transaction transaction);
 
     /**
      * takes all vegetables form the research department
      * @param transaction
-     * @return all vegetables that are in the research department, empty list if no vegetables were found
+     * @return all vegetables that are in the research department, empty list if no vegetables were found, null if unsuccessful
      */
     public abstract List<Vegetable> getAllVegetables(Transaction transaction);
 
     /**
      * reads all flowers from the research department
      * @param transaction
-     * @return all flowers that are in the research department, empty list if no flowers were found
+     * @return all flowers that are in the research department, empty list if no flowers were found, null if unsuccessful
      */
     public abstract List<Flower> readAllFlowers(Transaction transaction);
 
     /**
      * reads all vegetables from the research department
      * @param transaction
-     * @return all vegetables that are in the research department, empty list if no vegetables were found
+     * @return all vegetables that are in the research department, empty list if no vegetables were found, null if unsuccessful
      */
     public abstract List<Vegetable> readAllVegetables(Transaction transaction);
 }
