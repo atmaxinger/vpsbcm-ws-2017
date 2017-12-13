@@ -50,15 +50,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
     @Override
     public void setExit(boolean exit) {
         this.exit = exit;
-        if(exit == true) {
-            for(Notification n : notifications) {
-                try {
-                    n.destroy();
-                } catch (MzsCoreException e) {
-                    logger.trace("EXCEPTION", e);
-                }
-            }
-        }
+/* if(exit == true) {            for(Notification n : notifications) {                try {                    n.destroy();                } catch (MzsCoreException e) {                    logger.trace("EXCEPTION", e);                }            }        } */
     }
 
 

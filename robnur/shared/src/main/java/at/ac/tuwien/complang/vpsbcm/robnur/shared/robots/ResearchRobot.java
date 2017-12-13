@@ -27,7 +27,7 @@ public class ResearchRobot extends Robot {
 
     public synchronized void tryUpgradeFlowerPlant() {
         if (researchService.isExit()) {
-            logger.info("exiting...");
+            logger.info("you can quit me now...");
             return;
         }
 
@@ -86,7 +86,7 @@ public class ResearchRobot extends Robot {
 
     public synchronized void tryUpgradeVegetablePlant() {
         if (researchService.isExit()) {
-            logger.info("exiting...");
+            logger.info("you can quit me now...");
             return;
         }
 

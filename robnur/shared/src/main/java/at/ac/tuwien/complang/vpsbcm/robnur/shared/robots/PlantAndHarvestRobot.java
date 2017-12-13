@@ -39,7 +39,7 @@ public class PlantAndHarvestRobot extends Robot {
      */
     public synchronized void tryHarvestPlant() {
         if (storageService.isExit()) {
-            logger.info("exiting...");
+            logger.info("you can quit me now...");
             return;
         }
 
@@ -52,7 +52,7 @@ public class PlantAndHarvestRobot extends Robot {
      */
     public synchronized void tryPlant() {
         if (storageService.isExit()) {
-            logger.info("exiting...");
+            logger.info("you can quit me now...");
             return;
         }
 
@@ -102,7 +102,7 @@ public class PlantAndHarvestRobot extends Robot {
         }
 
         if (storageService.isExit()) {
-            logger.info("exiting...");
+            logger.info("you can quit me now...");
             return;
         }
 
@@ -145,7 +145,7 @@ public class PlantAndHarvestRobot extends Robot {
      */
     public void tryHarvestVegetable() {
         if (storageService.isExit()) {
-            logger.info("exiting...");
+            logger.info("you can quit me now...");
             return;
         }
 
@@ -192,7 +192,7 @@ public class PlantAndHarvestRobot extends Robot {
      */
     public void tryHarvestFlower() {
         if (storageService.isExit()) {
-            logger.info("exiting...");
+            logger.info("you can quit me now...");
             return;
         }
 
