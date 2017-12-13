@@ -30,9 +30,11 @@ public class PackRobot extends Robot {
 
     private void tryPutFlowersIntoResearch() {
         if (researchService.isExit()) {
-            logger.info("exiting...");
+            logger.info("you can quit me now...");
             return;
         }
+
+        logger.debug("tryPutFlowersIntoResearch");
 
         Transaction transaction = transactionService.beginTransaction(TRANSACTION_TIMEOUT); // TODO change timeout
         List<Flower> flowers = packingService.readAllFlowers(transaction);
@@ -77,7 +79,7 @@ public class PackRobot extends Robot {
 
     public synchronized void tryCreateBouquet() {
         if (researchService.isExit()) {
-            logger.info("exiting...");
+            logger.info("you can quit me now...");
             return;
         }
 
@@ -188,9 +190,11 @@ public class PackRobot extends Robot {
 
     private void tryPutVegetablesIntoResearch() {
         if (researchService.isExit()) {
-            logger.info("exiting...");
+            logger.info("you can quit me now...");
             return;
         }
+
+        logger.debug("tryPutVegetablesIntoResearch");
 
         Transaction transaction = transactionService.beginTransaction(TRANSACTION_TIMEOUT);
         List<Vegetable> vegetables = packingService.readAllVegetables(transaction);
@@ -230,7 +234,7 @@ public class PackRobot extends Robot {
 
     public synchronized void tryCreateVegetableBasket() {
         if (researchService.isExit()) {
-            logger.info("exiting...");
+            logger.info("you can quit me now...");
             return;
         }
 
