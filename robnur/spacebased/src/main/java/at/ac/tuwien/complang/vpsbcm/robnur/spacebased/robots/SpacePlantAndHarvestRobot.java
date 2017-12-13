@@ -6,9 +6,12 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.PackingService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.*;
 import org.mozartspaces.core.MzsCoreException;
+import org.mozartspaces.notifications.Notification;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Scanner;
 
 public class SpacePlantAndHarvestRobot {
 
@@ -40,7 +43,16 @@ public class SpacePlantAndHarvestRobot {
 
         PlantAndHarvestRobot robot = new PlantAndHarvestRobot(args[0], -1, -1, storageService, greenhouseService, transactionService, packingService, compostService);
 
-        greenhouseService.registerPlantAndHarvestRobot(robot);
-        storageService.registerPlantAndHarvestRobot(robot);
+        List<Notification> notifications = greenhouseService.registerPlantAndHarvestRobot(robot);
+        notifications.addAll(storageService.registerPlantAndHarvestRobot(robot));
+
+        Scanner scanner = new Scanner(System.in);
+        scanner.next("exit");
+
+        for (Notification n:notifications) {
+            n.destroy();
+        }
+
+        System.out.println("SpacePlantAndHarvestRobot stopped");
     }
 }

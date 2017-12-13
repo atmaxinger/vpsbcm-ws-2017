@@ -82,42 +82,55 @@ public class StorageServiceImpl extends StorageService {
         }
     }
 
-    public void registerPlantAndHarvestRobot(PlantAndHarvestRobot robot) {
+    public List<Notification> registerPlantAndHarvestRobot(PlantAndHarvestRobot robot) {
         try {
-            notificationManager.createNotification(flowerSeedContainer, (notification, operation, list) -> {
+
+            List<Notification> notifications = new ArrayList<>();
+
+            Notification notificationFlowerSeedContainer = notificationManager.createNotification(flowerSeedContainer, (notification, operation, list) -> {
                 logger.debug("at.ac.tuwien.complang.vpsbcm.robnur.postgres.robot notify - got notification on flowerSeedContainer");
                 robot.tryHarvestPlant();
                 robot.tryPlant();
             }, Operation.WRITE);
 
-            notificationManager.createNotification(vegetableSeedContainer, (notification, operation, list) -> {
+            Notification notificationVegetableSeedContainer = notificationManager.createNotification(vegetableSeedContainer, (notification, operation, list) -> {
                 logger.debug("at.ac.tuwien.complang.vpsbcm.robnur.postgres.robot notify - got notification on vegetableSeedContainer");
                 robot.tryHarvestPlant();
                 robot.tryPlant();
             }, Operation.WRITE);
 
-            notificationManager.createNotification(soilContainer, (notification, operation, list) -> {
+            Notification notificationSoilContainer = notificationManager.createNotification(soilContainer, (notification, operation, list) -> {
                 logger.debug("at.ac.tuwien.complang.vpsbcm.robnur.postgres.robot notify - got notification on soilContainer");
                 robot.tryHarvestPlant();
                 robot.tryPlant();
             }, Operation.WRITE);
 
-            notificationManager.createNotification(flowerFertilizerContainer, (notification, operation, list) -> {
+            Notification notificationFlowerFertilizerContainer = notificationManager.createNotification(flowerFertilizerContainer, (notification, operation, list) -> {
                 logger.debug("at.ac.tuwien.complang.vpsbcm.robnur.postgres.robot notify - got notification on flowerFertilizerContainer");
                 robot.tryHarvestPlant();
                 robot.tryPlant();
             }, Operation.WRITE);
 
-            notificationManager.createNotification(vegetableFertilizerContainer, (notification, operation, list) -> {
+            Notification notificationVegetableFertilizerContainer = notificationManager.createNotification(vegetableFertilizerContainer, (notification, operation, list) -> {
                 logger.debug("at.ac.tuwien.complang.vpsbcm.robnur.postgres.robot notify - got notification on vegetableFertilizerContainer");
                 robot.tryHarvestPlant();
                 robot.tryPlant();
             }, Operation.WRITE);
+
+            notifications.add(notificationFlowerSeedContainer);
+            notifications.add(notificationVegetableSeedContainer);
+            notifications.add(notificationSoilContainer);
+            notifications.add(notificationFlowerFertilizerContainer);
+            notifications.add(notificationVegetableFertilizerContainer);
+
+            return notifications;
         } catch (MzsCoreException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        return null;
     }
 
     @Override

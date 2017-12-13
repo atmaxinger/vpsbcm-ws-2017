@@ -9,10 +9,12 @@ import org.mozartspaces.capi3.AnyCoordinator;
 import org.mozartspaces.capi3.Coordinator;
 import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.core.*;
+import org.mozartspaces.notifications.Notification;
 import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -76,14 +78,23 @@ public class ResearchServiceImpl extends ResearchService {
         return ServiceUtil.readAllItems(vegetableContainer,transaction,capi);
     }
 
-    public void registerResearchRobot(ResearchRobot researchRobot){
+    public List<Notification> registerResearchRobot(ResearchRobot researchRobot){
         try {
-            notificationManager.createNotification(flowerContainer, (notification, operation, list) -> researchRobot.tryUpgradeFlowerPlant(), Operation.WRITE);
-            notificationManager.createNotification(vegetableContainer, (notification, operation, list) -> researchRobot.tryUpgradeVegetablePlant(),Operation.WRITE);
+            List<Notification> notifications = new ArrayList<>();
+
+            Notification notificationFlowerContainer = notificationManager.createNotification(flowerContainer, (notification, operation, list) -> researchRobot.tryUpgradeFlowerPlant(), Operation.WRITE);
+            Notification notificationVegetableContainer = notificationManager.createNotification(vegetableContainer, (notification, operation, list) -> researchRobot.tryUpgradeVegetablePlant(),Operation.WRITE);
+
+            notifications.add(notificationFlowerContainer);
+            notifications.add(notificationVegetableContainer);
+
+            return notifications;
         } catch (MzsCoreException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        return null;
     }
 }

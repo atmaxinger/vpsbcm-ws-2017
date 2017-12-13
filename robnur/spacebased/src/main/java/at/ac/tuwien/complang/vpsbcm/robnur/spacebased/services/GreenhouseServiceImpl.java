@@ -1,6 +1,5 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services;
 
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Flower;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Plant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
@@ -10,6 +9,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import org.apache.log4j.Logger;
 import org.mozartspaces.capi3.*;
 import org.mozartspaces.core.*;
+import org.mozartspaces.notifications.Notification;
 import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 
@@ -64,18 +64,24 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         notificationManager.createNotification(greenhouseContainer, (notification, operation, list) -> raiseChangedEvent(), Operation.DELETE, Operation.TAKE, Operation.WRITE);
     }
 
-    public void registerPlantAndHarvestRobot(PlantAndHarvestRobot robot) {
+    public List<Notification> registerPlantAndHarvestRobot(PlantAndHarvestRobot robot) {
         try {
-            notificationManager.createNotification(greenhouseContainer, (notification, operation, list) -> {
+            Notification notificationGreenhouseContainer = notificationManager.createNotification(greenhouseContainer, (notification, operation, list) -> {
                 logger.debug("notify plantandharvest - greenhouseContainer " + operation.name());
                 robot.tryHarvestPlant();
                 robot.tryPlant();
             }, Operation.WRITE, Operation.TAKE, Operation.DELETE);
+
+            List list = new ArrayList();
+            list.add(notificationGreenhouseContainer);
+
+            return list;
         } catch (MzsCoreException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     @Override
