@@ -24,7 +24,7 @@ public class SpacePlantAndHarvestRobot {
         int harvestTransactionTimeout = 1000;
 
         if(args.length < 2) {
-            logger.debug("You need to specify an Id and the space uri, optionally you can specify the plant timeout (in ms) and the harvest timeout (in ms)");
+            logger.fatal("You need to specify an Id and the space uri, optionally you can specify the plant timeout (in ms) and the harvest timeout (in ms)");
             System.exit(1);
         }
         else if(args.length == 3) {

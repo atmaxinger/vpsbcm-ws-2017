@@ -24,7 +24,7 @@ public class SpaceResearchRobot {
 
     public static void main(String[] args) throws URISyntaxException, MzsCoreException {
         if(args.length != 2) {
-            logger.debug("You need to specify an Id and a space uri");
+            logger.fatal("You need to specify an Id and a space uri");
             System.exit(1);
         }
 

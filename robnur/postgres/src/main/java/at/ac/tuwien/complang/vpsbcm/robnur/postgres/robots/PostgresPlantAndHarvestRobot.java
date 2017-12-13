@@ -21,7 +21,7 @@ public class PostgresPlantAndHarvestRobot {
         int harvestTransactionTimeout = 1000;
 
         if(args.length == 0) {
-            logger.debug("You need to specify the id");
+            logger.fatal("You need to specify the id");
             System.exit(1);
         }
         else if(args.length == 2) {

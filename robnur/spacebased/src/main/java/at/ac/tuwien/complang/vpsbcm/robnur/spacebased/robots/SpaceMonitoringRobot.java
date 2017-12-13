@@ -31,7 +31,7 @@ public class SpaceMonitoringRobot {
 
     public static void main(String[] args) throws URISyntaxException, MzsCoreException, InterruptedException {
         if(args.length != 1) {
-            logger.debug("You need to specify the space uri");
+            logger.fatal("You need to specify the space uri");
             System.exit(1);
         }
 

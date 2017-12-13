@@ -21,7 +21,7 @@ public class PostgresPackRobot {
 
     public static void main(String[] args) throws URISyntaxException, SQLException {
         if(args.length != 1) {
-            logger.debug("You need to specify the id!");
+            logger.fatal("You need to specify the id!");
             System.exit(0);
         }
 
