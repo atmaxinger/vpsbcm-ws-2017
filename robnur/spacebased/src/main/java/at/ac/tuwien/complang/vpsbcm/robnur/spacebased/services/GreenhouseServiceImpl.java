@@ -211,8 +211,8 @@ public class GreenhouseServiceImpl extends GreenhouseService {
 
 
     @Override
-    public VegetablePlant getHarvestableVegetablePlant(Transaction t) {
-        TransactionReference transactionReference = TransactionServiceImpl.getTransactionReference(t);
+    public VegetablePlant getHarvestableVegetablePlant(Transaction transaction) {
+        TransactionReference transactionReference = TransactionServiceImpl.getTransactionReference(transaction);
 
         try {
             ComparableProperty growthProperty = ComparableProperty.forName("growth");
@@ -229,7 +229,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
                 return vegetablePlants.get(0);
             }
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(t);
+            TransactionServiceImpl.setTransactionTimedOut(transaction);
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -238,8 +238,8 @@ public class GreenhouseServiceImpl extends GreenhouseService {
     }
 
     @Override
-    public FlowerPlant getHarvestableFlowerPlant(Transaction t) {
-        TransactionReference tref = TransactionServiceImpl.getTransactionReference(t);
+    public FlowerPlant getHarvestableFlowerPlant(Transaction transaction) {
+        TransactionReference tref = TransactionServiceImpl.getTransactionReference(transaction);
 
         try {
             ComparableProperty growthProperty = ComparableProperty.forName("growth");
@@ -256,7 +256,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
 
             }
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(t);
+            TransactionServiceImpl.setTransactionTimedOut(transaction);
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
