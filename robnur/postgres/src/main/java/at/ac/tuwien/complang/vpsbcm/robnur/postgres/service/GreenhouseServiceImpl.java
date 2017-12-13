@@ -116,7 +116,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         /*if (readAllFlowerPlants(transaction).size() + readAllVegetablePlants(transaction).size() >= 20) {
             return false;
         }*/
-        logger.info(String.format("plant vegetable; id: %s, remainingHarvests: %d, threadid = %s, growth = %s",vegetablePlant.getId(),vegetablePlant.getCultivationInformation().getRemainingNumberOfHarvests(),Thread.currentThread().getId(), vegetablePlant.getGrowth()));
+        logger.debug(String.format("plant vegetable; id: %s, remainingHarvests: %d, threadid = %s, growth = %s",vegetablePlant.getId(),vegetablePlant.getCultivationInformation().getRemainingNumberOfHarvests(),Thread.currentThread().getId(), vegetablePlant.getGrowth()));
         return plantVegetables(Collections.singletonList(vegetablePlant), transaction);
     }
 
@@ -129,14 +129,14 @@ public class GreenhouseServiceImpl extends GreenhouseService {
     public List<VegetablePlant> getAllVegetablePlants(Transaction transaction) {
         List<VegetablePlant> vegetablePlants = readAllVegetablePlants(transaction);
 
-        logger.info(String.format("GreenhouseServiceImpl: read %d vegetable plants", vegetablePlants.size()));
+        logger.debug(String.format("GreenhouseServiceImpl: read %d vegetable plants", vegetablePlants.size()));
 
         try {
             Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
             int cnt = statement.executeUpdate("DELETE FROM " + GREENHOUSE_VEGETABLE_PLANT_TABLE);
-            logger.info(String.format("GreenhouseServiceImpl: deleted %d vegetable plants", cnt));
+            logger.debug(String.format("GreenhouseServiceImpl: deleted %d vegetable plants", cnt));
         } catch (SQLException e) {
-            logger.info(String.format("GreenhouseServiceImpl: deleted did not work --> try again"));
+            logger.debug(String.format("GreenhouseServiceImpl: deleted did not work --> try again"));
             logger.trace("EXCEPTION", e);
             return null;
         }
@@ -150,9 +150,9 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         try {
             Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
             int cnt = statement.executeUpdate("DELETE FROM " + GREENHOUSE_FLOWER_PLANT_TABLE);
-            logger.info(String.format("GreenhouseServiceImpl: deleted %d flower plants", cnt));
+            logger.debug(String.format("GreenhouseServiceImpl: deleted %d flower plants", cnt));
         } catch (SQLException e) {
-            logger.info(String.format("GreenhouseServiceImpl: deleted flowerplant did not work --> try again"));
+            logger.debug(String.format("GreenhouseServiceImpl: deleted flowerplant did not work --> try again"));
             logger.trace("EXCEPTION", e);
             return null;
         }

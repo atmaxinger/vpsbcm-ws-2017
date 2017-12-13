@@ -45,7 +45,7 @@ public class PostgresMonitoringRobot {
                         "    ((SELECT (data->>'growth')::int from gvp g3 WHERE (g3.data->>'id')::text = (g1.data->>'id')::text) + ((random()*(1.2-0.8)+0.8) * 100))::int) " +
                         "    FROM gvp g2 " +
                         "    WHERE g1.id = g2.id);");
-                logger.info("updated vegetables");
+                logger.debug("updated vegetables");
 
                 statement.execute(
                         "UPDATE gfp g1 SET " +
@@ -54,7 +54,7 @@ public class PostgresMonitoringRobot {
                                 "    ((SELECT (data->>'growth')::int from gfp g3 WHERE (g3.data->>'id')::text = (g1.data->>'id')::text) + ((random()*(1.2-0.8)+0.8) * 100))::int) " +
                                 "    FROM gfp g2 " +
                                 "    WHERE g1.id = g2.id);");
-                logger.info("updated flowers");
+                logger.debug("updated flowers");
 
                 transaction.commit();
 
@@ -66,9 +66,9 @@ public class PostgresMonitoringRobot {
 
 
             try {
-                logger.info("before sleep");
+                logger.debug("before sleep");
                 Thread.sleep(2000);
-                logger.info("after sleep");
+                logger.debug("after sleep");
             } catch (InterruptedException e) {
                 logger.trace("EXCEPTION", e);
             }

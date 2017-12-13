@@ -181,7 +181,7 @@ public class StorageServiceImpl extends StorageService {
 
         try {
             List<Entry> entries = new LinkedList<>();
-            logger.info("put " + plants.size() + "flower seeds into storage");
+            logger.debug("put " + plants.size() + "flower seeds into storage");
             for(FlowerPlant plant : plants) {
                 entries.add(new Entry(plant, LabelCoordinator.newCoordinationData(plant.getTypeName())));
             }
@@ -471,12 +471,12 @@ public class StorageServiceImpl extends StorageService {
 
     @Override
     public Water accessTap(String robotId) {
-        logger.info("in accessTap");
+        logger.debug("in accessTap");
 
         try {
-            logger.info(robotId + " wait for water");
+            logger.debug(robotId + " wait for water");
             List<String> tokens = capi.take(waterTokenContainer,AnyCoordinator.newSelector(),MzsConstants.RequestTimeout.INFINITE,null);
-            logger.info(robotId + " got water");
+            logger.debug(robotId + " got water");
 
             if(tokens == null || tokens.isEmpty()){
                 logger.fatal("WaterFATAL no token");
@@ -486,33 +486,33 @@ public class StorageServiceImpl extends StorageService {
                 return null;
             }
 
-            logger.info(robotId + " write name into waterAccessContainer");
+            logger.debug(robotId + " write name into waterAccessContainer");
             capi.write(new Entry(robotId),waterAccessContainer,MzsConstants.RequestTimeout.INFINITE,null);
 
-            logger.info(robotId + " wait for water");
+            logger.debug(robotId + " wait for water");
             Thread.sleep(1000);
             Water water = new Water();
             water.setAmount(250);
-            logger.info(robotId + " create water");
+            logger.debug(robotId + " create water");
 
 
-            logger.info(robotId + " remove name");
+            logger.debug(robotId + " remove name");
             capi.take(waterAccessContainer,AnyCoordinator.newSelector(),MzsConstants.RequestTimeout.INFINITE,null);
 
-            logger.info(robotId + " put back token");
+            logger.debug(robotId + " put back token");
             capi.write(new Entry(tokens.get(0)),waterTokenContainer,MzsConstants.RequestTimeout.INFINITE,null);
 
-            logger.info(robotId + " return water");
+            logger.debug(robotId + " return water");
 
 
             return water;
 
         } catch (MzsCoreException e) {
-            logger.info("MzsCoreException accessTap");
+            logger.debug("MzsCoreException accessTap");
 
             logger.trace("EXCEPTION", e);
         } catch (InterruptedException e) {
-            logger.info("InterruptedException accessTap");
+            logger.debug("InterruptedException accessTap");
 
             logger.trace("EXCEPTION", e);
         }

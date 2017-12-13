@@ -391,7 +391,7 @@ public class ServiceUtil {
             statement.close();
         } catch (SQLException e) {
             logger.trace("EXCEPTION", e);
-            logger.info(String.format("DELETE FROM %s WHERE (data " + prepareArrow(parameterName) + " %s)::text = '%s'", table, parameterName, parameterValue));
+            logger.debug(String.format("DELETE FROM %s WHERE (data " + prepareArrow(parameterName) + " %s)::text = '%s'", table, parameterName, parameterValue));
             throw e;
         }
 

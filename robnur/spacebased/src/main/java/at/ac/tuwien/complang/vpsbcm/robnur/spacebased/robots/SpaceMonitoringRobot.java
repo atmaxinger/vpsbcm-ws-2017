@@ -107,9 +107,9 @@ public class SpaceMonitoringRobot {
             return;
         }
 
-        logger.info("flower-commit before");
+        logger.debug("flower-commit before");
         t.commit();
-        logger.info("flower-commit after");
+        logger.debug("flower-commit after");
 
     }
 
