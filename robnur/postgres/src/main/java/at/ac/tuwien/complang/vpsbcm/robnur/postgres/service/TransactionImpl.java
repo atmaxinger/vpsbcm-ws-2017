@@ -11,7 +11,6 @@ public class TransactionImpl implements Transaction {
     final static Logger logger = Logger.getLogger(TransactionService.class);
 
     private Connection connection;
-    private boolean rolledBack = false;
     private String reason;
 
     public TransactionImpl(Connection connection, String reason) {
@@ -45,16 +44,11 @@ public class TransactionImpl implements Transaction {
             //logger.debug(String.format("rolled back connection %s", connection));
             //connection.close();
             //logger.debug(String.format("closed connection %s after rollback", connection));
-            rolledBack = true;
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
-    }
-
-    public boolean hasBeenRolledBack() {
-        return rolledBack;
     }
 
     public Connection getConnection() {

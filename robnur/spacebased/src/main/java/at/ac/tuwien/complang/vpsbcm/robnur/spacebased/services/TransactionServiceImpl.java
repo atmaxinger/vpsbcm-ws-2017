@@ -32,8 +32,6 @@ public class TransactionServiceImpl implements TransactionService {
         TransactionReference ref;
         Capi capi;
 
-        private boolean rolledBack = false;
-
         private boolean timeOut = false;
 
         public void setTimeOut(boolean timeOut) {
@@ -63,7 +61,6 @@ public class TransactionServiceImpl implements TransactionService {
                 try {
                     loggerTransaction.debug(String.format("Trying to roll back transaction %s", ref.getId()));
                     capi.rollbackTransaction(ref);
-                    rolledBack = true;
                     loggerTransaction.debug(String.format("Rolled back transaction %s", ref.getId()));
                     return true;
                 } catch (TransactionException | MzsCoreException e) {
@@ -73,11 +70,6 @@ public class TransactionServiceImpl implements TransactionService {
             }
 
             return false;
-        }
-
-        @Override
-        public boolean hasBeenRolledBack() {
-            return rolledBack;
         }
     }
 
