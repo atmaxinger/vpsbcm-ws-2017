@@ -316,7 +316,7 @@ public class StorageServiceImpl extends StorageService {
             }
 
             logger.info(robotId + " write name into waterAccessContainer");
-            statement.execute(String.format("INSERT INTO %s (id,data) VALUES (%s,'{}')",STORAGE_WATER_ACCESS_TABLE,robotId));
+            statement.execute(String.format("INSERT INTO %s (id,data) VALUES ('%s','{}')",STORAGE_WATER_ACCESS_TABLE,robotId));
 
             logger.info(robotId + " wait for water");
 
