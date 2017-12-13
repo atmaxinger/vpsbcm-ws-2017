@@ -103,6 +103,7 @@ public class StorageServiceImpl extends StorageService {
                 public void onNotify(int pid, DBMETHOD method) {
                     if(method == DBMETHOD.INSERT){
                         try {
+                            logger.info("in hear1");
 
                             Connection connection = PostgresHelper.getNewConnection("water access",-1);
                             connection.setAutoCommit(true);
@@ -111,6 +112,7 @@ public class StorageServiceImpl extends StorageService {
                             ResultSet resultSet = statement.executeQuery("SELECT * FROM " + STORAGE_WATER_ACCESS_TABLE);
                             resultSet.next();
                             String robotId = resultSet.getString("data");
+                            logger.info("in hear2");
 
                             notifyWaterRobotChanged(robotId);
 
@@ -332,7 +334,6 @@ public class StorageServiceImpl extends StorageService {
                 if(resultSet.next()){
                     statement.execute("DELETE FROM " + STORAGE_WATER_TOKEN_TABLE);
                     connection.commit();
-                    connection.setAutoCommit(true);
                     locked = false;
                 } else {
                     connection.commit();
@@ -340,10 +341,10 @@ public class StorageServiceImpl extends StorageService {
                 }
             }
 
-
             connection.setAutoCommit(true);
+
             logger.debug(robotId + " write name into waterAccessContainer");
-            statement.execute(String.format("INSERT INTO %s (data) VALUES ('{}')",STORAGE_WATER_ACCESS_TABLE,robotId));
+            statement.execute(String.format("INSERT INTO %s (data) VALUES ('%s')",STORAGE_WATER_ACCESS_TABLE,robotId));
 
             logger.info(robotId + " wait for water");
 
@@ -450,6 +451,6 @@ public class StorageServiceImpl extends StorageService {
     }
 
     public static List<String> getTables() {
-        return Arrays.asList(STORAGE_FLOWER_SEED_TABLE,STORAGE_VEGETABLE_SEED_TABLE,STORAGE_SOIL_TABLE,STORAGE_FLOWER_FERTILIZER_TABLE,STORAGE_VEGETABLE_FERTILIZER_TABLE,STORAGE_WATER_TABLE,STORAGE_WATER_TOKEN_TABLE,STORAGE_WATER_ACCESS_TABLE);
+        return Arrays.asList(STORAGE_FLOWER_SEED_TABLE,STORAGE_VEGETABLE_SEED_TABLE,STORAGE_SOIL_TABLE,STORAGE_FLOWER_FERTILIZER_TABLE,STORAGE_VEGETABLE_FERTILIZER_TABLE,STORAGE_WATER_TABLE,STORAGE_WATER_TOKEN_TABLE);
     }
 }

@@ -13,6 +13,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlantCultivati
 import org.apache.log4j.Logger;
 
 import java.sql.*;
+import java.util.Arrays;
 import java.util.List;
 
 public class InitDb {
@@ -303,23 +304,18 @@ public class InitDb {
     }
 
     private static void insertInitialWaterToken(){
-    System.out.print("IN");
         try {
             Connection connection = PostgresHelper.getNewConnection("water access",-1);
 
-            try {
-                Statement statement = connection.createStatement();
-                statement.execute("DROP TABLE IF EXISTS " + "wa");
-                statement.execute("CREATE TABLE " + "wa" + "(data VARCHAR(1000))");
-                statement.close();
-            } catch (SQLException e) {
-                logger.trace("EXCEPTION", e);
-            }
-
-            //connection.setAutoCommit(true);
             Statement statement = connection.createStatement();
+            statement.execute("DROP TABLE IF EXISTS " + StorageServiceImpl.STORAGE_WATER_ACCESS_TABLE);
+            statement.execute("CREATE TABLE " + StorageServiceImpl.STORAGE_WATER_ACCESS_TABLE + "(data VARCHAR(1000))");
+
+            createNotifyFunction(Arrays.asList(StorageServiceImpl.STORAGE_WATER_ACCESS_TABLE));
 
             statement.execute(String.format("INSERT INTO %s (data) VALUES ('{}')","wt"));
+
+            statement.close();
 
         } catch (SQLException e) {
             logger.trace("EXCEPTION", e);
