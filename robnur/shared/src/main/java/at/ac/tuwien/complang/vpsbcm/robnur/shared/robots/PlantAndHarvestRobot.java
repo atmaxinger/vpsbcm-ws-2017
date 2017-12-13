@@ -271,7 +271,7 @@ public class PlantAndHarvestRobot extends Robot {
 
             logger.info("about to access water");
             // Step 2: get the water needed for the plant
-            storageService.getWater(nextSeed.getCultivationInformation().getWaterAmount());
+            storageService.getWater(nextSeed.getCultivationInformation().getWaterAmount(), this.getId());
 
             nextSeed.setPlantRobot(this.getId());
 

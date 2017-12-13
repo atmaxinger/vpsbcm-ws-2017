@@ -7,8 +7,12 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ConfigService;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.ConfigServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.Water;
+import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.StorageServiceImpl;
+import org.mozartspaces.capi3.LabelCoordinator;
 import org.mozartspaces.core.*;
 import org.mozartspaces.core.aspects.ContainerIPoint;
+
+import java.util.Arrays;
 
 public class SpaceServer {
 
@@ -25,12 +29,12 @@ public class SpaceServer {
         putInitialFlowerPlantCultivationInformation(configService);
         putInitialVegetablePlantCultivationInformation(configService);
 
-        ContainerReference waterContainer = CapiUtil.lookupOrCreateContainer("waterContainer", core.getConfig().getSpaceUri(), null,null, capi);
+        ContainerReference waterContainer = CapiUtil.lookupOrCreateContainer("waterContainer", core.getConfig().getSpaceUri(), Arrays.asList(new LabelCoordinator()), null, capi);
         capi.addContainerAspect(new WaterAspect(), waterContainer, ContainerIPoint.POST_TAKE);
 
         Water water = new Water();
         water.setAmount(250);
-        capi.write(new Entry(water), waterContainer);
+        capi.write(new Entry(water, LabelCoordinator.newCoordinationData(StorageServiceImpl.WATER_TOKEN_LABEL)), waterContainer);
     }
 
     public static void putInitialFlowerPlantCultivationInformation(ConfigService configService) {

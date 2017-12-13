@@ -22,6 +22,10 @@ public class StorageServiceImpl extends StorageService {
 
     final static Logger logger = Logger.getLogger(StorageServiceImpl.class);
 
+    public final static String WATER_LABEL = "water";
+    public final static String WATER_TOKEN_LABEL = "watertoken";
+    public final static String WATER_ACCESSOR_LABEL = "wateraccessor";
+
     private Capi capi;
     private NotificationManager notificationManager;
 
@@ -48,7 +52,7 @@ public class StorageServiceImpl extends StorageService {
         soilContainer = CapiUtil.lookupOrCreateContainer("storageSoilContainer", spaceUri, coords, null, capi);
         flowerFertilizerContainer = CapiUtil.lookupOrCreateContainer("storageFlowerFertilizerContainer", spaceUri, coords, null, capi);
         vegetableFertilizerContainer = CapiUtil.lookupOrCreateContainer("storageVegetableFertilizerContainer", spaceUri, coords, null, capi);
-        waterContainer = CapiUtil.lookupOrCreateContainer("waterContainer", spaceUri, coords, null, capi);
+        waterContainer = CapiUtil.lookupOrCreateContainer("waterContainer", spaceUri, Arrays.asList(new LabelCoordinator()), null, capi);
 
         try {
             notificationManager.createNotification(flowerSeedContainer, (notification, operation, list) -> notifyFlowerSeedsChanged(readAllFlowerSeeds()), Operation.DELETE, Operation.TAKE, Operation.WRITE);
@@ -411,17 +415,25 @@ public class StorageServiceImpl extends StorageService {
 
     public void putWater(Water water) {
         try {
-            capi.write(waterContainer, new Entry(water));
+            capi.write(waterContainer, new Entry(water, LabelCoordinator.newCoordinationData(WATER_LABEL)));
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
     }
 
-    public Water accessTap() {
+    @Override
+    public Water accessTap(String robotId) {
         ArrayList<Water> waterArrayList = null;
 
         try {
-            waterArrayList = capi.take(waterContainer, AnyCoordinator.newSelector(), MzsConstants.RequestTimeout.INFINITE, null);
+            waterArrayList = capi.take(waterContainer, LabelCoordinator.newSelector(WATER_TOKEN_LABEL), MzsConstants.RequestTimeout.INFINITE, null);
+            capi.write(new Entry(robotId, LabelCoordinator.newCoordinationData(WATER_ACCESSOR_LABEL)), waterContainer, MzsConstants.RequestTimeout.INFINITE, null);
+            waterArrayList = capi.take(waterContainer, LabelCoordinator.newSelector(WATER_LABEL), MzsConstants.RequestTimeout.INFINITE, null);
+
+            //TransactionReference tref = capi.createTransaction(-1, capi.getCore().getConfig().getSpaceUri());
+            //capi.lockContainer(waterContainer, tref);
+
+
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }

@@ -254,7 +254,7 @@ public class StorageServiceImpl extends StorageService {
     }
 
     @Override
-    public Water accessTap() {
+    public Water accessTap(String robotId) {
         // TODO: !!!!!! NOT TRANSACTIONAL SECURE !!!!!!
         // TODO: !!!!!! BUSY WAITING !!!!!!
         while (true){

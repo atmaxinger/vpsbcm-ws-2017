@@ -424,14 +424,15 @@ public abstract class StorageService {
      * Blocks until the specified amount of water has been taken
      *
      * @param amount the amount of water
+     * @param robotId the id of the accessor
      */
-    public void getWater(int amount){
+    public void getWater(int amount, String robotId){
         Water water = new Water();
 
         int howMany = (int)Math.ceil((float)amount / 250.0f);
 
         for (int i = 0; i < howMany; i++){
-            Water w = accessTap();
+            Water w = accessTap(robotId);
             water.setAmount(water.getAmount()+ w.getAmount());
         }
     }
@@ -439,9 +440,11 @@ public abstract class StorageService {
     /**
      * Access the water tap
      * Blocks until 1 water is retrieved
+     *
+     * @param robotId the id of the accessor
      * @return 1 water
      */
-    public abstract Water accessTap();
+    public abstract Water accessTap(String robotId);
 
     /**
      * Put 1 water into the storage
