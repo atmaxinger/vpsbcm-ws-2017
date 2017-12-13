@@ -8,6 +8,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ConfigService;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.ConfigServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.Water;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.StorageServiceImpl;
+import org.mozartspaces.capi3.AnyCoordinator;
 import org.mozartspaces.capi3.LabelCoordinator;
 import org.mozartspaces.core.*;
 import org.mozartspaces.core.aspects.ContainerIPoint;
@@ -32,9 +33,13 @@ public class SpaceServer {
         ContainerReference waterContainer = CapiUtil.lookupOrCreateContainer("waterContainer", core.getConfig().getSpaceUri(), Arrays.asList(new LabelCoordinator()), null, capi);
         capi.addContainerAspect(new WaterAspect(), waterContainer, ContainerIPoint.POST_TAKE);
 
-        Water water = new Water();
+        /*Water water = new Water();
         water.setAmount(250);
-        capi.write(new Entry(water, LabelCoordinator.newCoordinationData(StorageServiceImpl.WATER_TOKEN_LABEL)), waterContainer);
+        capi.write(new Entry(water, LabelCoordinator.newCoordinationData(StorageServiceImpl.WATER_TOKEN_LABEL)), waterContainer);*/
+
+        ContainerReference waterTokenContainer = CapiUtil.lookupOrCreateContainer("waterTokenContainer", core.getConfig().getSpaceUri(), Arrays.asList(new AnyCoordinator()), null, capi);
+        capi.write(new Entry(new String("TOKEN")),waterTokenContainer,MzsConstants.RequestTimeout.INFINITE,null);
+
     }
 
     public static void putInitialFlowerPlantCultivationInformation(ConfigService configService) {

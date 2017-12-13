@@ -33,7 +33,7 @@ public class WaterAspect extends AbstractContainerAspect {
                                  int executionCount,
                                  List<Serializable> entries) {
 
-        boolean tokenWasTaken = false;
+ /*       boolean tokenWasTaken = false;
 
         for(Selector selector : request.getSelectors()) {
             if(selector instanceof LabelCoordinator.LabelSelector) {
@@ -82,8 +82,9 @@ public class WaterAspect extends AbstractContainerAspect {
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
-
+*/
         return AspectResult.OK;
+
     }
 
 

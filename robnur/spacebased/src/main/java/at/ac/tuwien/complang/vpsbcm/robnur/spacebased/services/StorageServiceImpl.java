@@ -11,9 +11,12 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import org.apache.log4j.Logger;
 import org.mozartspaces.capi3.*;
 import org.mozartspaces.core.*;
+import org.mozartspaces.notifications.Notification;
+import org.mozartspaces.notifications.NotificationListener;
 import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -21,10 +24,6 @@ import java.util.*;
 public class StorageServiceImpl extends StorageService {
 
     final static Logger logger = Logger.getLogger(StorageServiceImpl.class);
-
-    public final static String WATER_LABEL = "water";
-    public final static String WATER_TOKEN_LABEL = "watertoken";
-    public final static String WATER_ACCESSOR_LABEL = "wateraccessor";
 
     private Capi capi;
     private NotificationManager notificationManager;
@@ -36,8 +35,14 @@ public class StorageServiceImpl extends StorageService {
     private ContainerReference flowerFertilizerContainer;
     private ContainerReference vegetableFertilizerContainer;
     private ContainerReference waterContainer;
+    private ContainerReference waterTokenContainer;
+    private ContainerReference waterAccessContainer;
+    private URI spaceUri;
+
 
     public StorageServiceImpl(URI spaceUri) throws MzsCoreException, URISyntaxException {
+
+        this.spaceUri = spaceUri;
 
         MzsCore core = DefaultMzsCore.newInstanceWithoutSpace();
 
@@ -52,7 +57,9 @@ public class StorageServiceImpl extends StorageService {
         soilContainer = CapiUtil.lookupOrCreateContainer("storageSoilContainer", spaceUri, coords, null, capi);
         flowerFertilizerContainer = CapiUtil.lookupOrCreateContainer("storageFlowerFertilizerContainer", spaceUri, coords, null, capi);
         vegetableFertilizerContainer = CapiUtil.lookupOrCreateContainer("storageVegetableFertilizerContainer", spaceUri, coords, null, capi);
-        waterContainer = CapiUtil.lookupOrCreateContainer("waterContainer", spaceUri, Arrays.asList(new LabelCoordinator()), null, capi);
+        waterContainer = CapiUtil.lookupOrCreateContainer("waterContainer", spaceUri, Arrays.asList(new AnyCoordinator()), null, capi);
+        waterTokenContainer = CapiUtil.lookupOrCreateContainer("waterTokenContainer", spaceUri, Arrays.asList(new AnyCoordinator()), null, capi);
+        waterAccessContainer = CapiUtil.lookupOrCreateContainer("waterAccessContainer", spaceUri, Arrays.asList(new AnyCoordinator()), null, capi);
 
         try {
             notificationManager.createNotification(flowerSeedContainer, (notification, operation, list) -> notifyFlowerSeedsChanged(readAllFlowerSeeds()), Operation.DELETE, Operation.TAKE, Operation.WRITE);
@@ -61,6 +68,15 @@ public class StorageServiceImpl extends StorageService {
             notificationManager.createNotification(soilContainer, (notification, operation, list) -> notifySoilPackagesChanged(readAllSoilPackage()), Operation.DELETE, Operation.TAKE, Operation.WRITE);
             notificationManager.createNotification(flowerFertilizerContainer, (notification, operation, list) -> notifyFlowerFertilizerChanged(readAllFlowerFertilizer()), Operation.DELETE, Operation.TAKE, Operation.WRITE);
             notificationManager.createNotification(vegetableFertilizerContainer, (notification, operation, list) -> notifyVegetableFertilizerChanged(readAllVegetableFertilizer()), Operation.DELETE, Operation.TAKE, Operation.WRITE);
+
+            notificationManager.createNotification(waterAccessContainer, (notification, operation, list) -> {
+                if(operation == Operation.WRITE) {
+                    Entry e = (Entry)list.get(0);
+                   notifyWaterRobotChanged((String)e.getValue());
+                } else if (operation == Operation.TAKE) {
+                    notifyWaterRobotChanged(null);
+                }
+            }, Operation.TAKE, Operation.WRITE);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -415,7 +431,7 @@ public class StorageServiceImpl extends StorageService {
 
     public void putWater(Water water) {
         try {
-            capi.write(waterContainer, new Entry(water, LabelCoordinator.newCoordinationData(WATER_LABEL)));
+            capi.write(waterContainer, new Entry(water));
         } catch (MzsCoreException e) {
             e.printStackTrace();
         }
@@ -423,21 +439,52 @@ public class StorageServiceImpl extends StorageService {
 
     @Override
     public Water accessTap(String robotId) {
-        ArrayList<Water> waterArrayList = null;
+        logger.info("in accessTap");
 
         try {
-            waterArrayList = capi.take(waterContainer, LabelCoordinator.newSelector(WATER_TOKEN_LABEL), MzsConstants.RequestTimeout.INFINITE, null);
-            capi.write(new Entry(robotId, LabelCoordinator.newCoordinationData(WATER_ACCESSOR_LABEL)), waterContainer, MzsConstants.RequestTimeout.INFINITE, null);
-            waterArrayList = capi.take(waterContainer, LabelCoordinator.newSelector(WATER_LABEL), MzsConstants.RequestTimeout.INFINITE, null);
+            logger.info(robotId + " wait for water");
+            List<String> tokens = capi.take(waterTokenContainer,AnyCoordinator.newSelector(),MzsConstants.RequestTimeout.INFINITE,null);
+            logger.info(robotId + " got water");
 
-            //TransactionReference tref = capi.createTransaction(-1, capi.getCore().getConfig().getSpaceUri());
-            //capi.lockContainer(waterContainer, tref);
+            if(tokens == null || tokens.isEmpty()){
+                logger.fatal("WaterFATAL no token");
+                return null;
+            }else if(tokens.size() > 1){
+                logger.fatal("WaterFATAL to many tokens");
+                return null;
+            }
 
+            logger.info(robotId + " write name into waterAccessContainer");
+            capi.write(new Entry(robotId),waterAccessContainer,MzsConstants.RequestTimeout.INFINITE,null);
+
+            logger.info(robotId + " wait for water");
+            Thread.sleep(1000);
+            Water water = new Water();
+            water.setAmount(250);
+            logger.info(robotId + " create water");
+
+
+            logger.info(robotId + " remove name");
+            capi.take(waterAccessContainer,AnyCoordinator.newSelector(),MzsConstants.RequestTimeout.INFINITE,null);
+
+            logger.info(robotId + " put back token");
+            capi.write(new Entry(tokens.get(0)),waterTokenContainer,MzsConstants.RequestTimeout.INFINITE,null);
+
+            logger.info(robotId + " return water");
+
+
+            return water;
 
         } catch (MzsCoreException e) {
+            logger.info("MzsCoreException accessTap");
+
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            logger.info("InterruptedException accessTap");
+
             e.printStackTrace();
         }
 
-        return waterArrayList.get(0);
+        return null;
     }
 }

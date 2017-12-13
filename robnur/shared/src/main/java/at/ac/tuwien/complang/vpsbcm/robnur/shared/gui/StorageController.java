@@ -329,25 +329,37 @@ public class StorageController {
             vegFert.amount = "0";
         }
 
-        ResourceTableDataModel water = new ResourceTableDataModel() {
+
+        obs.addAll(soil, flowerFertilizer, vegFert, waterModel);
+    }
+
+
+    ResourceTableDataModel waterModel;
+
+    private void initResourcesTableView() {
+        waterModel = new ResourceTableDataModel() {
             @Override
             void buyAction(int amount) {
             }
         };
-        water.resource = "Wasser";
-        water.amount = "frei";
-        water.canBuy = false;
+        waterModel.resource = "Wasser";
+        waterModel.amount = "frei";
+        waterModel.canBuy = false;
 
-        obs.addAll(soil, flowerFertilizer, vegFert, water);
-    }
-
-
-    private void initResourcesTableView() {
         initResourcesData();
 
         storageService.onFlowerFertilizerChanged(data -> initResourcesData());
         storageService.onSoilPackagesChanged(data -> initResourcesData());
         storageService.onVegetableFertilizerChanged(data -> initResourcesData());
+        storageService.onWaterRobotChanged(data -> {
+            if(data == null) {
+                waterModel.amount = "frei";
+            }
+            else {
+                waterModel.amount = "Robot " + data;
+            }
+            tvResources.refresh();
+        });
 
         tcResourcesArt.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().resource));
         tcResourcesAmountStatus.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().amount));

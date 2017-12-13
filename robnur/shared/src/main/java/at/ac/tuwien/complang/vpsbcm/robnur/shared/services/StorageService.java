@@ -27,6 +27,8 @@ public abstract class StorageService {
     private Callback<List<SoilPackage>> soilPackagesChanged;
     private Callback<List<FlowerFertilizer>> flowerFertilizerChanged;
     private Callback<List<VegetableFertilizer>> vegetableFertilizerChanged;
+    private Callback<String> waterRobotChanged;
+
 
     protected void notifyFlowerSeedsChanged(List<FlowerPlant> list) {
         if(flowerSeedsChanged != null) {
@@ -61,6 +63,12 @@ public abstract class StorageService {
         }
     }
 
+    protected void notifyWaterRobotChanged(String id) {
+        if(waterRobotChanged != null) {
+            waterRobotChanged.handle(id);
+        }
+    }
+
     public void onFlowerSeedChanged(Callback<List<FlowerPlant>> seedsChanged) {
         this.flowerSeedsChanged = seedsChanged;
     }
@@ -79,6 +87,10 @@ public abstract class StorageService {
 
     public void onVegetableFertilizerChanged(Callback<List<VegetableFertilizer>> vegetableFertilizerChanged) {
         this.vegetableFertilizerChanged = vegetableFertilizerChanged;
+    }
+
+    public void onWaterRobotChanged(Callback<String> waterRobotChanged) {
+        this.waterRobotChanged = waterRobotChanged;
     }
 
     /**
