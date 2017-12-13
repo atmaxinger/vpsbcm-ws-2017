@@ -5,9 +5,11 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlantCultivationInformation;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ConfigService;
+import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.CompostServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.ConfigServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.Water;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.StorageServiceImpl;
+import org.apache.log4j.Logger;
 import org.mozartspaces.capi3.AnyCoordinator;
 import org.mozartspaces.capi3.LabelCoordinator;
 import org.mozartspaces.core.*;
@@ -16,13 +18,14 @@ import org.mozartspaces.core.aspects.ContainerIPoint;
 import java.util.Arrays;
 
 public class SpaceServer {
+    final static Logger logger = Logger.getLogger(SpaceServer.class);
 
     public static void main(String[] args) throws MzsCoreException {
 
         MzsCore core = DefaultMzsCore.newInstance();
         Capi capi = new Capi(core);
 
-        System.out.println("uri: " + core.getConfig().getSpaceUri());
+        logger.debug("uri: " + core.getConfig().getSpaceUri());
 
         ConfigService configService = null;
         configService = new ConfigServiceImpl(core.getConfig().getSpaceUri());
@@ -32,11 +35,7 @@ public class SpaceServer {
 
         ContainerReference waterContainer = CapiUtil.lookupOrCreateContainer("waterContainer", core.getConfig().getSpaceUri(), Arrays.asList(new LabelCoordinator()), null, capi);
         capi.addContainerAspect(new WaterAspect(), waterContainer, ContainerIPoint.POST_TAKE);
-
-        /*Water water = new Water();
-        water.setAmount(250);
-        capi.write(new Entry(water, LabelCoordinator.newCoordinationData(StorageServiceImpl.WATER_TOKEN_LABEL)), waterContainer);*/
-
+        
         ContainerReference waterTokenContainer = CapiUtil.lookupOrCreateContainer("waterTokenContainer", core.getConfig().getSpaceUri(), Arrays.asList(new AnyCoordinator()), null, capi);
         capi.write(new Entry(new String("TOKEN")),waterTokenContainer,MzsConstants.RequestTimeout.INFINITE,null);
 

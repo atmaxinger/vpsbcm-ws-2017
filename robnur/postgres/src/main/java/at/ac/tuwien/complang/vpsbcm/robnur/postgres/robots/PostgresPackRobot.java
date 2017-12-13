@@ -8,6 +8,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Exitable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ResearchService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
 import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.MarketServiceImpl;
+import org.apache.log4j.Logger;
 
 import java.net.URISyntaxException;
 import java.sql.SQLException;
@@ -16,10 +17,11 @@ import java.util.List;
 import java.util.Scanner;
 
 public class PostgresPackRobot {
+    final static Logger logger = Logger.getLogger(PostgresPackRobot.class);
 
     public static void main(String[] args) throws URISyntaxException, SQLException {
         if(args.length != 1) {
-            System.err.println("You need to specify the id!");
+            logger.debug("You need to specify the id!");
             System.exit(0);
         }
 

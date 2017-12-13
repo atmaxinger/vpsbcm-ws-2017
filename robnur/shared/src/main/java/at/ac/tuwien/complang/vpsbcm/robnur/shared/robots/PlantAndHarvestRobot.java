@@ -245,7 +245,7 @@ public class PlantAndHarvestRobot extends Robot {
                 }
             }
             if (i == -1) {
-                System.err.println("plant type not found");
+                logger.debug("plant type not found");
                 return null;
             }
 

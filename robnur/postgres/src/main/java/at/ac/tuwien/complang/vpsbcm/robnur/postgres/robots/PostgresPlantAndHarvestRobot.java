@@ -6,6 +6,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.CompostService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Exitable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.PackingService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
+import org.apache.log4j.Logger;
 
 import java.net.URISyntaxException;
 import java.util.LinkedList;
@@ -13,13 +14,14 @@ import java.util.List;
 import java.util.Scanner;
 
 public class PostgresPlantAndHarvestRobot {
+    final static Logger logger = Logger.getLogger(PostgresPlantAndHarvestRobot.class);
 
     public static void main(String[] args) throws URISyntaxException, InterruptedException {
         int plantTransactionTimeout = 60*1000;
         int harvestTransactionTimeout = 1000;
 
         if(args.length == 0) {
-            System.err.println("You need to specify the id");
+            logger.debug("You need to specify the id");
             System.exit(1);
         }
         else if(args.length == 2) {

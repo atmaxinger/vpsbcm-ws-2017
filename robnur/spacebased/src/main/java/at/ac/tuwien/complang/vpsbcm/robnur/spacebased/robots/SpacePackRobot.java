@@ -8,6 +8,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.MarketServiceImpl
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.PackingServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.ResearchServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.TransactionServiceImpl;
+import org.apache.log4j.Logger;
 import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.notifications.Notification;
 
@@ -18,10 +19,12 @@ import java.util.List;
 import java.util.Scanner;
 
 public class SpacePackRobot {
+    final static Logger logger = Logger.getLogger(SpacePackRobot.class);
+
 
     public static void main(String[] args) throws URISyntaxException, MzsCoreException {
         if(args.length != 2) {
-            System.err.println("You need to specify an Id and a space uri");
+            logger.debug("You need to specify an Id and a space uri");
             System.exit(1);
         }
 
@@ -48,6 +51,6 @@ public class SpacePackRobot {
             exitable.setExit(true);
         }
 
-        System.out.println("SpacePackRobot stopped");
+        logger.debug("SpacePackRobot stopped");
     }
 }

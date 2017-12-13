@@ -275,7 +275,7 @@ public class PackRobot extends Robot {
                         logger.info(String.format("PackRobot %s: remove vegetable(%s) from packing-queue", this.getId(), v.getId()));
                         Vegetable vegetable = packingService.getVegetable(vegetablesOfSameType.get(i).getId(), transaction);
                         if (vegetable == null) {
-                            System.err.println("Did not get vegetable -- rollback");
+                            logger.debug("Did not get vegetable -- rollback");
                             transaction.rollback();
 
                             tryCreateVegetableBasket();

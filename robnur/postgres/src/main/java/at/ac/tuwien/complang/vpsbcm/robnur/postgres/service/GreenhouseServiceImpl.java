@@ -181,7 +181,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         try {
             statement = ((TransactionImpl) transaction).getConnection().createStatement();
         } catch (SQLException e) {
-            System.err.println("getHarvestableVegetablePlant -create statement - returning null");
+            logger.debug("getHarvestableVegetablePlant -create statement - returning null");
             logger.trace("EXCEPTION", e);
             return null;
         }
@@ -205,7 +205,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         try {
             statement.close();
         } catch (SQLException e) {
-            System.err.println("getHarvestableVegetablePlant - statement close - Ignoring");
+            logger.debug("getHarvestableVegetablePlant - statement close - Ignoring");
             logger.trace("EXCEPTION", e);
         }
 
@@ -224,7 +224,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         try {
             statement = ((TransactionImpl) transaction).getConnection().createStatement();
         } catch (SQLException e) {
-            System.err.println("getHarvestableFlowerPlant - create statement - returning null");
+            logger.debug("getHarvestableFlowerPlant - create statement - returning null");
             logger.trace("EXCEPTION", e);
             return null;
         }
@@ -241,14 +241,14 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             }
         } catch (SQLException | IOException e) {
             result = null;
-            System.err.println("getHarvestableFlowerPlant - select and delete - returning null");
+            logger.debug("getHarvestableFlowerPlant - select and delete - returning null");
             logger.trace("EXCEPTION", e);
         }
 
         try {
             statement.close();
         } catch (SQLException e) {
-            System.err.println("getHarvestableFlowerPlant - statement close - ignoring");
+            logger.debug("getHarvestableFlowerPlant - statement close - ignoring");
             logger.trace("EXCEPTION", e);
         }
 

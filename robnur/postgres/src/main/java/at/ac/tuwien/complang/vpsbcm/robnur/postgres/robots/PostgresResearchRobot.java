@@ -9,6 +9,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.CompostServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.TransactionServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.ResearchRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.CompostService;
+import org.apache.log4j.Logger;
 
 import java.net.URISyntaxException;
 import java.sql.SQLException;
@@ -17,9 +18,11 @@ import java.util.List;
 import java.util.Scanner;
 
 public class PostgresResearchRobot {
+    final static Logger logger = Logger.getLogger(PostgresResearchRobot.class);
+
     public static void main(String[] args) {
         if(args.length != 1) {
-            System.err.println("You need to specify the id!");
+            logger.debug("You need to specify the id!");
             System.exit(1);
         }
 

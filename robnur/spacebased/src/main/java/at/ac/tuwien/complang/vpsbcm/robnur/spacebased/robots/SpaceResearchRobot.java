@@ -9,6 +9,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.ConfigServiceImpl
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.ResearchServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.TransactionServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.CompostService;
+import org.apache.log4j.Logger;
 import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.notifications.Notification;
 
@@ -19,10 +20,11 @@ import java.util.List;
 import java.util.Scanner;
 
 public class SpaceResearchRobot {
+    final static Logger logger = Logger.getLogger(SpaceResearchRobot.class);
 
     public static void main(String[] args) throws URISyntaxException, MzsCoreException {
         if(args.length != 2) {
-            System.err.println("You need to specify an Id and a space uri");
+            logger.debug("You need to specify an Id and a space uri");
             System.exit(1);
         }
 
@@ -51,6 +53,6 @@ public class SpaceResearchRobot {
             exitable.setExit(true);
         }
 
-        System.out.println("SpacePlantAndHarvestRobot stopped");
+        logger.debug("SpacePlantAndHarvestRobot stopped");
     }
 }

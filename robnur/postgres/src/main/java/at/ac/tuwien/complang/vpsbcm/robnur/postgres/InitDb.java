@@ -56,7 +56,7 @@ public class InitDb {
         putInitialFlowerPlantCultivationInformation(configService);
         putInitialVegetablePlantCultivationInformation(configService);
 
-        System.out.println("FINISHED");
+        logger.debug("FINISHED");
     }
 
     private static void createTables(List<String> tables){
@@ -156,7 +156,7 @@ public class InitDb {
     }
 
     private static void createGreenhouseTrigger(){
-        System.out.println("creating greenhouse trigger...");
+        logger.debug("creating greenhouse trigger...");
 
         Connection connection = PostgresHelper.getNewConnection("greenhouseTrigger",-1);
         try {

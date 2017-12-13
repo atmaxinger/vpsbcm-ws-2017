@@ -6,6 +6,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Exitable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.PackingService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.*;
+import org.apache.log4j.Logger;
 import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.notifications.Notification;
 
@@ -16,13 +17,14 @@ import java.util.List;
 import java.util.Scanner;
 
 public class SpacePlantAndHarvestRobot {
+    final static Logger logger = Logger.getLogger(SpacePlantAndHarvestRobot.class);
 
     public static void main(String[] args) throws URISyntaxException, MzsCoreException, InterruptedException {
         int plantTransactionTimeout = 60*1000;
         int harvestTransactionTimeout = 1000;
 
         if(args.length < 2) {
-            System.err.println("You need to specify an Id and the space uri, optionally you can specify the plant timeout (in ms) and the harvest timeout (in ms)");
+            logger.debug("You need to specify an Id and the space uri, optionally you can specify the plant timeout (in ms) and the harvest timeout (in ms)");
             System.exit(1);
         }
         else if(args.length == 3) {
@@ -33,8 +35,8 @@ public class SpacePlantAndHarvestRobot {
             harvestTransactionTimeout = Integer.parseInt(args[3]);
         }
 
-        System.out.println(String.format("Starting with plant timeout: %d", plantTransactionTimeout));
-        System.out.println(String.format("Starting with harvest timeout: %d", harvestTransactionTimeout));
+        logger.debug(String.format("Starting with plant timeout: %d", plantTransactionTimeout));
+        logger.debug(String.format("Starting with harvest timeout: %d", harvestTransactionTimeout));
 
         List<Exitable> exitables = new LinkedList<>();
 
@@ -62,6 +64,6 @@ public class SpacePlantAndHarvestRobot {
             exitable.setExit(true);
         }
 
-        System.out.println("SpacePlantAndHarvestRobot stopped");
+        logger.debug("SpacePlantAndHarvestRobot stopped");
     }
 }
