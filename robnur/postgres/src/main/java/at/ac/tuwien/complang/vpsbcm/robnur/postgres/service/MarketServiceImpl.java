@@ -3,6 +3,7 @@ package at.ac.tuwien.complang.vpsbcm.robnur.postgres.service;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.MarketService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
+import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -10,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class MarketServiceImpl extends MarketService {
+    final static Logger logger = Logger.getLogger(MarketServiceImpl.class);
 
     private static final String MARKET_BOUQUET_TABLE = "mbt";
     private static final String MARKET_VEGETABLE_BASKET_TABLE = "mvb";
@@ -54,7 +56,7 @@ public class MarketServiceImpl extends MarketService {
             listeners.add(flowerListener);
             listeners.add(vegetableListener);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 
@@ -90,7 +92,7 @@ public class MarketServiceImpl extends MarketService {
         try {
             ServiceUtil.deleteItemById(bouquet.getId(),MARKET_BOUQUET_TABLE);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 
@@ -102,7 +104,7 @@ public class MarketServiceImpl extends MarketService {
         try {
             ServiceUtil.deleteItemById(vegetableBasket.getId(),MARKET_VEGETABLE_BASKET_TABLE);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 

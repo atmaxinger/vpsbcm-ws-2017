@@ -28,7 +28,7 @@ public class TransactionServiceImpl implements TransactionService {
 //                connection.setNetworkTimeout(Executors.newFixedThreadPool(10), (int) timeoutMillis);
             //}
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         //logger.debug(String.format("Started transaction on connection %s", connection));

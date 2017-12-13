@@ -1,6 +1,7 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.postgres;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.*;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.gui.RobNurGUI;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.Water;
@@ -9,11 +10,13 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.StorageService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlantCultivationInformation;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlantCultivationInformation;
+import org.apache.log4j.Logger;
 
 import java.sql.*;
 import java.util.List;
 
 public class InitDb {
+    final static Logger logger = Logger.getLogger(InitDb.class);
 
     public static void main(String args[]) {
 
@@ -67,14 +70,14 @@ public class InitDb {
                 statement.execute("CREATE TABLE " + t + "(ID BIGSERIAL PRIMARY KEY, DATA JSON NOT NULL)");
                 statement.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.trace("EXCEPTION", e);
             }
         }
 
         try {
             connection.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 
@@ -108,14 +111,14 @@ public class InitDb {
 
                 statement.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.trace("EXCEPTION", e);
             }
         }
 
         try {
             connection.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
     }
@@ -148,7 +151,7 @@ public class InitDb {
             statement.close();
             connection.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 
@@ -184,7 +187,7 @@ public class InitDb {
             statement.close();
             connection.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 
@@ -310,7 +313,7 @@ public class InitDb {
                 statement.execute("CREATE TABLE " + "wa" + "(data VARCHAR(1000))");
                 statement.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.trace("EXCEPTION", e);
             }
 
             //connection.setAutoCommit(true);
@@ -319,7 +322,7 @@ public class InitDb {
             statement.execute(String.format("INSERT INTO %s (data) VALUES ('{}')","wt"));
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 }

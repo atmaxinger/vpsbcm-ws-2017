@@ -4,6 +4,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Flower;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlantCultivationInformation;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
+import org.apache.log4j.Logger;
 import org.mozartspaces.capi3.*;
 import org.mozartspaces.core.*;
 
@@ -13,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ServiceUtil {
+    final static Logger logger = Logger.getLogger(ServiceUtil.class);
 
     public synchronized static <T extends Serializable> T getItemById(String id, ContainerReference containerReference, Transaction transaction, Capi capi) {
         return getItemByParameter("id",id,containerReference,transaction,capi);
@@ -38,7 +40,7 @@ public class ServiceUtil {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
         }
         catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         return null;
@@ -52,7 +54,7 @@ public class ServiceUtil {
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 
@@ -64,7 +66,7 @@ public class ServiceUtil {
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 
@@ -77,7 +79,7 @@ public class ServiceUtil {
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
         return result;
     }
@@ -101,7 +103,7 @@ public class ServiceUtil {
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 
@@ -119,7 +121,7 @@ public class ServiceUtil {
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         return null;
@@ -134,7 +136,7 @@ public class ServiceUtil {
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
         return result;
     }

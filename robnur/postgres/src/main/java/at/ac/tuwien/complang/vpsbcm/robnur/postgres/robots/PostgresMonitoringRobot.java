@@ -59,7 +59,7 @@ public class PostgresMonitoringRobot {
                 transaction.commit();
 
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.trace("EXCEPTION", e);
                 transaction.rollback();
             }
 
@@ -70,7 +70,7 @@ public class PostgresMonitoringRobot {
                 Thread.sleep(2000);
                 logger.info("after sleep");
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.trace("EXCEPTION", e);
             }
         }
     }

@@ -31,7 +31,7 @@ public class PostgresHelper {
 
             return prop.getProperty(property);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         return null;
@@ -56,7 +56,7 @@ public class PostgresHelper {
             //logger.debug("NEW CONNECTION: " + connection + " reason: " + reason);
             return connection;
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
         return null;
     }

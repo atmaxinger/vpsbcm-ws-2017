@@ -48,7 +48,7 @@ public class TransactionServiceImpl implements TransactionService {
                     return true;
                 } catch (TransactionException | MzsCoreException e) {
                     logger.debug(String.format("Error committing transaction %s", ref.getId()));
-                    e.printStackTrace();
+                    logger.trace("EXCEPTION", e);
                 }
             }
 
@@ -65,7 +65,7 @@ public class TransactionServiceImpl implements TransactionService {
                     return true;
                 } catch (TransactionException | MzsCoreException e) {
                     logger.debug(String.format("Error committing transaction %s", ref.getId()));
-                    e.printStackTrace();
+                    logger.trace("EXCEPTION", e);
                 }
             }
 
@@ -105,7 +105,7 @@ public class TransactionServiceImpl implements TransactionService {
 
             return transaction;
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         return null;

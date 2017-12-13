@@ -58,7 +58,7 @@ public class WaterAspect extends AbstractContainerAspect {
                  robotId = ids.get(0);
              }
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         logger.debug(String.format("Robot %s has taken water - wait %d ms", robotId, WATER_INTERVAL_MS));
@@ -66,7 +66,7 @@ public class WaterAspect extends AbstractContainerAspect {
         try {
             Thread.sleep(WATER_INTERVAL_MS);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         Water water = new Water();
@@ -80,7 +80,7 @@ public class WaterAspect extends AbstractContainerAspect {
             capi.write(request.getContainer(), new Entry("token", LabelCoordinator.newCoordinationData(StorageServiceImpl.WATER_TOKEN_LABEL)));
             logger.debug("put new water");
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 */
         return AspectResult.OK;

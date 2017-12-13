@@ -20,7 +20,7 @@ public class ConfigServiceSpaceBasedTest extends ConfigServiceTest {
         try {
             init();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 

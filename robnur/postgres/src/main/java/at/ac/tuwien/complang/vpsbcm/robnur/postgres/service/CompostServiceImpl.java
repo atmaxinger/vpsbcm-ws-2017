@@ -1,11 +1,13 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.postgres.service;
 
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.gui.RobNurGUI;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Flower;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.CompostService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
+import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -13,6 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class CompostServiceImpl extends CompostService {
+    final static Logger logger = Logger.getLogger(CompostServiceImpl.class);
 
     private static final String COMPOST_FLOWER_PLANT_TABLE = "cfp";
     private static final String COMPOST_VEGETABLE_PLANT_TABLE = "cvp";
@@ -78,7 +81,7 @@ public class CompostServiceImpl extends CompostService {
             listeners.add(vegetablesListener);
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 

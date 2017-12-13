@@ -20,7 +20,7 @@ public class CompostServiceSpaceBasedTest extends CompostServiceTest {
         try {
             init();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 

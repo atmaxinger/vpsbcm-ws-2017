@@ -6,6 +6,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlantCultivati
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ConfigService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
+import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -13,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ConfigServiceImpl extends ConfigService {
+    final static Logger logger = Logger.getLogger(ConfigServiceImpl.class);
 
     private static final String CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE = "cfpci";
     private static final String CONFIG_VEGETABLE_PLANT_CULTIVATION_INFORMATION_TABLE = "cvpci";
@@ -58,7 +60,7 @@ public class ConfigServiceImpl extends ConfigService {
             listeners.add(flowersListener);
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 
@@ -80,7 +82,7 @@ public class ConfigServiceImpl extends ConfigService {
         try {
             ServiceUtil.deleteItemById(id,CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE,transaction);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 
@@ -88,7 +90,7 @@ public class ConfigServiceImpl extends ConfigService {
         try {
             ServiceUtil.deleteItemById(id,CONFIG_VEGETABLE_PLANT_CULTIVATION_INFORMATION_TABLE,transaction);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 

@@ -36,7 +36,7 @@ public class ServiceUtil {
                 System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WHY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WHY");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         return transaction;
@@ -75,7 +75,7 @@ public class ServiceUtil {
             statement.close();
         } catch (SQLException | JsonProcessingException e) {
             System.err.println("writeItem - return false");
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
             return false;
         }
 
@@ -132,7 +132,7 @@ public class ServiceUtil {
         } catch (SQLException | IOException e) {
             result = null;
             System.err.println("readAllItems - return null");
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         return result;
@@ -185,7 +185,7 @@ public class ServiceUtil {
         } catch (SQLException | IOException e) {
             result = null;
             System.err.println("getAllItems - return null");
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         return result;
@@ -242,7 +242,7 @@ public class ServiceUtil {
 
         } catch (SQLException | IOException e) {
             System.err.println("readItemByParameter - Ignoring (result = " + result + ")");
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         return result;
@@ -271,7 +271,7 @@ public class ServiceUtil {
             statement = ((TransactionImpl) transaction).getConnection().createStatement();
         } catch (SQLException e) {
             System.err.println("getItemByParameter - createStatement - returning null");
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
             return null;
         }
 
@@ -288,14 +288,14 @@ public class ServiceUtil {
         } catch (SQLException | IOException e) {
             System.err.println("getItemByParameter - select and delete - returning null");
             result = null;
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         try {
             statement.close();
         } catch (SQLException e) {
             System.err.println("getItemByParameter - statement.close - Ignoring");
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         return result;
@@ -325,7 +325,7 @@ public class ServiceUtil {
             statement = ((TransactionImpl) transaction).getConnection().createStatement();
         } catch (SQLException e) {
             System.err.println("getItemsByParameter - create statement - returning null");
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
             return null;
         }
 
@@ -345,14 +345,14 @@ public class ServiceUtil {
         } catch (SQLException | IOException e) {
             result = null;
             System.err.println("getItemsByParameter - select and delete - returning null");
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         try {
             statement.close();
         } catch (SQLException e) {
             System.err.println("getItemsByParameter - statement close - Ignoring");
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         return result;
@@ -390,7 +390,7 @@ public class ServiceUtil {
             statement.execute(String.format("DELETE FROM %s WHERE (data " + prepareArrow(parameterName) + " %s)::text = '%s'", table, parameterName, parameterValue));
             statement.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
             logger.info(String.format("DELETE FROM %s WHERE (data " + prepareArrow(parameterName) + " %s)::text = '%s'", table, parameterName, parameterValue));
             throw e;
         }
@@ -429,7 +429,7 @@ public class ServiceUtil {
             statement.execute(query);
             statement.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
             throw e;
         }
     }

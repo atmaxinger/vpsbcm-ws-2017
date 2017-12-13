@@ -25,7 +25,7 @@ public class TransactionImpl implements Transaction {
             connection.close();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
             return false;
         }
     }
@@ -37,7 +37,7 @@ public class TransactionImpl implements Transaction {
             connection.close();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
             return false;
         }
     }

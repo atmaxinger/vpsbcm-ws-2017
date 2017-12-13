@@ -6,6 +6,8 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.CompostService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
+import org.apache.log4j.Logger;
 import org.mozartspaces.capi3.AnyCoordinator;
 import org.mozartspaces.capi3.Coordinator;
 import org.mozartspaces.core.*;
@@ -19,6 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class CompostServiceImpl extends CompostService {
+    final static Logger logger = Logger.getLogger(CompostServiceImpl.class);
 
     Capi capi;
     private NotificationManager notificationManager;
@@ -45,7 +48,7 @@ public class CompostServiceImpl extends CompostService {
                 try {
                     n.destroy();
                 } catch (MzsCoreException e) {
-                    e.printStackTrace();
+                    logger.trace("EXCEPTION", e);
                 }
             }
         }
@@ -70,9 +73,9 @@ public class CompostServiceImpl extends CompostService {
             notifications.add(notificationManager.createNotification(vegetablePlantContainer, (notification, operation, list) -> notifyVegetablePlantsChanged(readAllVegetablePlants()), Operation.WRITE, Operation.TAKE, Operation.DELETE));
             notifications.add(notificationManager.createNotification(vegetableContainer, (notification, operation, list) -> notifyVegetablesChanged(readAllVegetables()), Operation.WRITE, Operation.TAKE, Operation.DELETE));
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 

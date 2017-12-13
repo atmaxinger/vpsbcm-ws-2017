@@ -1,6 +1,7 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.postgres.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.log4j.Logger;
 import org.postgresql.PGConnection;
 import org.postgresql.PGNotification;
 
@@ -11,6 +12,7 @@ import java.sql.*;
 import java.util.function.Function;
 
 abstract class Listener extends Thread {
+    final static Logger logger = Logger.getLogger(ConfigServiceImpl.class);
 
     private Connection conn;
     private Method method;
@@ -55,7 +57,7 @@ abstract class Listener extends Thread {
                 // notifications
                 Thread.sleep(100);
             } catch (SQLException | InterruptedException e) {
-                e.printStackTrace();
+                logger.trace("EXCEPTION", e);
             }
         }
     }

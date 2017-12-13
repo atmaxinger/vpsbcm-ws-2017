@@ -5,6 +5,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PackRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.PackingService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
+import org.apache.log4j.Logger;
 import org.mozartspaces.capi3.*;
 import org.mozartspaces.core.*;
 import org.mozartspaces.notifications.Notification;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.net.URI;
 
 public class PackingServiceImpl extends PackingService {
+    final static Logger logger = Logger.getLogger(ResearchServiceImpl.class);
 
     private Capi capi;
 
@@ -42,7 +44,7 @@ public class PackingServiceImpl extends PackingService {
                 try {
                     n.destroy();
                 } catch (MzsCoreException e) {
-                    e.printStackTrace();
+                    logger.trace("EXCEPTION", e);
                 }
             }
         }
@@ -63,10 +65,10 @@ public class PackingServiceImpl extends PackingService {
                 notifications.add(notificationManager.createNotification(vegetableContainer, (notification, operation, list) -> raiseVegetablesChanged(), Operation.DELETE, Operation.TAKE, Operation.WRITE));
                 notifications.add(notificationManager.createNotification(flowerContainer, (notification, operation, list) -> raiseFlowersChanged(), Operation.DELETE, Operation.TAKE, Operation.WRITE));
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.trace("EXCEPTION", e);
             }
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 
@@ -111,9 +113,9 @@ public class PackingServiceImpl extends PackingService {
             notifications.add(notificationVegetableContainer);
 
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 }

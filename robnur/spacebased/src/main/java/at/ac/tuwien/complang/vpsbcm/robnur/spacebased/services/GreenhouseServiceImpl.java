@@ -55,7 +55,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
                 try {
                     n.destroy();
                 } catch (MzsCoreException e) {
-                    e.printStackTrace();
+                    logger.trace("EXCEPTION", e);
                 }
             }
         }
@@ -98,9 +98,9 @@ public class GreenhouseServiceImpl extends GreenhouseService {
 
            notifications.add(notificationGreenhouseContainer);
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 
@@ -116,15 +116,15 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             capi.write(entries, greenhouseContainer, MzsConstants.RequestTimeout.INFINITE, ref);
             return true;
         } catch (ContainerFullException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
             return false;
         } catch (MzsTimeoutException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
             TransactionServiceImpl.setTransactionTimedOut(transaction);
             return false;
         }
         catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
             return false;
         }
     }
@@ -143,15 +143,15 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             return true;
 
         } catch (ContainerFullException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
             return false;
         }catch (MzsTimeoutException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
             TransactionServiceImpl.setTransactionTimedOut(transaction);
             return false;
         }
         catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
             return false;
         }
     }
@@ -180,7 +180,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         return null;
@@ -200,7 +200,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
 
@@ -216,7 +216,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
         return vegetablePlants;
     }
@@ -230,7 +230,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
         return flowerPlants;
     }
@@ -257,7 +257,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         return null;
@@ -284,7 +284,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         return null;

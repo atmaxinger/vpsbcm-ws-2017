@@ -110,12 +110,12 @@ public class StorageServiceImpl extends StorageService {
 
                             ResultSet resultSet = statement.executeQuery("SELECT * FROM " + STORAGE_WATER_ACCESS_TABLE);
                             resultSet.next();
-                            String robotId = resultSet.getString("id");
+                            String robotId = resultSet.getString("data");
 
                             notifyWaterRobotChanged(robotId);
 
                         } catch (SQLException e) {
-                            e.printStackTrace();
+                            logger.trace("EXCEPTION", e);
                         }
                     } else if(method == DBMETHOD.DELETE){
                         notifyWaterRobotChanged(null);
@@ -132,7 +132,7 @@ public class StorageServiceImpl extends StorageService {
             listeners.add(accessWaterListener);
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 
@@ -230,7 +230,7 @@ public class StorageServiceImpl extends StorageService {
             try {
                 ServiceUtil.deleteItemById(flowerFertilizer.getId(),STORAGE_FLOWER_FERTILIZER_TABLE,transaction);
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.trace("EXCEPTION", e);
                 return null;
             }
         }
@@ -280,7 +280,7 @@ public class StorageServiceImpl extends StorageService {
             try {
                 ServiceUtil.deleteItemById(vegetableFertilizer.getId(),STORAGE_VEGETABLE_FERTILIZER_TABLE,transaction);
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.trace("EXCEPTION", e);
                 return null;
             }
         }
@@ -367,9 +367,9 @@ public class StorageServiceImpl extends StorageService {
             return water;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         return null;
@@ -445,7 +445,7 @@ public class StorageServiceImpl extends StorageService {
             listeners.add(soilListener);
             listeners.add(waterListener);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 

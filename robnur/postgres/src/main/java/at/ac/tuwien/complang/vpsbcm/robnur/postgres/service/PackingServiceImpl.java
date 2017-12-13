@@ -5,6 +5,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PackRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.PackingService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
+import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -12,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class PackingServiceImpl extends PackingService {
+    final static Logger logger = Logger.getLogger(PackingServiceImpl.class);
 
     private static final String PACKING_FLOWER_TABLE = "paf";
     private static final String PACKING_VEGETABLE_TABLE = "pav";
@@ -56,7 +58,7 @@ public class PackingServiceImpl extends PackingService {
             listeners.add(vegetableListener);
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 
@@ -119,7 +121,7 @@ public class PackingServiceImpl extends PackingService {
             listeners.add(vegetableListener);
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 }

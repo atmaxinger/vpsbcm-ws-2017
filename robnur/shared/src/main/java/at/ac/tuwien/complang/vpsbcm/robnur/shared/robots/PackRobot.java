@@ -353,7 +353,7 @@ public class PackRobot extends Robot {
         try {
             Thread.sleep(waitTime);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 }

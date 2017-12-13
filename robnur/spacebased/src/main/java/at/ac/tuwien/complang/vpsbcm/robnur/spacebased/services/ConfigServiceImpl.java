@@ -4,8 +4,10 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlantCultivationI
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlantCultivationInformation;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableType;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.CompostService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ConfigService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
+import org.apache.log4j.Logger;
 import org.mozartspaces.capi3.*;
 import org.mozartspaces.core.*;
 import org.mozartspaces.notifications.Notification;
@@ -19,6 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ConfigServiceImpl extends ConfigService {
+    final static Logger logger = Logger.getLogger(ConfigServiceImpl.class);
 
     Capi capi;
     private NotificationManager notificationManager;
@@ -43,7 +46,7 @@ public class ConfigServiceImpl extends ConfigService {
                 try {
                     n.destroy();
                 } catch (MzsCoreException e) {
-                    e.printStackTrace();
+                    logger.trace("EXCEPTION", e);
                 }
             }
         }
@@ -62,9 +65,9 @@ public class ConfigServiceImpl extends ConfigService {
             notifications.add(notificationManager.createNotification(flowerPlantCultivationInformationContainer, (notification, operation, list) -> notifyFlowerCultivationInformationChanged(readAllFlowerPlantCultivationInformation(null)), Operation.WRITE));
             notifications.add(notificationManager.createNotification(vegetablePlantCultivationInformationContainer, (notification, operation, list) -> notifyVegetableCultivationInformationChanged(readAllVegetablePlantCultivationInformation(null)), Operation.WRITE));
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 

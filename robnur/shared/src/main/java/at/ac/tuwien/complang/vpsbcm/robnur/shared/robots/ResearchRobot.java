@@ -248,7 +248,7 @@ public class ResearchRobot extends Robot {
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 }

@@ -85,7 +85,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             listeners.add(flowerListener);
             listeners.add(vegetableListener);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 
@@ -137,7 +137,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             logger.info(String.format("GreenhouseServiceImpl: deleted %d vegetable plants", cnt));
         } catch (SQLException e) {
             logger.info(String.format("GreenhouseServiceImpl: deleted did not work --> try again"));
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
             return null;
         }
         return vegetablePlants;
@@ -153,7 +153,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             logger.info(String.format("GreenhouseServiceImpl: deleted %d flower plants", cnt));
         } catch (SQLException e) {
             logger.info(String.format("GreenhouseServiceImpl: deleted flowerplant did not work --> try again"));
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
             return null;
         }
 
@@ -182,7 +182,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             statement = ((TransactionImpl) transaction).getConnection().createStatement();
         } catch (SQLException e) {
             System.err.println("getHarvestableVegetablePlant -create statement - returning null");
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
             return null;
         }
 
@@ -199,14 +199,14 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         } catch (SQLException | IOException e) {
             result = null;
             logger.fatal("getHarvestableVegetablePlant - select and delete - returning null");
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         try {
             statement.close();
         } catch (SQLException e) {
             System.err.println("getHarvestableVegetablePlant - statement close - Ignoring");
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         return result;
@@ -225,7 +225,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             statement = ((TransactionImpl) transaction).getConnection().createStatement();
         } catch (SQLException e) {
             System.err.println("getHarvestableFlowerPlant - create statement - returning null");
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
             return null;
         }
 
@@ -242,14 +242,14 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         } catch (SQLException | IOException e) {
             result = null;
             System.err.println("getHarvestableFlowerPlant - select and delete - returning null");
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         try {
             statement.close();
         } catch (SQLException e) {
             System.err.println("getHarvestableFlowerPlant - statement close - ignoring");
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         return result;
@@ -279,7 +279,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             listeners.add(flowerListener);
             listeners.add(vegetableListener);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 

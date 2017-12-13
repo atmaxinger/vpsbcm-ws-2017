@@ -5,6 +5,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.ResearchRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ResearchService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
+import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -12,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ResearchServiceImpl extends ResearchService {
+    final static Logger logger = Logger.getLogger(ResearchServiceImpl.class);
 
     private static final String RESEARCH_FLOWER_TABLE = "rf";
     private static final String RESEARCH_VEGETABLE_TABLE = "rv";
@@ -57,7 +59,7 @@ public class ResearchServiceImpl extends ResearchService {
             listeners.add(flowerListener);
             listeners.add(vegetableListener);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 
@@ -115,7 +117,7 @@ public class ResearchServiceImpl extends ResearchService {
             listeners.add(flowerListener);
             listeners.add(vegetableListener);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 }

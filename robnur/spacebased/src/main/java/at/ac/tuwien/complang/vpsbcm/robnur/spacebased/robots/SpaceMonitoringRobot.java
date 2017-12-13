@@ -122,7 +122,7 @@ public class SpaceMonitoringRobot {
             try {
                 Thread.sleep(MONITORING_INTERVAL_MS);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.trace("EXCEPTION", e);
             }
         }
     }
