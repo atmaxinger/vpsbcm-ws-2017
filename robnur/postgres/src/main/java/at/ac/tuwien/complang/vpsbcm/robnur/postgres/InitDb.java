@@ -45,6 +45,8 @@ public class InitDb {
 
         createWaterTrigger("sw");
 
+        insertInitialWaterToken();
+
         createGreenhouseTrigger();
 
         ConfigService configService = new ConfigServiceImpl();
@@ -295,5 +297,20 @@ public class InitDb {
         }
 
         transaction.commit();
+    }
+
+    private static void insertInitialWaterToken(){
+
+        try {
+            Connection connection = PostgresHelper.getNewConnection("water access",-1);
+            connection.setAutoCommit(true);
+            Statement statement = connection.createStatement();
+
+            statement.execute(String.format("INSERT INTO %s (data) VALUES ('{}')",StorageServiceImpl.STORAGE_WATER_ACCESS_TABLE));
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -32,7 +32,7 @@ public class StorageServiceImpl extends StorageService {
     private static final String STORAGE_VEGETABLE_FERTILIZER_TABLE = "svf";
     private static final String STORAGE_WATER_TABLE = "sw";
     private static final String STORAGE_WATER_TOKEN_TABLE = "wt";
-    private static final String STORAGE_WATER_ACCESS_TABLE = "wa";
+    public static final String STORAGE_WATER_ACCESS_TABLE = "wa";
 
     final static Logger logger = Logger.getLogger(StorageServiceImpl.class);
 
@@ -306,7 +306,7 @@ public class StorageServiceImpl extends StorageService {
             }
 
             logger.info(robotId + " write name into waterAccessContainer");
-            statement.execute(String.format("INSERT INTO %s (id) VALUES %s",STORAGE_WATER_ACCESS_TABLE,robotId));
+            statement.execute(String.format("INSERT INTO %s (id) VALUES (%s)",STORAGE_WATER_ACCESS_TABLE,robotId));
 
             logger.info(robotId + " wait for water");
 
@@ -322,8 +322,8 @@ public class StorageServiceImpl extends StorageService {
 
             logger.info(robotId + " put back token");
 
+            statement.execute(String.format("INSERT INTO %s (data) VALUES ('{}')",STORAGE_WATER_ACCESS_TABLE));
 
-            statement.execute(String.format("INSERT INTO %s (id) VALUES 'TOKEN'",STORAGE_WATER_TOKEN_TABLE,robotId));
             logger.info(robotId + " return water");
 
             return water;
