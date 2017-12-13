@@ -8,9 +8,12 @@ import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.PackingServiceImp
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.ResearchServiceImpl;
 import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.TransactionServiceImpl;
 import org.mozartspaces.core.MzsCoreException;
+import org.mozartspaces.notifications.Notification;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Scanner;
 
 public class SpacePackRobot {
 
@@ -28,6 +31,15 @@ public class SpacePackRobot {
         TransactionService transactionService = new TransactionServiceImpl(uri);
 
         PackRobot packRobot = new PackRobot(args[0], packingService,marketService,researchService,transactionService);
-        packingService.registerPackRobot(packRobot);
+        List<Notification> notifications = packingService.registerPackRobot(packRobot);
+
+        Scanner scanner = new Scanner(System.in);
+        scanner.next("exit");
+
+        for (Notification n:notifications) {
+            n.destroy();
+        }
+
+        System.out.println("SpacePackRobot stopped");
     }
 }

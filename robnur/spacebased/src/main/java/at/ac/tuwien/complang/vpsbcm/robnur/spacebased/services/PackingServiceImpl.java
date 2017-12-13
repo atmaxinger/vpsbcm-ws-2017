@@ -7,20 +7,25 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.PackingService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import org.mozartspaces.capi3.*;
 import org.mozartspaces.core.*;
+import org.mozartspaces.notifications.Notification;
 import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.net.URI;
 
 public class PackingServiceImpl extends PackingService {
 
-    Capi capi;
+    private Capi capi;
 
-    ContainerReference vegetableContainer;
-    ContainerReference flowerContainer;
-    NotificationManager notificationManager;
+    private ContainerReference vegetableContainer;
+    private ContainerReference flowerContainer;
+    private NotificationManager notificationManager;
+
+    private List<Notification> notifications = new ArrayList<>();
+
 
     public PackingServiceImpl(URI spaceUri) {
         MzsCore core = DefaultMzsCore.newInstanceWithoutSpace();
@@ -76,14 +81,30 @@ public class PackingServiceImpl extends PackingService {
         return ServiceUtil.readAllItems(vegetableContainer,selector,transaction,capi);
     }
 
-    public void registerPackRobot(PackRobot packRobot){
+    public List<Notification> registerPackRobot(PackRobot packRobot){
         try {
-            notificationManager.createNotification(flowerContainer, (notification, operation, list) -> packRobot.tryCreateBouquet(),Operation.WRITE);
-            notificationManager.createNotification(vegetableContainer, (notification, operation, list) -> packRobot.tryCreateVegetableBasket(),Operation.WRITE);
+            Notification notificationFlowerContainer = notificationManager.createNotification(flowerContainer, (notification, operation, list) -> packRobot.tryCreateBouquet(),Operation.WRITE);
+            Notification notificationVegetableContainer = notificationManager.createNotification(vegetableContainer, (notification, operation, list) -> packRobot.tryCreateVegetableBasket(),Operation.WRITE);
+
+            notifications.add(notificationFlowerContainer);
+            notifications.add(notificationVegetableContainer);
+
+            return notifications;
         } catch (MzsCoreException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        return null;
+    }
+
+    private boolean isExit(){
+        for (Notification n:notifications) {
+            if(n.isActive()){
+                return true;
+            }
+        }
+        return false;
     }
 }
