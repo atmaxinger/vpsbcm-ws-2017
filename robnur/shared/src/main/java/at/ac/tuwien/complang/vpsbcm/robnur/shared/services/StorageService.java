@@ -21,8 +21,7 @@ public abstract class StorageService {
     }
 
     private org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(StorageService.class);
-
-
+    
     private Callback<List<FlowerPlant>> flowerSeedsChanged;
     private Callback<List<VegetablePlant>> vegetableSeedChanged;
     private Callback<List<SoilPackage>> soilPackagesChanged;
@@ -201,7 +200,7 @@ public abstract class StorageService {
 
     /**
      * Read all currently available flower seeds (without setting a lock)
-     * @return list of all currently available flower seeds
+     * @return list of all currently available flower seeds if successful, or null otherwise
      */
     public List<FlowerPlant> readAllFlowerSeeds() {
         return readAllFlowerSeeds(null);
@@ -209,13 +208,13 @@ public abstract class StorageService {
     /**
      * Read all currently available flower seeds
      * @param transaction the transaction
-     * @return list of all currently available flower seeds
+     * @return list of all currently available flower seeds if successful, or null otherwise
      */
     public abstract List<FlowerPlant> readAllFlowerSeeds(Transaction transaction);
 
     /**
      * Read all currently available vegetable seeds (without setting a lock)
-     * @return list of all currently available vegetable seeds
+     * @return list of all currently available vegetable seeds if successful, or null otherwise
      */
     public List<VegetablePlant> readAllVegetableSeeds() {
         return readAllVegetableSeeds(null);
@@ -223,33 +222,87 @@ public abstract class StorageService {
     /**
      * Read all currently available vegetable seeds
      * @param transaction the transaction
-     * @return list of all currently available vegetable seeds
+     * @return list of all currently available vegetable seeds if successful, or null otherwise
      */
     public abstract List<VegetablePlant> readAllVegetableSeeds(Transaction transaction);
 
-    
+    /**
+     * Take the amount of flower fertilizers from the storage (read + delete)
+     * @param amount the amount to get
+     * @param transaction the transaction
+     * @return list of flower fertilizers if successful, or null otherwise
+     */
     public abstract List<FlowerFertilizer> getFlowerFertilizer(int amount, Transaction transaction);
 
+    /**
+     * Put one flower fertilizer into the storage
+     * @param flowerFertilizer the fertilizer
+     */
     public abstract void putFlowerFertilizer(FlowerFertilizer flowerFertilizer);
+    /**
+     * Put multiple flower fertilizers into the storage
+     * @param flowerFertilizers the fertilizers
+     */
     public abstract void putFlowerFertilizers(List<FlowerFertilizer> flowerFertilizers);
+    /**
+     * Put multiple flower fertilizers into the storage
+     * @param flowerFertilizers the fertilizers
+     * @param transaction transaction
+     */
     public abstract void putFlowerFertilizers(List<FlowerFertilizer> flowerFertilizers, Transaction transaction);
 
-
+    /**
+     * read all available flower fertilizer (without lock)
+     * @return list of flower fertilizers if successful, or null otherwise
+     */
     public List<FlowerFertilizer> readAllFlowerFertilizer() {
         return readAllFlowerFertilizer(null);
     }
+    /**
+     * read all available flower fertilizer
+     * @param transaction the transaction
+     * @return list of flower fertilizers if successful, or null otherwise
+     */
     public abstract List<FlowerFertilizer> readAllFlowerFertilizer(Transaction transaction);
 
+
+    /**
+     * Take the amount of vegetable fertilizers from the storage (read + delete)
+     * @param amount the amount to get
+     * @param transaction the transaction
+     * @return list of vegetable fertilizers if successful, or null otherwise
+     */
     public abstract List<VegetableFertilizer> getVegetableFertilizer(int amount, Transaction transaction);
 
+    /**
+     * Put 1 vegetable fertilizers into the storage
+     * @param vegetableFertilizer the fertilizer
+     */
     public abstract void putVegetableFertilizer(VegetableFertilizer vegetableFertilizer);
+    /**
+     * Put multiple vegetable fertilizers into the storage
+     * @param vegetableFertilizers the fertilizers
+     */
     public abstract void putVegetableFertilizers(List<VegetableFertilizer> vegetableFertilizers);
+    /**
+     * Put multiple vegetable fertilizers into the storage
+     * @param vegetableFertilizers the fertilizers
+     * @param t the transaction
+     */
     public abstract void putVegetableFertilizers(List<VegetableFertilizer> vegetableFertilizers, Transaction t);
 
-
+    /**
+     * read all available flower fertilizer (without blocking)
+     * @return list of flower fertilizers if successful, or null otherwise
+     */
     public List<VegetableFertilizer> readAllVegetableFertilizer() {
         return readAllVegetableFertilizer(null);
     }
+    /**
+     * read all available flower fertilizer
+     * @param transaction the transaction
+     * @return list of flower fertilizers if successful, or null otherwise
+     */
     public abstract List<VegetableFertilizer> readAllVegetableFertilizer(Transaction transaction);
 
 
@@ -285,12 +338,12 @@ public abstract class StorageService {
     }
 
     /**
-     * Trys to get enough soil packages to satisfy the amount.
+     * Tries to get enough soil packages to satisfy the amount.
      * You need to return the packages that you don't need
      *
      * @param amount the amount
      * @param transaction the transaction
-     * @return
+     * @return the soil packages if successful, or null otherwise
      */
     public List<SoilPackage> tryGetSoilPackages(int amount, Transaction transaction){
         List<SoilPackage> selectedSoilPackages = new ArrayList<>();
@@ -335,7 +388,7 @@ public abstract class StorageService {
     /**
      * Gets (read + delete) all available soil packages
      * @param transaction the transaction
-     * @return List of soil packages
+     * @return List of soil packages if successful, or null otherwise
      */
     protected abstract List<SoilPackage> getAllSoilPackages(Transaction transaction);
 
@@ -354,7 +407,7 @@ public abstract class StorageService {
 
     /**
      * Read all available soil packages (without lock)
-     * @return all availbale soil packages
+     * @return all availbale soil packages if successful, or null otherwise
      */
     public List<SoilPackage> readAllSoilPackage() {
         return readAllSoilPackage(null);
@@ -362,7 +415,7 @@ public abstract class StorageService {
     /**
      * Read all available soil packages
      * @param transaction the transaction
-     * @return all availbale soil packages
+     * @return all availbale soil packages if successful, or null otherwise
      */
     public abstract List<SoilPackage> readAllSoilPackage(Transaction transaction);
 
