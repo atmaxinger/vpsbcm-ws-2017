@@ -14,7 +14,7 @@ import java.sql.SQLException;
 import java.util.Scanner;
 
 public class PostgresResearchRobot {
-    public static void main(String[] args) throws URISyntaxException, SQLException {
+    public static void main(String[] args) {
         if(args.length != 1) {
             System.err.println("You need to specify the id!");
             System.exit(1);
@@ -29,6 +29,11 @@ public class PostgresResearchRobot {
         researchService.registerResearchRobot(researchRobot);
 
         Scanner scanner = new Scanner(System.in);
-        scanner.next();
+        while(true) {
+            String command = scanner.nextLine();
+            if(command.toLowerCase().equals("exit")) {
+                System.exit(0);
+            }
+        }
     }
 }

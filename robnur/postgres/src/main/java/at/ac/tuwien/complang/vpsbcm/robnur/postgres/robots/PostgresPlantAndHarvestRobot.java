@@ -7,6 +7,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.PackingService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
 
 import java.net.URISyntaxException;
+import java.util.Scanner;
 
 public class PostgresPlantAndHarvestRobot {
 
@@ -38,18 +39,12 @@ public class PostgresPlantAndHarvestRobot {
         greenhouseService.registerPlantAndHarvestRobot(robot);
         storageService.registerPlantAndHarvestRobot(robot);
 
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
+        Scanner scanner = new Scanner(System.in);
+        while(true) {
+            String command = scanner.nextLine();
+            if(command.toLowerCase().equals("exit")) {
+                System.exit(0);
             }
-        });
-        t.start();
+        }
     }
 }

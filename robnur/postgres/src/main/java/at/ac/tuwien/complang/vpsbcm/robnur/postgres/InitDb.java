@@ -303,6 +303,16 @@ public class InitDb {
     System.out.print("IN");
         try {
             Connection connection = PostgresHelper.getNewConnection("water access",-1);
+
+            try {
+                Statement statement = connection.createStatement();
+                statement.execute("DROP TABLE IF EXISTS " + "wa");
+                statement.execute("CREATE TABLE " + "wa" + "(data VARCHAR(1000))");
+                statement.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
             //connection.setAutoCommit(true);
             Statement statement = connection.createStatement();
 

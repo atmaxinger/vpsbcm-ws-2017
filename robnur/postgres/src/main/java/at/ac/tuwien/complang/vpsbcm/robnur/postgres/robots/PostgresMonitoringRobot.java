@@ -25,8 +25,6 @@ public class PostgresMonitoringRobot {
         //MonitoringRobot monitoringRobot = new MonitoringRobot(greenhouseService, transactionService);
         //monitoringRobot.monitorGreenhouse();
         monitorGreenhouse();
-
-
     }
 
     public static void monitorGreenhouse() {

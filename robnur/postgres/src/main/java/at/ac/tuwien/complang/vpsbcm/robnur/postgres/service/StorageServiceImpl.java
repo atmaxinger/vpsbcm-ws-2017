@@ -296,7 +296,6 @@ public class StorageServiceImpl extends StorageService {
 
         try {
             Connection connection = PostgresHelper.getNewConnection("water access",-1);
-            connection.setAutoCommit(true);
             Statement statement = connection.createStatement();
 
             boolean locked = true;
@@ -315,8 +314,10 @@ public class StorageServiceImpl extends StorageService {
                 }
             }
 
+
+            connection.setAutoCommit(true);
             logger.info(robotId + " write name into waterAccessContainer");
-            statement.execute(String.format("INSERT INTO %s (id,data) VALUES ('%s','{}')",STORAGE_WATER_ACCESS_TABLE,robotId));
+            statement.execute(String.format("INSERT INTO %s (data) VALUES ('{}')",STORAGE_WATER_ACCESS_TABLE,robotId));
 
             logger.info(robotId + " wait for water");
 
@@ -328,13 +329,14 @@ public class StorageServiceImpl extends StorageService {
 
             logger.info(robotId + " remove name");
 
-            statement.execute("DELETE FROM " + STORAGE_WATER_ACCESS_TABLE);
+            ///statement.execute("DELETE FROM " + STORAGE_WATER_ACCESS_TABLE);
 
             logger.info(robotId + " put back token");
 
-            statement.execute(String.format("INSERT INTO %s (data) VALUES ('{}')",STORAGE_WATER_TOKEN_TABLE));
+            ///statement.execute(String.format("INSERT INTO %s (data) VALUES ('{}')",STORAGE_WATER_TOKEN_TABLE));
 
             logger.info(robotId + " return water");
+
 
             return water;
 

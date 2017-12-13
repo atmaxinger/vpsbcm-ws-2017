@@ -29,6 +29,11 @@ public class PostgresPackRobot {
         packingService.registerPackRobot(packRobot);
 
         Scanner scanner = new Scanner(System.in);
-        scanner.next();
+        while(true) {
+            String command = scanner.nextLine();
+            if(command.toLowerCase().equals("exit")) {
+                System.exit(0);
+            }
+        }
     }
 }
