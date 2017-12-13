@@ -105,4 +105,10 @@ public abstract class CompostService {
      * @return all vegetables that are in the compost, empty list if no vegetables were found, null if unsuccessful
      */
     public abstract List<Vegetable> readAllVegetables();
+
+    /**
+     * checks if notifications are stopped
+     * @return true if notifications are stopped else false
+     */
+    public abstract boolean isExit();
 }

@@ -75,4 +75,10 @@ public abstract class ConfigService {
      * @return all vegetable plant cultivation information, empty list if no vegetables were found, null if unsuccessful
      */
     public abstract List<VegetablePlantCultivationInformation> readAllVegetablePlantCultivationInformation(Transaction transaction);
+
+    /**
+     * checks if notifications are stopped
+     * @return true if notifications are stopped else false
+     */
+    public abstract boolean isExit();
 }

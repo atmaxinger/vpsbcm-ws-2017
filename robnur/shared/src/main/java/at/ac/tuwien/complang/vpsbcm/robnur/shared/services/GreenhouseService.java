@@ -91,4 +91,10 @@ public abstract class GreenhouseService {
      * @return a flower plant that can be harvested, null if no harvestable flower plant was found
      */
     public abstract FlowerPlant getHarvestableFlowerPlant(Transaction transaction);
+
+    /**
+     * checks if notifications are stopped
+     * @return true if notifications are stopped else false
+     */
+    public abstract boolean isExit();
 }

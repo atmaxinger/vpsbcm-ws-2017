@@ -71,4 +71,10 @@ public abstract class MarketService {
      * @param vegetableBasket to sell
      */
     public abstract void sellVegetableBasket(VegetableBasket vegetableBasket);
+
+    /**
+     * checks if notifications are stopped
+     * @return true if notifications are stopped else false
+     */
+    public abstract boolean isExit();
 }

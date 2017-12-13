@@ -99,7 +99,8 @@ public class PackingServiceImpl extends PackingService {
         return null;
     }
 
-    private boolean isExit(){
+    @Override
+    public boolean isExit(){
         for (Notification n:notifications) {
             if(n.isActive()){
                 return true;
