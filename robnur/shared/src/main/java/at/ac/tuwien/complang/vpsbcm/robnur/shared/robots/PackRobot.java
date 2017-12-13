@@ -9,7 +9,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class PackRobot extends Robot {
 
-    private final int TRANSACTION_TIMEOUT = 1000;
+    private final int TRANSACTION_TIMEOUT = -1;
     private PackingService packingService;
     private MarketService marketService;
     private ResearchService researchService;
@@ -36,7 +36,7 @@ public class PackRobot extends Robot {
 
         logger.debug("tryPutFlowersIntoResearch");
 
-        Transaction transaction = transactionService.beginTransaction(TRANSACTION_TIMEOUT); // TODO change timeout
+        Transaction transaction = transactionService.beginTransaction(TRANSACTION_TIMEOUT);
         List<Flower> flowers = packingService.readAllFlowers(transaction);
 
         if (flowers == null) {
