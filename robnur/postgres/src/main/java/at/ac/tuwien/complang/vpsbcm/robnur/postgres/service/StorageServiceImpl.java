@@ -299,14 +299,24 @@ public class StorageServiceImpl extends StorageService {
             connection.setAutoCommit(true);
             Statement statement = connection.createStatement();
 
-            List<String> tokens = null;
-            while (tokens == null || tokens.isEmpty()){
+            boolean locked = true;
+            while (locked){
                 logger.info(robotId + " wait for water");
-                tokens = ServiceUtil.getAllItems(STORAGE_WATER_TOKEN_TABLE,String.class);
+                connection.setAutoCommit(false);
+                ResultSet resultSet = statement.executeQuery("SELECT * FROM " + STORAGE_WATER_TOKEN_TABLE);
+                if(resultSet.next()){
+                    statement.execute("DELETE FROM " + STORAGE_WATER_TOKEN_TABLE);
+                    connection.commit();
+                    connection.setAutoCommit(true);
+                    locked = false;
+                } else {
+                    connection.commit();
+                    Thread.sleep(100);
+                }
             }
 
             logger.info(robotId + " write name into waterAccessContainer");
-            statement.execute(String.format("INSERT INTO %s (id) VALUES (%s)",STORAGE_WATER_ACCESS_TABLE,robotId));
+            statement.execute(String.format("INSERT INTO %s (id,data) VALUES (%s,'{}')",STORAGE_WATER_ACCESS_TABLE,robotId));
 
             logger.info(robotId + " wait for water");
 
@@ -318,11 +328,11 @@ public class StorageServiceImpl extends StorageService {
 
             logger.info(robotId + " remove name");
 
-            statement.execute(String.format("DELETE FROM ",STORAGE_WATER_ACCESS_TABLE));
+            statement.execute("DELETE FROM " + STORAGE_WATER_ACCESS_TABLE);
 
             logger.info(robotId + " put back token");
 
-            statement.execute(String.format("INSERT INTO %s (data) VALUES ('{}')",STORAGE_WATER_ACCESS_TABLE));
+            statement.execute(String.format("INSERT INTO %s (data) VALUES ('{}')",STORAGE_WATER_TOKEN_TABLE));
 
             logger.info(robotId + " return water");
 

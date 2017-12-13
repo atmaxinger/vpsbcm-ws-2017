@@ -300,14 +300,13 @@ public class InitDb {
     }
 
     private static void insertInitialWaterToken(){
-
+    System.out.print("IN");
         try {
             Connection connection = PostgresHelper.getNewConnection("water access",-1);
-            connection.setAutoCommit(true);
+            //connection.setAutoCommit(true);
             Statement statement = connection.createStatement();
 
-            statement.execute(String.format("INSERT INTO %s (data) VALUES ('{}')",StorageServiceImpl.STORAGE_WATER_ACCESS_TABLE));
-
+            statement.execute(String.format("INSERT INTO %s (data) VALUES ('{}')","wt"));//StorageServiceImpl.STORAGE_WATER_ACCESS_TABLE));
 
         } catch (SQLException e) {
             e.printStackTrace();
