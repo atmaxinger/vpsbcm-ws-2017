@@ -45,11 +45,6 @@ public class ConfigServiceImpl extends ConfigService {
     }
 
     @Override
-    public FlowerPlantCultivationInformation getFlowerPlantCultivationInformation(String id, Transaction transaction) {
-        return ServiceUtil.getItemById(id,flowerPlantCultivationInformationContainer,transaction,capi);
-    }
-
-    @Override
     public FlowerPlantCultivationInformation getFlowerPlantCultivationInformation(FlowerType flowerType, Transaction transaction) {
         Selector selector = LabelCoordinator.newSelector(flowerType.name(),1);
 
@@ -62,16 +57,6 @@ public class ConfigServiceImpl extends ConfigService {
         Selector selector = LabelCoordinator.newSelector(vegetableType.name(),1);
 
         return ServiceUtil.getItem(selector,vegetablePlantCultivationInformationContainer,transaction,capi);
-    }
-
-    @Override
-    public void deleteFlowerPlantCultivationInformation(String id, Transaction transaction) {
-         ServiceUtil.getItemById(id,flowerPlantCultivationInformationContainer,transaction,capi);
-    }
-
-    @Override
-    public void deleteVegetablePlantCultivationInformation(String id, Transaction transaction) {
-        ServiceUtil.getItemById(id,vegetablePlantCultivationInformationContainer,transaction,capi);
     }
 
     @Override

@@ -11,9 +11,36 @@ public abstract class GreenhouseService {
         this.greenhouseChanged = greenhouseChanged;
     }
 
+    /**
+     * plants a list of vegetable plants in the greenhouse
+     * @param vegetablePlants
+     * @param transaction
+     * @return true if successful otherwise false
+     */
     public abstract boolean plantVegetables(List<VegetablePlant> vegetablePlants, Transaction transaction);
+
+    /**
+     * plants a list of vegetable plants in the greenhouse
+     * @param flowerPlants
+     * @param transaction
+     * @return true if successful otherwise false
+     */
     public abstract boolean plantFlowers(List<FlowerPlant> flowerPlants, Transaction transaction);
+
+    /**
+     * plants a vegetable plant in the greenhouse
+     * @param vegetablePlant
+     * @param transaction
+     * @return true if successful otherwise false
+     */
     public abstract boolean plant(VegetablePlant vegetablePlant, Transaction transaction);
+
+    /**
+     * plants a flower plant in the greenhouse
+     * @param flowerPlant
+     * @param transaction
+     * @return true if successful otherwise false
+     */
     public abstract boolean plant(FlowerPlant flowerPlant, Transaction transaction);
 
 

@@ -139,7 +139,6 @@ public class ResearchRobot extends Robot {
         flowerPlantCultivationInformation = (FlowerPlantCultivationInformation) upgradeCultivationInformation(flowerPlantCultivationInformation);
 
         // update cultivation information
-        configService.deleteFlowerPlantCultivationInformation(flowerPlantCultivationInformation.getId(), transaction);
         configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, transaction);
 
         logger.info(String.format("ResearchRobot %s: upgraded Config of %s to level %d", this.getId(), flowerType.name(), flowerPlantCultivationInformation.getUpgradeLevel()));
@@ -151,7 +150,6 @@ public class ResearchRobot extends Robot {
         vegetablePlantCultivationInformation = (VegetablePlantCultivationInformation) upgradeCultivationInformation(vegetablePlantCultivationInformation);
 
         // update cultivation information
-        configService.deleteVegetablePlantCultivationInformation(vegetablePlantCultivationInformation.getId(), transaction);
         configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation, transaction);
 
         logger.info(String.format("ResearchRobot %s: upgraded Config of %s to level %d", this.getId(), vegetableType.name(), vegetablePlantCultivationInformation.getUpgradeLevel()));

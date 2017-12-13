@@ -57,16 +57,6 @@ public class ResearchServiceImpl extends ResearchService {
     }
 
     @Override
-    public void deleteFlower(Flower flower, Transaction transaction) {
-        ServiceUtil.deleteItemById(flower.getId(),flowerContainer,transaction,capi);
-    }
-
-    @Override
-    public void deleteVegetable(Vegetable vegetable,Transaction transaction) {
-        ServiceUtil.deleteItemById(vegetable.getId(),flowerContainer,transaction,capi);
-    }
-
-    @Override
     public List<Flower> getAllFlowers(Transaction transaction) {
         return ServiceUtil.getAllItems(flowerContainer,transaction,capi);
     }

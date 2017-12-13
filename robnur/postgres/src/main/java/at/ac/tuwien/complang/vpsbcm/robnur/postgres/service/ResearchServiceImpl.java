@@ -38,28 +38,14 @@ public class ResearchServiceImpl extends ResearchService {
         }
     }
 
+    @Override
     public void putFlower(Flower flower, Transaction transaction) {
         ServiceUtil.writeItem(flower,RESEARCH_FLOWER_TABLE, transaction);
     }
 
+    @Override
     public void putVegetable(Vegetable vegetable, Transaction transaction) {
         ServiceUtil.writeItem(vegetable,RESEARCH_VEGETABLE_TABLE, transaction);
-    }
-
-    public void deleteFlower(Flower flower, Transaction transaction) {
-        try {
-            ServiceUtil.deleteItemById(flower.getId(),RESEARCH_FLOWER_TABLE,transaction);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void deleteVegetable(Vegetable vegetable, Transaction transaction) {
-        try {
-            ServiceUtil.deleteItemById(vegetable.getId(),RESEARCH_VEGETABLE_TABLE,transaction);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override

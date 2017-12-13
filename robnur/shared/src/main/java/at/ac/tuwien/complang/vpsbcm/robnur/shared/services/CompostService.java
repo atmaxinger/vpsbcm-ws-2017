@@ -54,19 +54,55 @@ public abstract class CompostService {
         }
     }
 
+    /**
+     * puts a flower plant on the compost
+     * @param flowerPlant
+     * @param transaction
+     */
     public abstract void putFlowerPlant(FlowerPlant flowerPlant, Transaction transaction);
 
+    /**
+     * puts a vegetable plant on the compost
+     * @param vegetablePlant
+     * @param transaction
+     */
     public abstract void putVegetablePlant(VegetablePlant vegetablePlant, Transaction transaction);
 
+    /**
+     * puts a flower on the compost
+     * @param flower
+     * @param transaction
+     */
     public abstract void putFlower(Flower flower, Transaction transaction);
 
+    /**
+     * puts a vegetable on the compost
+     * @param vegetable
+     * @param transaction
+     */
     public abstract void putVegetable(Vegetable vegetable, Transaction transaction);
 
+    /**
+     * reads all flower plants that are in the compost
+     * @return all flower plant that are in the compost, empty list if no flower plants were found
+     */
     public abstract List<FlowerPlant> readAllFlowerPlants();
 
+    /**
+     * reads all vegetable plants that are in the compost
+     * @return all vegetable plant that are in the compost, empty list if no vegetable plants were found
+     */
     public abstract List<VegetablePlant> readAllVegetablePlants();
 
+    /**
+     * reads all flowers that are in the compost
+     * @return all flowers that are in the compost, empty list if no flowers were found
+     */
     public abstract List<Flower> readAllFlowers();
 
+    /**
+     * reads all vegetables that are in the compost
+     * @return all vegetables that are in the compost, empty list if no vegetables were found
+     */
     public abstract List<Vegetable> readAllVegetables();
 }
