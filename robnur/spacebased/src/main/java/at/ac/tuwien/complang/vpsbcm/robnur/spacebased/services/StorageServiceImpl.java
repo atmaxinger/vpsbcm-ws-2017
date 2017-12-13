@@ -1,11 +1,8 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services;
 
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.FlowerFertilizer;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.VegetableFertilizer;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlant;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerType;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.SoilPackage;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.Water;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PlantAndHarvestRobot;
@@ -145,13 +142,17 @@ public class StorageServiceImpl extends StorageService {
         }
     }
 
+
     @Override
-    public List<FlowerPlant> getSeeds(FlowerType type, Transaction transaction) {
+    protected FlowerPlant getSeed(FlowerType type, Transaction transaction) {
         TransactionReference tref = TransactionServiceImpl.getTransactionReference(transaction);
-        List<FlowerPlant> plants = null;
+        FlowerPlant plant = null;
 
         try {
-            plants = capi.take(flowerSeedContainer, Collections.singletonList(LabelCoordinator.newSelector(type.name(), MzsConstants.Selecting.COUNT_MAX)), MzsConstants.RequestTimeout.DEFAULT, tref);
+            ArrayList<FlowerPlant> plants = capi.take(flowerSeedContainer, Collections.singletonList(LabelCoordinator.newSelector(type.name())), MzsConstants.RequestTimeout.DEFAULT, tref);
+            if(plants != null && !plants.isEmpty()) {
+                plant = plants.get(0);
+            }
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
             e.printStackTrace();
@@ -159,16 +160,19 @@ public class StorageServiceImpl extends StorageService {
             e.printStackTrace();
         }
 
-        return plants;
+        return plant;
     }
 
     @Override
-    protected List<VegetablePlant> getSeeds(VegetableType type, Transaction transaction) {
+    protected VegetablePlant getSeed(VegetableType type, Transaction transaction) {
         TransactionReference tref = TransactionServiceImpl.getTransactionReference(transaction);
-        List<VegetablePlant> plants = null;
+        VegetablePlant plant = null;
 
         try {
-            plants = capi.take(vegetableSeedContainer, Collections.singletonList(LabelCoordinator.newSelector(type.name(), MzsConstants.Selecting.COUNT_MAX)), MzsConstants.RequestTimeout.DEFAULT, tref);
+            ArrayList<VegetablePlant> plants = capi.take(vegetableSeedContainer, Collections.singletonList(LabelCoordinator.newSelector(type.name())), MzsConstants.RequestTimeout.DEFAULT, tref);
+            if(plants != null && !plants.isEmpty()) {
+                plant = plants.get(0);
+            }
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
             e.printStackTrace();
@@ -176,7 +180,7 @@ public class StorageServiceImpl extends StorageService {
             e.printStackTrace();
         }
 
-        return plants;
+        return plant;
     }
 
     @Override
@@ -225,7 +229,7 @@ public class StorageServiceImpl extends StorageService {
         ArrayList<SoilPackage> soilPackages = null;
 
         try {
-            soilPackages = capi.take(soilContainer, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), 1000, tref);
+            soilPackages = capi.take(soilContainer, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), MzsConstants.RequestTimeout.DEFAULT, tref);
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
             e.printStackTrace();
@@ -251,7 +255,7 @@ public class StorageServiceImpl extends StorageService {
                 entries.add(new Entry(p));
             }
 
-            capi.write(entries, soilContainer, MzsConstants.RequestTimeout.DEFAULT, tref);
+            capi.write(entries, soilContainer, MzsConstants.RequestTimeout.INFINITE, tref);
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionTimedOut(transaction);
             e.printStackTrace();

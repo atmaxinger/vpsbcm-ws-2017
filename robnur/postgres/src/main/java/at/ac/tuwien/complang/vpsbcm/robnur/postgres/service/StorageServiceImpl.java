@@ -12,6 +12,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PlantAndHarvestRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.StorageService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,14 +76,13 @@ public class StorageServiceImpl extends StorageService {
     }
 
     @Override
-    public List<FlowerPlant> getSeeds(FlowerType type, Transaction transaction) {
-        return ServiceUtil.getItemsByParameter("'cultivationInformation'->>'flowerType'",type.name(),STORAGE_FLOWER_SEED_TABLE,FlowerPlant.class,transaction);
+    protected FlowerPlant getSeed(FlowerType type, Transaction transaction) {
+        return ServiceUtil.getItemByParameter("'cultivationInformation'->>'flowerType'",type.name(),STORAGE_FLOWER_SEED_TABLE,FlowerPlant.class,transaction);
     }
 
     @Override
-    protected List<VegetablePlant> getSeeds(VegetableType type, Transaction transaction) {
-        return ServiceUtil.getItemsByParameter("'cultivationInformation'->>'vegetableType'",type.name(),STORAGE_VEGETABLE_SEED_TABLE,VegetablePlant.class,transaction);
-
+    protected VegetablePlant getSeed(VegetableType type, Transaction transaction) {
+        return ServiceUtil.getItemByParameter("'cultivationInformation'->>'vegetableType'",type.name(),STORAGE_VEGETABLE_SEED_TABLE,VegetablePlant.class,transaction);
     }
 
     @Override

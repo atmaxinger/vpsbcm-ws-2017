@@ -10,6 +10,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.SoilPackage;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.Water;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -89,7 +90,7 @@ public abstract class StorageService {
      * @param transaction the transaction
      * @return seed that can be planted or null
      */
-    public VegetablePlant tryGetSeed(VegetableType type, Transaction transaction) {
+    /*public VegetablePlant tryGetSeed(VegetableType type, Transaction transaction) {
         logger.info("try to get VEGETABLE seed of type: " + type);
 
         List<VegetablePlant> availableSeeds = getSeeds(type, transaction);
@@ -129,7 +130,33 @@ public abstract class StorageService {
         }
 
         return null;
+    }*/
+    public VegetablePlant tryGetSeed(VegetableType type, Transaction transaction) {
+        VegetablePlant plant = getSeed(type, transaction);
+
+        if(plant == null) {
+            logger.debug("DID NOT GANY SEED");
+            return null;
+        }
+
+        logger.debug("SEED: " + plant.getTypeName());
+        List<VegetableFertilizer> fertilizers = getVegetableFertilizer(plant.getCultivationInformation().getFertilizerAmount(), transaction);
+        if(fertilizers == null) {
+            putVegetableSeeds(Collections.singletonList(plant), transaction);
+            logger.debug("DID NOT GET FERTILIZER");
+            return null;
+        }
+
+        if(!tryGetExactAmountOfSoil(plant.getCultivationInformation().getSoilAmount(), transaction)) {
+            putVegetableSeeds(Collections.singletonList(plant), transaction);
+            putVegetableFertilizers(fertilizers, transaction);
+            logger.debug("DID NOT GET SOIL");
+            return null;
+        }
+
+        return plant;
     }
+
 
     /**
      * Trys to get a seed of the specified type that can be planted.
@@ -140,51 +167,33 @@ public abstract class StorageService {
      * @return seed that can be planted or null
      */
     public FlowerPlant tryGetSeed(FlowerType type, Transaction transaction) {
-        logger.info("try to get FLOWER seed of type: " + type);
+        FlowerPlant plant = getSeed(type, transaction);
 
-        List<FlowerPlant> availableSeeds = getSeeds(type, transaction);
-
-        if(availableSeeds == null) {
-            logger.info("flower seed was null");
+        if(plant == null) {
+            logger.debug("DID NOT GANY SEED");
             return null;
         }
 
-        logger.info("got "+ availableSeeds.size() +" FLOWERseeds");
-
-        List<FlowerFertilizer> flowerFertilizers = readAllFlowerFertilizer(transaction);
-
-        if(flowerFertilizers == null){
-            logger.info("flower vertilizer was null");
+        logger.debug("SEED: " + plant.getTypeName());
+        List<FlowerFertilizer> fertilizers = getFlowerFertilizer(plant.getCultivationInformation().getFertilizerAmount(), transaction);
+        if(fertilizers == null) {
+            putFlowerSeeds(Collections.singletonList(plant), transaction);
+            logger.debug("DID NOT GET FERTILIZER");
             return null;
         }
 
-        logger.info("got " + flowerFertilizers.size() + "flower vertilizers");
-
-        int numberOfFertilizers = flowerFertilizers.size();
-
-        int soilAmount = availableSoilAmount(transaction);
-
-        // find a seed that can be planted
-        for (FlowerPlant plant : availableSeeds) {
-            if (plant.getCultivationInformation().getFlowerType() == type) {
-                if (numberOfFertilizers >= plant.getCultivationInformation().getFertilizerAmount()) {
-                    if (soilAmount >= plant.getCultivationInformation().getSoilAmount()) {
-                        availableSeeds.remove(plant);
-                        // Put remaining seeds back
-                        putFlowerSeeds(availableSeeds, transaction);
-                        logger.info(String.format("return seed for planting (%s) id: %s", plant.getTypeName(), plant.getId()));
-                        return plant;
-                    }
-                }
-            }
+        if(!tryGetExactAmountOfSoil(plant.getCultivationInformation().getSoilAmount(), transaction)) {
+            putFlowerSeeds(Collections.singletonList(plant), transaction);
+            putFlowerFertilizers(fertilizers, transaction);
+            logger.debug("DID NOT GET SOIL");
+            return null;
         }
 
-        logger.info("return NO seed for planting");
-        return null;
+        return plant;
     }
 
-    public abstract List<FlowerPlant> getSeeds(FlowerType type, Transaction transaction);
-    protected abstract List<VegetablePlant> getSeeds(VegetableType type, Transaction transaction);
+    protected abstract FlowerPlant getSeed(FlowerType type, Transaction transaction);
+    protected abstract VegetablePlant getSeed(VegetableType type, Transaction transaction);
 
     public abstract void putSeed(FlowerPlant plant, Transaction transaction);
     public abstract void putSeed(VegetablePlant plant, Transaction transaction);

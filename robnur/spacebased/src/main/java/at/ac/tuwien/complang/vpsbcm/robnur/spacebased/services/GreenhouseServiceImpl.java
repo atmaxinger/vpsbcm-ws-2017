@@ -49,7 +49,9 @@ public class GreenhouseServiceImpl extends GreenhouseService {
 
         String greenhouseContainerName = "greenhouseContainer";
 
-        try {
+        greenhouseContainer = CapiUtil.lookupOrCreateContainer(greenhouseContainerName, spaceUri, coordinators, null, capi);
+
+        /*try {
             greenhouseContainer = capi.lookupContainer(greenhouseContainerName, spaceUri, MzsConstants.RequestTimeout.DEFAULT, null);
         } catch (ContainerNotFoundException var9) {
             try {
@@ -57,7 +59,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             } catch (ContainerNameNotAvailableException var8) {
                 greenhouseContainer = capi.lookupContainer(greenhouseContainerName, spaceUri, MzsConstants.RequestTimeout.DEFAULT, null);
             }
-        }
+        }*/
 
         notificationManager.createNotification(greenhouseContainer, (notification, operation, list) -> raiseChangedEvent(), Operation.DELETE, Operation.TAKE, Operation.WRITE);
     }
@@ -85,12 +87,13 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             entries.add(new Entry(vegetablePlant, LabelCoordinator.newCoordinationData(VEGETABLE_LABEL)));
         }
         try {
-            capi.write(entries, greenhouseContainer, MzsConstants.RequestTimeout.DEFAULT, ref);
+            capi.write(entries, greenhouseContainer, MzsConstants.RequestTimeout.INFINITE, ref);
             return true;
         } catch (ContainerFullException e) {
-            System.out.println("CONTAINER FULL " + e.getMessage());
+            e.printStackTrace();
             return false;
         } catch (MzsTimeoutException e) {
+            e.printStackTrace();
             TransactionServiceImpl.setTransactionTimedOut(transaction);
             return false;
         }
@@ -110,12 +113,14 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         }
 
         try {
-            capi.write(entries, greenhouseContainer, MzsConstants.RequestTimeout.DEFAULT, ref);
+            capi.write(entries, greenhouseContainer, MzsConstants.RequestTimeout.INFINITE, ref);
             return true;
 
         } catch (ContainerFullException e) {
+            e.printStackTrace();
             return false;
         }catch (MzsTimeoutException e) {
+            e.printStackTrace();
             TransactionServiceImpl.setTransactionTimedOut(transaction);
             return false;
         }

@@ -340,7 +340,7 @@ public class PlantAndHarvestRobot extends Robot {
             logger.info(String.format("PlantAndHarvestRobot %s: got %s seed", this.getId(), nextSeed.getTypeName()));
 
             // Step 2: try to get the amount of soil needed for the plant
-            if (!storageService.tryGetExactAmountOfSoil(nextSeed.getCultivationInformation().getSoilAmount(), transaction)) {
+            /*if (!storageService.tryGetExactAmountOfSoil(nextSeed.getCultivationInformation().getSoilAmount(), transaction)) {
                 logger.info(String.format("PlantAndHarvestRobot %s: did not get exact amount of soil(%d) for seed(%s, %s)", this.getId(), nextSeed.getCultivationInformation().getSoilAmount(), nextSeed.getTypeName(), nextSeed.getId()));
                 transaction.rollback();printallSeeds(nextSeed,null);
                 return false;
@@ -358,7 +358,7 @@ public class PlantAndHarvestRobot extends Robot {
                 transaction.rollback();
                 printallSeeds(nextSeed,null);
                 return false;
-            }
+            }*/
 
             logger.info("about to access water");
             // Step 4: get the water needed for the plant
@@ -371,7 +371,6 @@ public class PlantAndHarvestRobot extends Robot {
                 if(!greenhouseService.plant((VegetablePlant) nextSeed, transaction)) {
                     logger.info(String.format("PlantAndHarvestRobot %s: could not plant seed(%s, %s)", this.getId(), nextSeed.getTypeName(), nextSeed.getId()));
                     transaction.rollback();
-                    printallSeeds(nextSeed,null);
                     return false;
                 }
                 logger.debug(String.format("tryPlantPlant - planted vegetable %s", nextSeed.getTypeName()));
@@ -379,33 +378,18 @@ public class PlantAndHarvestRobot extends Robot {
                 if(!greenhouseService.plant((FlowerPlant) nextSeed, transaction)) {
                     logger.info(String.format("PlantAndHarvestRobot %s: could not plant seed(%s, %s)", this.getId(), nextSeed.getTypeName(), nextSeed.getId()));
                     transaction.rollback();
-                    printallSeeds(nextSeed,null);
                     return false;
                 }
 
             } else {
                 logger.error(String.format("tryPlantPlant - not planted - unknown plant"));
                 transaction.rollback();
-                printallSeeds(nextSeed,null);
                 return false;
             }
 
 
             transaction.commit();
             logger.debug(String.format("-- planted plant %s %s", nextSeed.getId(), nextSeed.getTypeName()));
-
-            if(plantCount.containsKey(nextSeed.getId())){
-                logger.error("Again planted seed " + nextSeed.getId());
-            }
-            plantCount.put(nextSeed.getId(),1);
-
-            if (nextSeed instanceof VegetablePlant) {
-                plantedVegetablePlants++;
-                plantedVegetablePlantIds.add(nextSeed.getId());
-            } else if (nextSeed instanceof FlowerPlant) {
-                plantedFlowerPlants++;
-            }
-
             return true;
         }
 
@@ -422,33 +406,6 @@ public class PlantAndHarvestRobot extends Robot {
         @Override
         public int compareTo(Object o) {
             return Integer.compare(count, ((PlantCount) o).count);
-        }
-    }
-
-    private synchronized void printallSeeds(Plant plant, Transaction transaction) {
-        if(plant instanceof FlowerPlant) {
-            FlowerType type = ((FlowerPlant) plant).cultivationInformation.getFlowerType();
-            List<FlowerPlant> flowerSeeds = storageService.getSeeds(type, transaction);
-            storageService.putFlowerSeeds(flowerSeeds, transaction);
-
-            String s = "";
-            for (FlowerPlant seed : flowerSeeds) {
-                s += String.format("%s(%s),", seed.getTypeName(), seed.getId());
-            }
-            logger.debug(String.format("AVAILABLE FLOWER SEEDS (%d): %s", flowerSeeds.size(), s));
-
-            boolean containsType = false;
-
-            for (FlowerPlant seed : flowerSeeds) {
-                if (seed.getTypeName().contains(plant.getTypeName())) {
-                    containsType = true;
-                    break;
-                }
-            }
-
-            if (!containsType) {
-                logger.fatal("NO FLOWERS OF SAME TYPE FOUND");
-            }
         }
     }
 }
