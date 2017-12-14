@@ -20,10 +20,6 @@ public class PostgresMonitoringRobot {
 
 
     public static void main(String[] args) {
-        //GreenhouseService greenhouseService = new GreenhouseServiceImpl();
-
-        //MonitoringRobot monitoringRobot = new MonitoringRobot(greenhouseService, transactionService);
-        //monitoringRobot.monitorGreenhouse();
         monitorGreenhouse();
     }
 
@@ -45,7 +41,7 @@ public class PostgresMonitoringRobot {
                         "    ((SELECT (data->>'growth')::int from gvp g3 WHERE (g3.data->>'id')::text = (g1.data->>'id')::text) + ((random()*(1.2-0.8)+0.8) * 100))::int) " +
                         "    FROM gvp g2 " +
                         "    WHERE g1.id = g2.id);");
-                logger.debug("updated vegetables");
+                logger.info("PostgresMonitoringRobot: grew vegetables");
 
                 statement.execute(
                         "UPDATE gfp g1 SET " +
@@ -54,7 +50,7 @@ public class PostgresMonitoringRobot {
                                 "    ((SELECT (data->>'growth')::int from gfp g3 WHERE (g3.data->>'id')::text = (g1.data->>'id')::text) + ((random()*(1.2-0.8)+0.8) * 100))::int) " +
                                 "    FROM gfp g2 " +
                                 "    WHERE g1.id = g2.id);");
-                logger.debug("updated flowers");
+                logger.info("PostgresMonitoringRobot: grew flowers");
 
                 transaction.commit();
 
@@ -63,12 +59,8 @@ public class PostgresMonitoringRobot {
                 transaction.rollback();
             }
 
-
-
             try {
-                logger.debug("before sleep");
                 Thread.sleep(2000);
-                logger.debug("after sleep");
             } catch (InterruptedException e) {
                 logger.trace("EXCEPTION", e);
             }
