@@ -39,14 +39,12 @@ public class ResearchRobot extends Robot {
 
             FlowerPlantCultivationInformation cultivationInformation = configService.getFlowerPlantCultivationInformation(flowerType, transaction);
             if (cultivationInformation == null) {
-                logger.fatal(String.format("CultivationInformation for %s is null!", flowerType));
                 transaction.rollback();
                 continue;
             }
 
             // check if upgrade level of flower-type is already at a maximum
             if (cultivationInformation.getUpgradeLevel() >= 5) {
-                logger.debug(String.format("upgrade level of %s is already >= 5", cultivationInformation.getFlowerType()));
                 transaction.rollback();
                 continue;
             }
@@ -98,14 +96,12 @@ public class ResearchRobot extends Robot {
 
             VegetablePlantCultivationInformation cultivationInformation = configService.getVegetablePlantCultivationInformation(vegetableType, transaction);
             if (cultivationInformation == null) {
-                logger.fatal(String.format("CultivationInformation for %s is null!", vegetableType));
                 transaction.rollback();
                 continue;
             }
 
             // check if upgrade level of vegetable-type is already at a maximum
             if (cultivationInformation.getUpgradeLevel() >= 5) {
-                logger.debug(String.format("upgrade level of %s is already >= 5", cultivationInformation.getVegetableType()));
                 transaction.rollback();
                 continue;
             }

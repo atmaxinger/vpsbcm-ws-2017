@@ -77,8 +77,6 @@ public class PackRobot extends Robot {
             return;
         }
 
-        logger.debug(String.format("PackRobot %s: try to create bouquet", this.getId()));
-
         // check if there are already enough bouquets in the market
         if (marketService.getAmountOfBouquets() >= 5) {
             tryPutFlowersIntoResearch();
@@ -211,10 +209,6 @@ public class PackRobot extends Robot {
             logger.info(String.format("PackRobot %s: forward vegetable(%s) to research department.", this.getId(), vegetable.getId()));
 
             put++;
-        }
-
-        if (!transaction.commit()) {
-            logger.error("committing not successful -> retrying");
         }
 
         // If we have packed 10 into research, chances are good there are more...
