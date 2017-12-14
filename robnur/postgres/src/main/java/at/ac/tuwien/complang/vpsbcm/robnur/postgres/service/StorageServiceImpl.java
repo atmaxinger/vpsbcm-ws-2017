@@ -316,9 +316,6 @@ public class StorageServiceImpl extends StorageService {
     @Override
     public Water accessTap(String robotId) {
 
-        logger.debug("in accessTap");
-
-
         try {
             Connection connection = PostgresHelper.getNewConnection("water access",-1);
             Statement statement = connection.createStatement();

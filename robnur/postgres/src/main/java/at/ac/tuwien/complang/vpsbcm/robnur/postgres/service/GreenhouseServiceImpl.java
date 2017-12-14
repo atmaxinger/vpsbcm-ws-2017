@@ -113,10 +113,6 @@ public class GreenhouseServiceImpl extends GreenhouseService {
 
     @Override
     public boolean plant(VegetablePlant vegetablePlant, Transaction transaction) {
-        /*if (readAllFlowerPlants(transaction).size() + readAllVegetablePlants(transaction).size() >= 20) {
-            return false;
-        }*/
-        logger.debug(String.format("plant vegetable; id: %s, remainingHarvests: %d, threadid = %s, growth = %s",vegetablePlant.getId(),vegetablePlant.getCultivationInformation().getRemainingNumberOfHarvests(),Thread.currentThread().getId(), vegetablePlant.getGrowth()));
         return plantVegetables(Collections.singletonList(vegetablePlant), transaction);
     }
 
@@ -129,14 +125,10 @@ public class GreenhouseServiceImpl extends GreenhouseService {
     public List<VegetablePlant> getAllVegetablePlants(Transaction transaction) {
         List<VegetablePlant> vegetablePlants = readAllVegetablePlants(transaction);
 
-        logger.debug(String.format("GreenhouseServiceImpl: read %d vegetable plants", vegetablePlants.size()));
-
         try {
             Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
             int cnt = statement.executeUpdate("DELETE FROM " + GREENHOUSE_VEGETABLE_PLANT_TABLE);
-            logger.debug(String.format("GreenhouseServiceImpl: deleted %d vegetable plants", cnt));
         } catch (SQLException e) {
-            logger.debug(String.format("GreenhouseServiceImpl: deleted did not work --> try again"));
             logger.trace("EXCEPTION", e);
             return null;
         }
@@ -150,9 +142,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         try {
             Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
             int cnt = statement.executeUpdate("DELETE FROM " + GREENHOUSE_FLOWER_PLANT_TABLE);
-            logger.debug(String.format("GreenhouseServiceImpl: deleted %d flower plants", cnt));
         } catch (SQLException e) {
-            logger.debug(String.format("GreenhouseServiceImpl: deleted flowerplant did not work --> try again"));
             logger.trace("EXCEPTION", e);
             return null;
         }
@@ -181,7 +171,6 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         try {
             statement = ((TransactionImpl) transaction).getConnection().createStatement();
         } catch (SQLException e) {
-            logger.debug("getHarvestableVegetablePlant -create statement - returning null");
             logger.trace("EXCEPTION", e);
             return null;
         }
@@ -198,14 +187,12 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             }
         } catch (SQLException | IOException e) {
             result = null;
-            logger.fatal("getHarvestableVegetablePlant - select and delete - returning null");
             logger.trace("EXCEPTION", e);
         }
 
         try {
             statement.close();
         } catch (SQLException e) {
-            logger.debug("getHarvestableVegetablePlant - statement close - Ignoring");
             logger.trace("EXCEPTION", e);
         }
 
@@ -224,7 +211,6 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         try {
             statement = ((TransactionImpl) transaction).getConnection().createStatement();
         } catch (SQLException e) {
-            logger.debug("getHarvestableFlowerPlant - create statement - returning null");
             logger.trace("EXCEPTION", e);
             return null;
         }
@@ -241,14 +227,12 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             }
         } catch (SQLException | IOException e) {
             result = null;
-            logger.debug("getHarvestableFlowerPlant - select and delete - returning null");
             logger.trace("EXCEPTION", e);
         }
 
         try {
             statement.close();
         } catch (SQLException e) {
-            logger.debug("getHarvestableFlowerPlant - statement close - ignoring");
             logger.trace("EXCEPTION", e);
         }
 

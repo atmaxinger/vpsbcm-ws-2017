@@ -31,14 +31,6 @@ public class ServiceUtil {
     private static Transaction newTransaction() {
         TransactionImpl transaction = (TransactionImpl) transactionService.beginTransaction(-1);
 
-        try {
-            if(transaction.getConnection().isClosed()){
-                logger.debug("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WHY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WHY");
-            }
-        } catch (SQLException e) {
-            logger.trace("EXCEPTION", e);
-        }
-
         return transaction;
     }
 
@@ -74,7 +66,6 @@ public class ServiceUtil {
 
             statement.close();
         } catch (SQLException | JsonProcessingException e) {
-            logger.debug("writeItem - return false");
             logger.trace("EXCEPTION", e);
             return false;
         }
@@ -131,7 +122,6 @@ public class ServiceUtil {
             statement.close();
         } catch (SQLException | IOException e) {
             result = null;
-            logger.debug("readAllItems - return null");
             logger.trace("EXCEPTION", e);
         }
 
@@ -184,7 +174,6 @@ public class ServiceUtil {
             statement.close();
         } catch (SQLException | IOException e) {
             result = null;
-            logger.debug("getAllItems - return null");
             logger.trace("EXCEPTION", e);
         }
 
@@ -228,20 +217,16 @@ public class ServiceUtil {
             Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
 
             String query = String.format("SELECT * FROM %s WHERE (data " + prepareArrow(parameterName) + " %s)::text = '%s'", table, parameterName, parameterValue);
-            logger.debug("QUERY: " + query);
             ResultSet rs = statement.executeQuery(query);
 
             if(rs.next()) {
                 String data = rs.getString("data");
                 result = mapper.readValue(data, resultClass);
-            } else {
-                logger.debug("No results for query " + query);
             }
 
             statement.close();
 
         } catch (SQLException | IOException e) {
-            logger.debug("readItemByParameter - Ignoring (result = " + result + ")");
             logger.trace("EXCEPTION", e);
         }
 
@@ -270,7 +255,6 @@ public class ServiceUtil {
         try {
             statement = ((TransactionImpl) transaction).getConnection().createStatement();
         } catch (SQLException e) {
-            logger.debug("getItemByParameter - createStatement - returning null");
             logger.trace("EXCEPTION", e);
             return null;
         }
@@ -286,7 +270,6 @@ public class ServiceUtil {
 
             deleteItemByDatabaseId(databaseId, table, transaction);
         } catch (SQLException | IOException e) {
-            logger.debug("getItemByParameter - select and delete - returning null");
             result = null;
             logger.trace("EXCEPTION", e);
         }
@@ -294,7 +277,6 @@ public class ServiceUtil {
         try {
             statement.close();
         } catch (SQLException e) {
-            logger.debug("getItemByParameter - statement.close - Ignoring");
             logger.trace("EXCEPTION", e);
         }
 
@@ -324,7 +306,6 @@ public class ServiceUtil {
         try {
             statement = ((TransactionImpl) transaction).getConnection().createStatement();
         } catch (SQLException e) {
-            logger.debug("getItemsByParameter - create statement - returning null");
             logger.trace("EXCEPTION", e);
             return null;
         }
@@ -332,7 +313,6 @@ public class ServiceUtil {
         ResultSet rs = null;
         try {
             String query = String.format("SELECT * FROM %s WHERE (data " + prepareArrow(parameterName) + " %s)::text = '%s'", table, parameterName, parameterValue);
-            logger.debug("QUERY: " + query);
             rs = statement.executeQuery(query);
 
 
@@ -344,14 +324,12 @@ public class ServiceUtil {
             }
         } catch (SQLException | IOException e) {
             result = null;
-            logger.debug("getItemsByParameter - select and delete - returning null");
             logger.trace("EXCEPTION", e);
         }
 
         try {
             statement.close();
         } catch (SQLException e) {
-            logger.debug("getItemsByParameter - statement close - Ignoring");
             logger.trace("EXCEPTION", e);
         }
 
@@ -391,7 +369,6 @@ public class ServiceUtil {
             statement.close();
         } catch (SQLException e) {
             logger.trace("EXCEPTION", e);
-            logger.debug(String.format("DELETE FROM %s WHERE (data " + prepareArrow(parameterName) + " %s)::text = '%s'", table, parameterName, parameterValue));
             throw e;
         }
 
@@ -421,7 +398,6 @@ public class ServiceUtil {
     }
 
     private static void deleteItemByDatabaseId(long id, String table, Transaction transaction) throws SQLException {
-        logger.debug(String.format("deleteItemByDatabaseId(\"%s\",\"%s\",%s", id,table, transaction));
 
         try {
             Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
