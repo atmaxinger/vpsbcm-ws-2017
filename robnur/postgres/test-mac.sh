@@ -1,6 +1,6 @@
 #!/bin/bash
 
-numberOfRobots=3
+numberOfRobots=5
 
 sh run-script-mac.sh "pwsh pg-gui.ps1"
 sh run-script-mac.sh "pwsh pg-monitoring.ps1"
