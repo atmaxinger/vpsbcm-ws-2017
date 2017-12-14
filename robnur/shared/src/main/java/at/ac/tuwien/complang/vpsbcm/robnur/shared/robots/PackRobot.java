@@ -34,8 +34,6 @@ public class PackRobot extends Robot {
             return;
         }
 
-        logger.debug("tryPutFlowersIntoResearch");
-
         Transaction transaction = transactionService.beginTransaction(TRANSACTION_TIMEOUT);
         List<Flower> flowers = packingService.readAllFlowers(transaction);
 
@@ -46,10 +44,8 @@ public class PackRobot extends Robot {
 
         int put = 0;
         for (int i = 0; i < Math.min(flowers.size(), 10); i++) {
-            logger.debug(String.format("packingService.getFlower(%s,%s)", flowers.get(i).getId(), transaction));
             Flower flower = packingService.getFlower(flowers.get(i).getId(), transaction);
             if (flower == null) {
-                logger.debug(String.format("%s.rollback()", transaction));
                 transaction.rollback();
 
                 tryPutFlowersIntoResearch();
@@ -57,16 +53,14 @@ public class PackRobot extends Robot {
             }
 
             flower.addPutResearchRobot(getId());
-            logger.debug(String.format("researchService.putFlower(%s,%s)", flower, transaction));
             researchService.putFlower(flower, transaction);
+
             logger.info(String.format("PackRobot %s: forward flower (id = %s) to research department", this.getId(), flower.getId()));
 
             put++;
         }
 
-        logger.debug(String.format("%s.commit()", transaction));
         if (!transaction.commit()) {
-            logger.debug("committing was not successful -> retrying operation");
             transaction.rollback();
             tryPutFlowersIntoResearch();
         }
@@ -149,7 +143,7 @@ public class PackRobot extends Robot {
                 }
             } else {
                 // not enough flowers
-                logger.debug(String.format("PackRobot %s: not enough flowers to create bouquet", this.getId()));
+                logger.info(String.format("PackRobot %s: not enough flowers to create bouquet", this.getId()));
                 transaction.rollback();
                 tryCreateBouquet();
                 return;
@@ -174,7 +168,6 @@ public class PackRobot extends Robot {
             bouquet.setFlowers(flowersForBouquet);
             bouquet.setPackingRobotId(getId());
 
-            // TODO: do we need transaction here?
             marketService.putBouquet(bouquet, null);
             logger.info(String.format("PackRobot %s: created bouquet(%s) and put it into basket", this.getId(), bouquet.getId()));
 
@@ -193,8 +186,6 @@ public class PackRobot extends Robot {
             logger.info("you can quit me now...");
             return;
         }
-
-        logger.debug("tryPutVegetablesIntoResearch");
 
         Transaction transaction = transactionService.beginTransaction(TRANSACTION_TIMEOUT);
         List<Vegetable> vegetables = packingService.readAllVegetables(transaction);
@@ -216,6 +207,7 @@ public class PackRobot extends Robot {
 
             vegetable.addPutResearchRobot(getId());
             researchService.putVegetable(vegetable, transaction);
+
             logger.info(String.format("PackRobot %s: forward vegetable(%s) to research department.", this.getId(), vegetable.getId()));
 
             put++;
@@ -223,7 +215,6 @@ public class PackRobot extends Robot {
 
         if (!transaction.commit()) {
             logger.error("committing not successful -> retrying");
-            tryPutVegetablesIntoResearch();
         }
 
         // If we have packed 10 into research, chances are good there are more...
@@ -238,8 +229,6 @@ public class PackRobot extends Robot {
             return;
         }
 
-        logger.debug(String.format("PackRobot %s: try to create vegetable basket", this.getId()));
-
         if (marketService.getAmountOfVegetableBaskets() >= 3) {
             tryPutVegetablesIntoResearch();
             return;
@@ -250,12 +239,10 @@ public class PackRobot extends Robot {
 
         if (vegetables.size() <= 5) {
             // not enough vegetables available
-            logger.debug(String.format("PackRobot %s: not enough vegetable to create vegetable basket", this.getId()));
+            logger.info(String.format("PackRobot %s: not enough vegetable to create vegetable basket", this.getId()));
             transaction.commit();
             return;
         }
-
-        logger.debug(String.format("PackRobot %s: start creating vegetable basket", this.getId()));
 
         List<VegetableType> checkedVegetableTypes = new ArrayList();    // list of VegetableType to avoid checking a VegetableType twice
 
@@ -279,7 +266,6 @@ public class PackRobot extends Robot {
                         logger.info(String.format("PackRobot %s: remove vegetable(%s) from packing-queue", this.getId(), v.getId()));
                         Vegetable vegetable = packingService.getVegetable(vegetablesOfSameType.get(i).getId(), transaction);
                         if (vegetable == null) {
-                            logger.debug("Did not get vegetable -- rollback");
                             transaction.rollback();
 
                             tryCreateVegetableBasket();
@@ -294,7 +280,6 @@ public class PackRobot extends Robot {
 
                     waitPackingTime();
 
-                    // TODO: do we need transaction here?
                     marketService.putVegetableBasket(vegetableBasket, null);
                     logger.info(String.format("PackRobot %s: created vegetable basket(%s) and put it into basket", this.getId(), vegetableBasket.getId()));
 

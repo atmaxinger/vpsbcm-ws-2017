@@ -457,10 +457,4 @@ public abstract class StorageService implements Exitable {
      * @return 1 water
      */
     public abstract Water accessTap(String robotId);
-
-    /**
-     * Put 1 water into the storage
-     * @param water water to put
-     */
-    public abstract void putWater(Water water);
 }

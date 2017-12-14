@@ -34,7 +34,6 @@ public class StorageServiceImpl extends StorageService {
     private ContainerReference soilContainer;
     private ContainerReference flowerFertilizerContainer;
     private ContainerReference vegetableFertilizerContainer;
-    private ContainerReference waterContainer;
     private ContainerReference waterTokenContainer;
     private ContainerReference waterAccessContainer;
     private URI spaceUri;
@@ -71,7 +70,6 @@ public class StorageServiceImpl extends StorageService {
         soilContainer = CapiUtil.lookupOrCreateContainer("storageSoilContainer", spaceUri, coords, null, capi);
         flowerFertilizerContainer = CapiUtil.lookupOrCreateContainer("storageFlowerFertilizerContainer", spaceUri, coords, null, capi);
         vegetableFertilizerContainer = CapiUtil.lookupOrCreateContainer("storageVegetableFertilizerContainer", spaceUri, coords, null, capi);
-        waterContainer = CapiUtil.lookupOrCreateContainer("waterContainer", spaceUri, Arrays.asList(new AnyCoordinator()), null, capi);
         waterTokenContainer = CapiUtil.lookupOrCreateContainer("waterTokenContainer", spaceUri, Arrays.asList(new AnyCoordinator()), null, capi);
         waterAccessContainer = CapiUtil.lookupOrCreateContainer("waterAccessContainer", spaceUri, Arrays.asList(new AnyCoordinator()), null, capi);
 
@@ -451,14 +449,6 @@ public class StorageServiceImpl extends StorageService {
         }
 
         return vegetableFertilizers;
-    }
-
-    public void putWater(Water water) {
-        try {
-            capi.write(waterContainer, new Entry(water));
-        } catch (MzsCoreException e) {
-            logger.trace("EXCEPTION", e);
-        }
     }
 
     @Override

@@ -33,12 +33,8 @@ public class SpaceServer {
         putInitialFlowerPlantCultivationInformation(configService);
         putInitialVegetablePlantCultivationInformation(configService);
 
-        ContainerReference waterContainer = CapiUtil.lookupOrCreateContainer("waterContainer", core.getConfig().getSpaceUri(), Arrays.asList(new LabelCoordinator()), null, capi);
-        capi.addContainerAspect(new WaterAspect(), waterContainer, ContainerIPoint.POST_TAKE);
-        
         ContainerReference waterTokenContainer = CapiUtil.lookupOrCreateContainer("waterTokenContainer", core.getConfig().getSpaceUri(), Arrays.asList(new AnyCoordinator()), null, capi);
         capi.write(new Entry(new String("TOKEN")),waterTokenContainer,MzsConstants.RequestTimeout.INFINITE,null);
-
     }
 
     public static void putInitialFlowerPlantCultivationInformation(ConfigService configService) {

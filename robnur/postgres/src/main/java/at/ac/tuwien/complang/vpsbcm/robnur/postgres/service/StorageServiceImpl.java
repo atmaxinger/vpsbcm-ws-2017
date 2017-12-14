@@ -103,8 +103,6 @@ public class StorageServiceImpl extends StorageService {
                 public void onNotify(int pid, DBMETHOD method) {
                     if(method == DBMETHOD.INSERT){
                         try {
-                            logger.info("in hear1");
-
                             Connection connection = PostgresHelper.getNewConnection("water access",-1);
                             connection.setAutoCommit(true);
                             Statement statement = connection.createStatement();
@@ -112,7 +110,6 @@ public class StorageServiceImpl extends StorageService {
                             ResultSet resultSet = statement.executeQuery("SELECT * FROM " + STORAGE_WATER_ACCESS_TABLE);
                             resultSet.next();
                             String robotId = resultSet.getString("data");
-                            logger.info("in hear2");
 
                             notifyWaterRobotChanged(robotId);
 
@@ -328,7 +325,6 @@ public class StorageServiceImpl extends StorageService {
 
             boolean locked = true;
             while (locked){
-                logger.info(robotId + " wait for water");
                 connection.setAutoCommit(false);
                 ResultSet resultSet = statement.executeQuery("SELECT * FROM " + STORAGE_WATER_TOKEN_TABLE);
                 if(resultSet.next()){
@@ -343,27 +339,15 @@ public class StorageServiceImpl extends StorageService {
 
             connection.setAutoCommit(true);
 
-            logger.debug(robotId + " write name into waterAccessContainer");
             statement.execute(String.format("INSERT INTO %s (data) VALUES ('%s')",STORAGE_WATER_ACCESS_TABLE,robotId));
-
-            logger.info(robotId + " wait for water");
 
             Thread.sleep(1000);
             Water water = new Water();
             water.setAmount(250);
 
-            logger.debug(robotId + " create water");
-
-            logger.debug(robotId + " remove name");
-
             statement.execute("DELETE FROM " + STORAGE_WATER_ACCESS_TABLE);
 
-            logger.debug(robotId + " put back token");
-
             statement.execute(String.format("INSERT INTO %s (data) VALUES ('{}')",STORAGE_WATER_TOKEN_TABLE));
-
-            logger.debug(robotId + " return water");
-
 
             return water;
 
@@ -374,11 +358,6 @@ public class StorageServiceImpl extends StorageService {
         }
 
         return null;
-    }
-
-    @Override
-    public void putWater(Water water) {
-        ServiceUtil.writeItem(water,STORAGE_WATER_TABLE);
     }
 
     public void registerPlantAndHarvestRobot(PlantAndHarvestRobot robot) {
