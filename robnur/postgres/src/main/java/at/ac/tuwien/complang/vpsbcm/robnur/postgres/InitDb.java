@@ -41,12 +41,7 @@ public class InitDb {
 
         createTables(StorageServiceImpl.getTables());
         createNotifyFunction(StorageServiceImpl.getTables());
-
-        StorageService storageService = new StorageServiceImpl();
-        Water water = new Water();
-        water.setAmount(250);
-        storageService.putWater(water);
-
+        
         createWaterTrigger("sw");
 
         insertInitialWaterToken();
