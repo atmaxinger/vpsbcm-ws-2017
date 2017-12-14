@@ -94,31 +94,26 @@ public class StorageServiceImpl extends StorageService {
     public List<Notification> registerPlantAndHarvestRobot(PlantAndHarvestRobot robot) {
         try {
             Notification notificationFlowerSeedContainer = notificationManager.createNotification(flowerSeedContainer, (notification, operation, list) -> {
-                logger.debug("at.ac.tuwien.complang.vpsbcm.robnur.postgres.robot notify - got notification on flowerSeedContainer");
                 robot.tryHarvestPlant();
                 robot.tryPlant();
             }, Operation.WRITE);
 
             Notification notificationVegetableSeedContainer = notificationManager.createNotification(vegetableSeedContainer, (notification, operation, list) -> {
-                logger.debug("at.ac.tuwien.complang.vpsbcm.robnur.postgres.robot notify - got notification on vegetableSeedContainer");
                 robot.tryHarvestPlant();
                 robot.tryPlant();
             }, Operation.WRITE);
 
             Notification notificationSoilContainer = notificationManager.createNotification(soilContainer, (notification, operation, list) -> {
-                logger.debug("at.ac.tuwien.complang.vpsbcm.robnur.postgres.robot notify - got notification on soilContainer");
                 robot.tryHarvestPlant();
                 robot.tryPlant();
             }, Operation.WRITE);
 
             Notification notificationFlowerFertilizerContainer = notificationManager.createNotification(flowerFertilizerContainer, (notification, operation, list) -> {
-                logger.debug("at.ac.tuwien.complang.vpsbcm.robnur.postgres.robot notify - got notification on flowerFertilizerContainer");
                 robot.tryHarvestPlant();
                 robot.tryPlant();
             }, Operation.WRITE);
 
             Notification notificationVegetableFertilizerContainer = notificationManager.createNotification(vegetableFertilizerContainer, (notification, operation, list) -> {
-                logger.debug("at.ac.tuwien.complang.vpsbcm.robnur.postgres.robot notify - got notification on vegetableFertilizerContainer");
                 robot.tryHarvestPlant();
                 robot.tryPlant();
             }, Operation.WRITE);
@@ -450,49 +445,29 @@ public class StorageServiceImpl extends StorageService {
 
     @Override
     public Water accessTap(String robotId) {
-        logger.debug("in accessTap");
-
         try {
-            logger.debug(robotId + " wait for water");
             List<String> tokens = capi.take(waterTokenContainer,AnyCoordinator.newSelector(),MzsConstants.RequestTimeout.INFINITE,null);
-            logger.debug(robotId + " got water");
 
             if(tokens == null || tokens.isEmpty()){
-                logger.fatal("WaterFATAL no token");
                 return null;
             }else if(tokens.size() > 1){
-                logger.fatal("WaterFATAL to many tokens");
                 return null;
             }
 
-            logger.debug(robotId + " write name into waterAccessContainer");
             capi.write(new Entry(robotId),waterAccessContainer,MzsConstants.RequestTimeout.INFINITE,null);
 
-            logger.debug(robotId + " wait for water");
             Thread.sleep(1000);
             Water water = new Water();
             water.setAmount(250);
-            logger.debug(robotId + " create water");
 
-
-            logger.debug(robotId + " remove name");
             capi.take(waterAccessContainer,AnyCoordinator.newSelector(),MzsConstants.RequestTimeout.INFINITE,null);
-
-            logger.debug(robotId + " put back token");
             capi.write(new Entry(tokens.get(0)),waterTokenContainer,MzsConstants.RequestTimeout.INFINITE,null);
-
-            logger.debug(robotId + " return water");
-
 
             return water;
 
         } catch (MzsCoreException e) {
-            logger.debug("MzsCoreException accessTap");
-
             logger.trace("EXCEPTION", e);
         } catch (InterruptedException e) {
-            logger.debug("InterruptedException accessTap");
-
             logger.trace("EXCEPTION", e);
         }
 
