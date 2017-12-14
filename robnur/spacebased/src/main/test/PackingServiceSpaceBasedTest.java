@@ -20,7 +20,7 @@ public class PackingServiceSpaceBasedTest extends PackingServiceTest {
         try {
             init();
         } catch (Exception e) {
-            logger.trace("EXCEPTION", e);
+            e.printStackTrace();
         }
     }
 

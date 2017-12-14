@@ -20,7 +20,7 @@ public class ResearchServiceSpaceBasedTest extends ResearchServiceTest {
         try {
             init();
         } catch (Exception e) {
-            logger.trace("EXCEPTION", e);
+            e.printStackTrace();
         }
     }
 

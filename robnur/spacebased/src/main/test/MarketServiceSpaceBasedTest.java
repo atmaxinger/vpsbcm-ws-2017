@@ -19,7 +19,7 @@ public class MarketServiceSpaceBasedTest extends MarketServiceTest {
         try {
             init();
         } catch (Exception e) {
-            logger.trace("EXCEPTION", e);
+            e.printStackTrace();
         }
     }
 
