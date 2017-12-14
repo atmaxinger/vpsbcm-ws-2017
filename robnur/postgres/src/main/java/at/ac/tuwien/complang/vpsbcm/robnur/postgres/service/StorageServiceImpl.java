@@ -42,12 +42,12 @@ public class StorageServiceImpl extends StorageService {
     private boolean exit = false;
 
     @Override
-    public boolean isExit() {
+    public synchronized boolean isExit() {
         return exit;
     }
 
     @Override
-    public void setExit(boolean exit) {
+    public synchronized void setExit(boolean exit) {
         this.exit = exit;
         if(exit == true) {
             for(Listener listener : listeners) {

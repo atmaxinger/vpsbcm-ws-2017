@@ -34,12 +34,12 @@ public class ConfigServiceImpl extends ConfigService {
     boolean exit = false;
 
     @Override
-    public boolean isExit() {
+    public synchronized boolean isExit() {
         return exit;
     }
 
     @Override
-    public void setExit(boolean exit) {
+    public synchronized void setExit(boolean exit) {
         this.exit = exit;
 /* if(exit == true) {            for(Notification n : notifications) {                try {                    n.destroy();                } catch (MzsCoreException e) {                    logger.trace("EXCEPTION", e);                }            }        } */
     }
