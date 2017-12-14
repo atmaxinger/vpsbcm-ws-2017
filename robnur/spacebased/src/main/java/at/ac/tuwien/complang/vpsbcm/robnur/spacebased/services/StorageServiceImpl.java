@@ -48,7 +48,6 @@ public class StorageServiceImpl extends StorageService {
     @Override
     public synchronized void setExit(boolean exit) {
         this.exit = exit;
-/* if(exit == true) {            for(Notification n : notifications) {                try {                    n.destroy();                } catch (MzsCoreException e) {                    logger.trace("EXCEPTION", e);                }            }        } */
     }
 
     public StorageServiceImpl(URI spaceUri) throws MzsCoreException, URISyntaxException {
