@@ -19,11 +19,11 @@ public class TransactionServiceImpl implements TransactionService {
         return null;
     }
 
-    public synchronized static void setTransactionTimedOut(Transaction transaction) {
+    public synchronized static void setTransactionInvalid(Transaction transaction) {
         if(transaction != null) {
             logger.error(String.format("Transaction %s timed out", ((TransactionImpl)transaction).ref.getId()));
 
-            ((TransactionImpl) transaction).setTimeOut(true);
+            ((TransactionImpl) transaction).setInvalid(true);
         }
     }
 
@@ -32,15 +32,15 @@ public class TransactionServiceImpl implements TransactionService {
         TransactionReference ref;
         Capi capi;
 
-        private boolean timeOut = false;
+        private boolean invalid = false;
 
-        public void setTimeOut(boolean timeOut) {
-            this.timeOut = timeOut;
+        public void setInvalid(boolean invalid) {
+            this.invalid = invalid;
         }
 
         @Override
         public boolean commit() {
-            if(!timeOut) {
+            if(!invalid) {
                 try {
                     loggerTransaction.debug(String.format("Trying to commit transaction %s", ref.getId()));
                     capi.commitTransaction(ref);
@@ -57,7 +57,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         @Override
         public boolean rollback() {
-            if(!timeOut) {
+            if(!invalid) {
                 try {
                     loggerTransaction.debug(String.format("Trying to roll back transaction %s", ref.getId()));
                     capi.rollbackTransaction(ref);

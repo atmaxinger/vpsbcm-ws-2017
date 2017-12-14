@@ -12,11 +12,9 @@ import org.apache.log4j.Logger;
 import org.mozartspaces.capi3.*;
 import org.mozartspaces.core.*;
 import org.mozartspaces.notifications.Notification;
-import org.mozartspaces.notifications.NotificationListener;
 import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 
-import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -158,7 +156,7 @@ public class StorageServiceImpl extends StorageService {
             }
             capi.write(entries, vegetableSeedContainer, MzsConstants.RequestTimeout.INFINITE, tref);
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
             logger.trace("EXCEPTION", e);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
@@ -177,7 +175,7 @@ public class StorageServiceImpl extends StorageService {
             }
             capi.write(entries, flowerSeedContainer, MzsConstants.RequestTimeout.INFINITE, tref);
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
             logger.trace("EXCEPTION", e);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
@@ -196,7 +194,7 @@ public class StorageServiceImpl extends StorageService {
                 plant = plants.get(0);
             }
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
             logger.trace("EXCEPTION", e);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
@@ -216,7 +214,7 @@ public class StorageServiceImpl extends StorageService {
                 plant = plants.get(0);
             }
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
             logger.trace("EXCEPTION", e);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
@@ -238,7 +236,7 @@ public class StorageServiceImpl extends StorageService {
         try {
             plants = capi.read(flowerSeedContainer, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), MzsConstants.RequestTimeout.ZERO, tref);
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
             logger.trace("EXCEPTION", e);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
@@ -255,7 +253,7 @@ public class StorageServiceImpl extends StorageService {
         try {
             plants = capi.read(vegetableSeedContainer, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), MzsConstants.RequestTimeout.ZERO, tref);
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
             logger.trace("EXCEPTION", e);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
@@ -273,7 +271,7 @@ public class StorageServiceImpl extends StorageService {
         try {
             soilPackages = capi.take(soilContainer, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), MzsConstants.RequestTimeout.DEFAULT, tref);
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
             logger.trace("EXCEPTION", e);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
@@ -299,7 +297,7 @@ public class StorageServiceImpl extends StorageService {
 
             capi.write(entries, soilContainer, MzsConstants.RequestTimeout.INFINITE, tref);
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
             logger.trace("EXCEPTION", e);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
@@ -314,7 +312,7 @@ public class StorageServiceImpl extends StorageService {
         try {
             packages = capi.read(soilContainer, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), MzsConstants.RequestTimeout.ZERO, tref);
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
             logger.trace("EXCEPTION", e);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
@@ -332,7 +330,7 @@ public class StorageServiceImpl extends StorageService {
         try {
             flowerFertilizers = capi.take(flowerFertilizerContainer, AnyCoordinator.newSelector(amount), MzsConstants.RequestTimeout.DEFAULT, tref);
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
             logger.trace("EXCEPTION", e);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
@@ -364,7 +362,7 @@ public class StorageServiceImpl extends StorageService {
 
             capi.write(entries, flowerFertilizerContainer, MzsConstants.RequestTimeout.INFINITE, tref);
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(t);
+            TransactionServiceImpl.setTransactionInvalid(t);
             logger.trace("EXCEPTION", e);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
@@ -379,7 +377,7 @@ public class StorageServiceImpl extends StorageService {
         try {
             flowerFertilizers = capi.read(flowerFertilizerContainer, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), MzsConstants.RequestTimeout.ZERO, tref);
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
             logger.trace("EXCEPTION", e);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
@@ -396,7 +394,7 @@ public class StorageServiceImpl extends StorageService {
         try {
             vegetableFertilizers = capi.take(vegetableFertilizerContainer, AnyCoordinator.newSelector(amount), MzsConstants.RequestTimeout.DEFAULT, tref);
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
             logger.trace("EXCEPTION", e);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
@@ -427,7 +425,7 @@ public class StorageServiceImpl extends StorageService {
 
             capi.write(entries, vegetableFertilizerContainer, MzsConstants.RequestTimeout.INFINITE, tref);
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(t);
+            TransactionServiceImpl.setTransactionInvalid(t);
             logger.trace("EXCEPTION", e);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
@@ -442,7 +440,7 @@ public class StorageServiceImpl extends StorageService {
         try {
             vegetableFertilizers = capi.read(vegetableFertilizerContainer, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), MzsConstants.RequestTimeout.ZERO, tref);
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
             logger.trace("EXCEPTION", e);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);

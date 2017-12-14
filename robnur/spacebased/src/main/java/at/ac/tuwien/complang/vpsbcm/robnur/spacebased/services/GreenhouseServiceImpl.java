@@ -112,7 +112,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             return false;
         } catch (MzsTimeoutException e) {
             logger.trace("EXCEPTION", e);
-            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
             return false;
         }
         catch (MzsCoreException e) {
@@ -139,7 +139,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             return false;
         }catch (MzsTimeoutException e) {
             logger.trace("EXCEPTION", e);
-            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
             return false;
         }
         catch (MzsCoreException e) {
@@ -170,7 +170,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
 
             return vegetablePlants;
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
         }
@@ -190,7 +190,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
 
             return ps;
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
         }
@@ -206,7 +206,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         try {
             vegetablePlants = capi.read(greenhouseContainer, LabelCoordinator.newSelector(VEGETABLE_LABEL, LabelCoordinator.LabelSelector.COUNT_MAX), MzsConstants.RequestTimeout.DEFAULT, tref);
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
         }
@@ -220,7 +220,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         try {
             flowerPlants = capi.read(greenhouseContainer, LabelCoordinator.newSelector(FLOWER_LABEL, LabelCoordinator.LabelSelector.COUNT_MAX), MzsConstants.RequestTimeout.DEFAULT, tref);
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
         }
@@ -247,7 +247,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
                 return vegetablePlants.get(0);
             }
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
         }
@@ -274,7 +274,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
 
             }
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
         }

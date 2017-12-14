@@ -1,15 +1,11 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services;
 
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Flower;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlantCultivationInformation;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import org.apache.log4j.Logger;
 import org.mozartspaces.capi3.*;
 import org.mozartspaces.core.*;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -37,7 +33,7 @@ public class ServiceUtil {
             }
         }
         catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
         }
         catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
@@ -52,7 +48,7 @@ public class ServiceUtil {
         try {
             capi.write(new Entry(item),containerReference,MzsConstants.RequestTimeout.DEFAULT,transactionReference);
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
         }
@@ -64,7 +60,7 @@ public class ServiceUtil {
         try {
             capi.write(entry,containerReference,MzsConstants.RequestTimeout.DEFAULT,transactionReference);
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
         }
@@ -77,7 +73,7 @@ public class ServiceUtil {
         try {
             result = capi.read(containerReference, selector,MzsConstants.RequestTimeout.DEFAULT,transactionReference);
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
         }
@@ -101,7 +97,7 @@ public class ServiceUtil {
         try {
             capi.delete(containerReference,selectors,MzsConstants.RequestTimeout.DEFAULT,transactionReference);
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
         }
@@ -119,7 +115,7 @@ public class ServiceUtil {
                 return result.get(0);
             }
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
         }
@@ -134,7 +130,7 @@ public class ServiceUtil {
         try {
             result = capi.take(containerReference, selector,MzsConstants.RequestTimeout.DEFAULT,transactionReference);
         } catch (MzsTimeoutException | TransactionException e) {
-            TransactionServiceImpl.setTransactionTimedOut(transaction);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
         }
