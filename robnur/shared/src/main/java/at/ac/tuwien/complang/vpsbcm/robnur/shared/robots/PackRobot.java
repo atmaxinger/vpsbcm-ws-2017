@@ -211,6 +211,8 @@ public class PackRobot extends Robot {
             put++;
         }
 
+        transaction.commit();
+
         // If we have packed 10 into research, chances are good there are more...
         if (put == 10) {
             tryPutVegetablesIntoResearch();
