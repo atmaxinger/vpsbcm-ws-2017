@@ -5,47 +5,70 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PackRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.PackingService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
-import com.impossibl.postgres.api.jdbc.PGNotificationListener;
+import org.apache.log4j.Logger;
 
+import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class PackingServiceImpl extends PackingService {
+    final static Logger logger = Logger.getLogger(PackingServiceImpl.class);
 
     private static final String PACKING_FLOWER_TABLE = "paf";
     private static final String PACKING_VEGETABLE_TABLE = "pav";
 
+    private List<Listener> listeners = new LinkedList<>();
 
-    public PackingServiceImpl() {
+    private boolean exit = false;
 
-        PGNotificationListener listener = new PGNotificationListener() {
-            @Override
-            public void notification(int processId, String channelName, String payload) {
-                String table = ServiceUtil.getTableName(channelName, payload);
+    @Override
+    public synchronized boolean isExit() {
+        return exit;
+    }
 
-                switch (table) {
-                    case PACKING_FLOWER_TABLE:
-                        raiseFlowersChanged();
-                    case PACKING_VEGETABLE_TABLE:
-                        raiseVegetablesChanged();
-                        break;
-                }
-
+    @Override
+    public synchronized void setExit(boolean exit) {
+        this.exit = exit;
+        if(exit == true) {
+            for(Listener listener : listeners) {
+                listener.shutdown();
             }
-        };
+        }
+    }
+    public PackingServiceImpl() {
+        try {
+            Listener flowerListener = new Listener(PACKING_FLOWER_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    raiseFlowersChanged();
+                }
+            };
+            flowerListener.start();
 
-        PostgresHelper.getConnection().addNotificationListener(listener);
+            Listener vegetableListener = new Listener(PACKING_VEGETABLE_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    raiseVegetablesChanged();
+                }
+            };
+            vegetableListener.start();
 
-        PostgresHelper.setUpListen(PACKING_FLOWER_TABLE);
-        PostgresHelper.setUpListen(PACKING_VEGETABLE_TABLE);
+            listeners.add(flowerListener);
+            listeners.add(vegetableListener);
+
+        } catch (SQLException e) {
+            logger.trace("EXCEPTION", e);
+        }
     }
 
-    public void putFlower(Flower flower) {
-        ServiceUtil.writeItem(flower,PACKING_FLOWER_TABLE);
+    public void putFlower(Flower flower, Transaction transaction) {
+        ServiceUtil.writeItem(flower,PACKING_FLOWER_TABLE, transaction);
     }
 
-    public void putVegetable(Vegetable vegetable) {
-        ServiceUtil.writeItem(vegetable,PACKING_VEGETABLE_TABLE);
+    @Override
+    public void putVegetable(Vegetable vegetable, Transaction transaction) {
+        ServiceUtil.writeItem(vegetable,PACKING_VEGETABLE_TABLE,transaction);
     }
 
     public Flower getFlower(String flowerId, Transaction transaction) {
@@ -75,29 +98,30 @@ public class PackingServiceImpl extends PackingService {
     }
 
     public void registerPackRobot(PackRobot packRobot) {
-
-        PGNotificationListener listener = new PGNotificationListener() {
-            @Override
-            public void notification(int processId, String channelName, String payload) {
-                String table = ServiceUtil.getTableName(channelName, payload);
-                if(ServiceUtil.getOperation(channelName, payload) == ServiceUtil.DBOPERATION.INSERT) {
-                    System.out.println("/channels/" + channelName + " " + table);
-
-                    switch (table) {
-                        case PACKING_FLOWER_TABLE:
-                            packRobot.tryCreateBouquet();
-                            break;
-                        case PACKING_VEGETABLE_TABLE:
-                            packRobot.tryCreateVegetableBasket();
-                            break;
-                    }
+        try {
+            Listener flowerListener = new Listener(PACKING_FLOWER_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    packRobot.tryCreateBouquet();
+                    packRobot.tryCreateVegetableBasket();
                 }
-            }
-        };
+            };
+            flowerListener.start();
 
-        PostgresHelper.getConnection().addNotificationListener(listener);
+            Listener vegetableListener = new Listener(PACKING_VEGETABLE_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    packRobot.tryCreateVegetableBasket();
+                    packRobot.tryCreateBouquet();
+                }
+            };
+            vegetableListener.start();
 
-        PostgresHelper.setUpListen(PACKING_FLOWER_TABLE);
-        PostgresHelper.setUpListen(PACKING_VEGETABLE_TABLE);
+            listeners.add(flowerListener);
+            listeners.add(vegetableListener);
+
+        } catch (SQLException e) {
+            logger.trace("EXCEPTION", e);
+        }
     }
 }

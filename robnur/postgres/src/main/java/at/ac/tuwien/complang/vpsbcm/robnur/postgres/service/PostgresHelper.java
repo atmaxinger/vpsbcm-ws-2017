@@ -1,9 +1,12 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.postgres.service;
 
-import com.impossibl.postgres.api.jdbc.PGConnection;
-import com.impossibl.postgres.jdbc.PGDataSource;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
+import org.apache.log4j.Logger;
+import org.postgresql.PGConnection;
 
 import java.io.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Objects;
@@ -11,79 +14,50 @@ import java.util.Properties;
 
 public class PostgresHelper {
 
-    private static PGConnection connection;
-    private static PGDataSource dataSource = null;
+    final static Logger logger = Logger.getLogger(PostgresHelper.class);
 
-    private static String readProperty(String property) {
+
+    private synchronized static String readProperty(String property) {
         Properties prop = new Properties();
         try {
             String home = System.getProperty("user.home");
             File f = new File(home + "/robnur/postgres.properties");
+            FileReader reader = new FileReader(f);
 
-            prop.load(new FileReader(f));
+            prop.load(reader);
+
+            reader.close();
+
 
             return prop.getProperty(property);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         return null;
     }
 
-    private static void initDataSource() {
-        if(dataSource == null) {
-            dataSource = new PGDataSource();
-            dataSource.setHost(readProperty("db.server"));
-            dataSource.setPort(Integer.parseInt(Objects.requireNonNull(readProperty("db.port"))));
-            dataSource.setDatabase(readProperty("db.database"));
-            dataSource.setUser(readProperty("db.user"));
-            dataSource.setPassword(readProperty("db.password"));
+    public synchronized static Connection getNewConnection(String reason, int timeoutMillis){
+        String server = readProperty("db.server");
+        int port = Integer.parseInt(readProperty("db.port"));
+        String database = readProperty("db.database");
+        String user = readProperty("db.user");
+        String password = readProperty("db.password");
+
+        String url = String.format("jdbc:postgresql://%s:%d/%s", server, port, database);
+        Properties props = new Properties();
+        props.setProperty("user", user);
+        props.setProperty("password", password);
+        if(timeoutMillis > 0) {
+            props.setProperty("socketTimeout", ""+timeoutMillis/1000);
         }
-    }
-
-    public static PGConnection getConnection(){
-
-        if(connection == null){
-            initDataSource();
-            try {
-                connection = (PGConnection) dataSource.getConnection();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return connection;
-    }
-
-
-    public static PGConnection getNewConnection(){
-        initDataSource();
-        PGConnection pgConnection = null;
         try {
-            // This is a workaround for a bug in the JDBC driver implementation
-            try {
-                pgConnection = (PGConnection) dataSource.getConnection();
-            } catch (SQLException e) {
-                // IGNORE
-            }
-
-            if(pgConnection == null) {
-                pgConnection = (PGConnection) dataSource.getConnection();
-            }
+            Connection connection = DriverManager.getConnection(url, props);
+            //logger.debug("NEW CONNECTION: " + connection + " reason: " + reason);
+            return connection;
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
-        return pgConnection;
-    }
-
-    public static void setUpListen(String table) {
-
-        try {
-            Statement statement = PostgresHelper.getConnection().createStatement();
-            statement.execute(String.format("LISTEN %s_notify", table));
-            statement.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        return null;
     }
 }

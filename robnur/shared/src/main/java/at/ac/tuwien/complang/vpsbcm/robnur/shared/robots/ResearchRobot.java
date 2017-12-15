@@ -25,164 +25,138 @@ public class ResearchRobot extends Robot {
         tryUpgradeVegetablePlant();
     }
 
-    public void tryUpgradeFlowerPlant() {
-        Transaction transaction = transactionService.beginTransaction(-1);
-
-        List<Flower> flowers = researchService.readAllFlowers(transaction);
+    public synchronized void tryUpgradeFlowerPlant() {
+        if (researchService.isExit()) {
+            logger.info("you can quit me now...");
+            return;
+        }
 
         logger.info(String.format("ResearchRobot %s: looking for flowers to upgrade", this.getId()));
-
         // try to find a flower-plant to upgrade
         for (FlowerType flowerType : FlowerType.values()) {
+            Transaction transaction = transactionService.beginTransaction(-1);
+            List<Flower> flowers = researchService.getAllFlowers(transaction);
+
+            FlowerPlantCultivationInformation cultivationInformation = configService.getFlowerPlantCultivationInformation(flowerType, transaction);
+            if (cultivationInformation == null) {
+                transaction.rollback();
+                continue;
+            }
 
             // check if upgrade level of flower-type is already at a maximum
-            if (configService.readFlowerPlantCultivationInformation(flowerType, transaction).getUpgradeLevel() >= 5) {
-                transaction.commit();
-                return;
+            if (cultivationInformation.getUpgradeLevel() >= 5) {
+                transaction.rollback();
+                continue;
             }
 
             List<Flower> upgradableFlowersOfSameType = getUpgradableFlowersOfSameType(flowerType, flowers, 12);
 
             // check if there are enough upgradable flowers of the same type
             if (upgradableFlowersOfSameType == null) {
+                transaction.rollback();
                 continue;
             }
 
             logger.info(String.format("ResearchRobot %s: found 12 flowers of same type (%s)", this.getId(), flowerType.name()));
 
-            // remove the flowers from the research-queue
-            for (Flower f : upgradableFlowersOfSameType) {
-                logger.info(String.format("ResearchRobot %s: remove flower(%s) form research-queue", this.getId(), f.getId()));
-                researchService.deleteFlower(f, transaction);
+            // put back non used flowers
+            for (Flower f : flowers) {
+                if (!upgradableFlowersOfSameType.contains(f)) {
+                    researchService.putFlower(f, transaction);
+                }
             }
 
+            upgradeFlowerPlant(flowerType, cultivationInformation, transaction);
+
+            // put the flowers on the compost
+            for (Flower f : upgradableFlowersOfSameType) {
+                logger.info(String.format("ResearchRobot %s: put flower(%s) on the compost", this.getId(), f.getId()));
+                f.setCompostRobot(getId());
+                compostService.putFlower(f, transaction);
+            }
+
+            waitResearchTime();
             transaction.commit();
 
-            if (!upgradeFlowerPlant(flowerType)) {
-                // cultivation information was updated to level 5 (max level) by another research
-                for (Flower f : upgradableFlowersOfSameType) {
-                    logger.info(String.format("ResearchRobot %s: put back flower(%s) to research-queue", this.getId(), f.getId()));
-                    researchService.putFlower(f);
-                }
-
-            }else {
-                // put the flowers on the compost
-                for (Flower f : upgradableFlowersOfSameType) {
-                    logger.info(String.format("ResearchRobot %s: put flower(%s) on the compost", this.getId(), f.getId()));
-                    compostService.putFlower(f);
-                }
-
-                tryUpgradeFlowerPlant();  // try to upgrade another flower plant
-            }
-            return;
+            tryUpgradeFlowerPlant();
         }
-
-        logger.info(String.format("ResearchRobot %s: did not find (enough) upgradeable flowers", this.getId()));
-        transaction.commit();
     }
 
-    public void tryUpgradeVegetablePlant() {
-        Transaction transaction = transactionService.beginTransaction(-1);
-
-        List<Vegetable> vegetables = researchService.readAllVegetables(transaction);
+    public synchronized void tryUpgradeVegetablePlant() {
+        if (researchService.isExit()) {
+            logger.info("you can quit me now...");
+            return;
+        }
 
         logger.info(String.format("ResearchRobot %s: looking for vegetables to upgrade", this.getId()));
         // try to find a vegetable-plant to upgrade
         for (VegetableType vegetableType : VegetableType.values()) {
+            Transaction transaction = transactionService.beginTransaction(-1);
+            List<Vegetable> vegetables = researchService.getAllVegetables(transaction);
 
-            // check if upgrade level of flower-type is already at a maximum
-            if (configService.readVegetablePlantCultivationInformation(vegetableType, transaction).getUpgradeLevel() >= 5) {
-                return;
+            VegetablePlantCultivationInformation cultivationInformation = configService.getVegetablePlantCultivationInformation(vegetableType, transaction);
+            if (cultivationInformation == null) {
+                transaction.rollback();
+                continue;
+            }
+
+            // check if upgrade level of vegetable-type is already at a maximum
+            if (cultivationInformation.getUpgradeLevel() >= 5) {
+                transaction.rollback();
+                continue;
             }
 
             List<Vegetable> upgradableVegetablesOfSameType = getUpgradableVegetablesOfSameType(vegetableType, vegetables, 12);
 
             // check if there are enough upgradable vegetables of the same type
             if (upgradableVegetablesOfSameType == null) {
-                transaction.commit();
+                transaction.rollback();
                 continue;
             }
 
             logger.info(String.format("ResearchRobot %s: found 12 vegetables of same type (%s)", this.getId(), vegetableType.name()));
 
-            // remove the vegetables from the research-queue
-            for (Vegetable v : upgradableVegetablesOfSameType) {
-                logger.info(String.format("ResearchRobot %s: remove vegetable(%s) form research-queue", this.getId(), v.getId()));
-                researchService.putVegetable(v);
+            // put back not used vegetables
+            for (Vegetable v : vegetables) {
+                if (!upgradableVegetablesOfSameType.contains(v)) {
+                    researchService.putVegetable(v, transaction);
+                }
             }
 
+            upgradeVegetablePlant(vegetableType, cultivationInformation, transaction);
+
+            // put the vegetables on the compost
+            for (Vegetable v : upgradableVegetablesOfSameType) {
+                logger.info(String.format("ResearchRobot %s: put vegetable(%s) on the compost", this.getId(), v.getId()));
+                v.setCompostRobot(getId());
+                compostService.putVegetable(v, transaction);
+            }
+
+            waitResearchTime();
             transaction.commit();
 
-            if (!upgradeVegetablePlant(vegetableType)) {
-                // cultivation information was updated to level 5 (max level) by another research
-                for (Vegetable v : upgradableVegetablesOfSameType) {
-                    logger.info(String.format("ResearchRobot %s: put vegetable(%s) back in research-queue", this.getId(), v.getId()));
-                    researchService.putVegetable(v);
-                }
-                return;
-
-            }else {
-                // put the flowers on the compost
-                for (Vegetable v : upgradableVegetablesOfSameType) {
-                    logger.info(String.format("ResearchRobot %s: put vegetable(%s) on the compost", this.getId(), v.getId()));
-                    compostService.putVegetable(v);
-                }
-
-                tryUpgradeVegetablePlant();  // try to upgrade another plant
-            }
-
-            return;
+            tryUpgradeVegetablePlant();
         }
-
-        logger.info(String.format("ResearchRobot %s: did not find (enough) upgradeable vegetables", this.getId()));
-        transaction.commit();
     }
 
-    private boolean upgradeFlowerPlant(FlowerType flowerType) {
-        Transaction transaction = transactionService.beginTransaction(-1);
-
-        FlowerPlantCultivationInformation flowerPlantCultivationInformation = configService.readFlowerPlantCultivationInformation(flowerType,transaction);
-
-        if (flowerPlantCultivationInformation.getUpgradeLevel() >= 5) {
-            // maximum upgrade level reached
-            return false;
-        }
-
+    private boolean upgradeFlowerPlant(FlowerType flowerType, FlowerPlantCultivationInformation flowerPlantCultivationInformation, Transaction transaction) {
         flowerPlantCultivationInformation = (FlowerPlantCultivationInformation) upgradeCultivationInformation(flowerPlantCultivationInformation);
 
         // update cultivation information
-        configService.deleteFlowerPlantCultivationInformation(flowerPlantCultivationInformation.getId(), transaction);
         configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, transaction);
 
         logger.info(String.format("ResearchRobot %s: upgraded Config of %s to level %d", this.getId(), flowerType.name(), flowerPlantCultivationInformation.getUpgradeLevel()));
 
-        waitResearchTime();
-
-        transaction.commit();
-
         return true;    // cultivation information successfully upgraded
     }
 
-    private boolean upgradeVegetablePlant(VegetableType vegetableType) {
-        Transaction transaction = transactionService.beginTransaction(-1);
-
-        VegetablePlantCultivationInformation vegetablePlantCultivationInformation = configService.readVegetablePlantCultivationInformation(vegetableType,transaction);
-
-        if (vegetablePlantCultivationInformation.getUpgradeLevel() >= 5) {
-            // maximum upgrade level reached
-            return false;
-        }
-
+    private boolean upgradeVegetablePlant(VegetableType vegetableType, VegetablePlantCultivationInformation vegetablePlantCultivationInformation, Transaction transaction) {
         vegetablePlantCultivationInformation = (VegetablePlantCultivationInformation) upgradeCultivationInformation(vegetablePlantCultivationInformation);
 
         // update cultivation information
-        configService.deleteVegetablePlantCultivationInformation(vegetablePlantCultivationInformation.getId(), transaction);
         configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation, transaction);
 
         logger.info(String.format("ResearchRobot %s: upgraded Config of %s to level %d", this.getId(), vegetableType.name(), vegetablePlantCultivationInformation.getUpgradeLevel()));
-
-        waitResearchTime();
-        transaction.commit();
 
         return true;
     }
@@ -270,38 +244,7 @@ public class ResearchRobot extends Robot {
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
-
-    private FlowerPlantCultivationInformation getFlowerPlantCultivationInformation(FlowerType flowerType, Transaction transaction) {
-        List<FlowerPlantCultivationInformation> flowerPlantCultivationInformation = configService.readAllFlowerPlantCultivationInformation(transaction);
-
-        for (FlowerPlantCultivationInformation cultivationInformation : flowerPlantCultivationInformation) {
-            if (cultivationInformation.getFlowerType().equals(flowerType)) {
-                if (cultivationInformation.getUpgradeLevel() >= 5) {
-                    return null;
-                }
-                return cultivationInformation;
-            }
-        }
-
-        return null;
-    }
-
-    private VegetablePlantCultivationInformation getVegetablePlantCultivationInformation(VegetableType vegetableType, Transaction transaction) {
-
-        List<VegetablePlantCultivationInformation> vegetablePlantCultivationInformation = configService.readAllVegetablePlantCultivationInformation(transaction);
-
-        for (VegetablePlantCultivationInformation cultivationInformation : vegetablePlantCultivationInformation) {
-            if (cultivationInformation.getVegetableType().equals(vegetableType)) {
-                if (cultivationInformation.getUpgradeLevel() >= 5) {
-                    return null;
-                }
-                return cultivationInformation;
-            }
-        }
-        return null;
-    }
-
 }

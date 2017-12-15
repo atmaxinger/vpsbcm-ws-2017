@@ -25,16 +25,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.impossibl.pgjdbc-ng</groupId>
-            <artifactId>pgjdbc-ng</artifactId>
-            <version>0.7</version>
-            <classifier>complete</classifier>
-        </dependency>
-        <dependency>
-            <groupId>com.impossibl.pgjdbc-ng</groupId>
-            <artifactId>pgjdbc-ng-udt</artifactId>
-            <version>0.0.2</version>
-            <classifier>complete</classifier>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.1.4</version>
         </dependency>
         <dependency>
             <groupId>at.ac.tuwien.complang.vpsbcm</groupId>

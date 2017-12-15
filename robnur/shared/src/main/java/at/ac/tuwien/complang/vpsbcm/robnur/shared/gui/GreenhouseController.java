@@ -17,7 +17,7 @@ public class GreenhouseController {
     public TableView<Plant> greenHouse;
     public TableColumn<Plant, Integer> tcIndex;
     public TableColumn<Plant, String> tcPlant;
-    public TableColumn<Plant, Integer> tcGrowth;
+    public TableColumn<Plant, String> tcGrowth;
     public TableColumn<Plant, String> tcRemainingHarvets;
     public TableColumn<Plant, String> tcPlantId;
     public TableColumn<Plant, String> tcPlantedBy;
@@ -25,7 +25,7 @@ public class GreenhouseController {
     private GreenhouseService greenhouseService = RobNurGUI.greenhouseService;
 
 
-    void updateData(List<Plant> data) {
+    private synchronized void updateData(List<Plant> data) {
         ObservableList<Plant> plants = greenHouse.getItems();
         plants.clear();
         plants.addAll(data);
@@ -42,7 +42,21 @@ public class GreenhouseController {
 
         tcPlant.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getTypeName()));
 
-        tcGrowth.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue().getGrowth()));
+        tcGrowth.setCellValueFactory(param -> {
+            String s = "";
+
+            int growth = param.getValue().getGrowth();
+            if(growth <= 0) {
+                s = "Angepflanzt";
+            } else if(growth >= 100) {
+                s = "Erntebereit";
+            }
+            else {
+                s = String.format("%d", growth);
+            }
+
+            return new ReadOnlyStringWrapper(s);
+        });
 
         tcPlantedBy.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getPlantRobot()));
 

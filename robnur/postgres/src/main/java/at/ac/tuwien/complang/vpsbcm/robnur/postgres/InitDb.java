@@ -1,6 +1,7 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.postgres;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.*;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.gui.RobNurGUI;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.Water;
@@ -9,12 +10,15 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.StorageService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlantCultivationInformation;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlantCultivationInformation;
-import com.impossibl.postgres.api.jdbc.PGConnection;
+import org.apache.log4j.Logger;
 
 import java.sql.*;
+import java.util.Arrays;
 import java.util.List;
 
 public class InitDb {
+    final static Logger logger = Logger.getLogger(InitDb.class);
+
     public static void main(String args[]) {
 
         createTables(CompostServiceImpl.getTables());
@@ -37,22 +41,23 @@ public class InitDb {
 
         createTables(StorageServiceImpl.getTables());
         createNotifyFunction(StorageServiceImpl.getTables());
-
-        StorageService storageService = new StorageServiceImpl();
-        Water water = new Water();
-        water.setAmount(250);
-        storageService.putWater(water);
-
+        
         createWaterTrigger("sw");
+
+        insertInitialWaterToken();
+
+        createGreenhouseTrigger();
 
         ConfigService configService = new ConfigServiceImpl();
         putInitialFlowerPlantCultivationInformation(configService);
         putInitialVegetablePlantCultivationInformation(configService);
+
+        System.out.println("FINISHED - you can quit me now");
     }
 
     private static void createTables(List<String> tables){
 
-        PGConnection connection = PostgresHelper.getConnection();
+        Connection connection = PostgresHelper.getNewConnection("create table",-1);
 
         for (String t:tables) {
             try {
@@ -61,14 +66,20 @@ public class InitDb {
                 statement.execute("CREATE TABLE " + t + "(ID BIGSERIAL PRIMARY KEY, DATA JSON NOT NULL)");
                 statement.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.trace("EXCEPTION", e);
             }
+        }
+
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            logger.trace("EXCEPTION", e);
         }
     }
 
     private static void createNotifyFunction(List<String> tables) {
 
-        PGConnection connection = PostgresHelper.getConnection();
+        Connection connection = PostgresHelper.getNewConnection("create notify",-1);
 
         for (String table : tables) {
 
@@ -96,13 +107,20 @@ public class InitDb {
 
                 statement.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.trace("EXCEPTION", e);
             }
         }
+
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            logger.trace("EXCEPTION", e);
+        }
+
     }
 
     private static void createWaterTrigger(String waterTable) {
-        PGConnection connection = PostgresHelper.getConnection();
+        Connection connection = PostgresHelper.getNewConnection("asdfcreate water trigger",-1);
 
         try {
             Statement statement = connection.createStatement();
@@ -127,8 +145,45 @@ public class InitDb {
                             , waterTable));
 
             statement.close();
+            connection.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
+        }
+    }
+
+    private static void createGreenhouseTrigger(){
+        logger.debug("creating greenhouse trigger...");
+
+        Connection connection = PostgresHelper.getNewConnection("greenhouseTrigger",-1);
+        try {
+            Statement statement = connection.createStatement();
+
+            statement.execute("CREATE OR REPLACE FUNCTION check_greenhouse_count() RETURNS trigger AS $$ " +
+                    "    DECLARE " +
+                    "        flower_count int; " +
+                    "        vegetable_count int; " +
+                    "    BEGIN " +
+                    "         SELECT " +
+                    "           count(*) into flower_count " +
+                    "           FROM gfp; " +
+                    "         SELECT " +
+                    "           count(*) into vegetable_count " +
+                    "           FROM gvp; " +
+                    "         IF ((flower_count + vegetable_count) >= 20) THEN " +
+                    "           RAISE EXCEPTION 'too much plants in greenhouse'; " +
+                    "         END IF; " +
+                    "        RETURN NEW;" +
+                    "     END; " +
+                    "$$ LANGUAGE plpgsql; " +
+                    "CREATE TRIGGER gvp_check_count BEFORE INSERT ON gvp " +
+                    "    FOR EACH ROW EXECUTE PROCEDURE check_greenhouse_count(); " +
+                    "CREATE TRIGGER gfp_check_count BEFORE INSERT ON gfp " +
+                    "    FOR EACH ROW EXECUTE PROCEDURE check_greenhouse_count();");
+
+            statement.close();
+            connection.close();
+        } catch (SQLException e) {
+            logger.trace("EXCEPTION", e);
         }
     }
 
@@ -241,5 +296,24 @@ public class InitDb {
         }
 
         transaction.commit();
+    }
+
+    private static void insertInitialWaterToken(){
+        try {
+            Connection connection = PostgresHelper.getNewConnection("water access",-1);
+
+            Statement statement = connection.createStatement();
+            statement.execute("DROP TABLE IF EXISTS " + StorageServiceImpl.STORAGE_WATER_ACCESS_TABLE);
+            statement.execute("CREATE TABLE " + StorageServiceImpl.STORAGE_WATER_ACCESS_TABLE + "(data VARCHAR(1000))");
+
+            createNotifyFunction(Arrays.asList(StorageServiceImpl.STORAGE_WATER_ACCESS_TABLE));
+
+            statement.execute(String.format("INSERT INTO %s (data) VALUES ('{}')","wt"));
+
+            statement.close();
+
+        } catch (SQLException e) {
+            logger.trace("EXCEPTION", e);
+        }
     }
 }

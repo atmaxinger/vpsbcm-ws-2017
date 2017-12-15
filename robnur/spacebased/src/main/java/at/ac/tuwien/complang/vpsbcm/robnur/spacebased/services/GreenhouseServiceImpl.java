@@ -9,14 +9,12 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import org.apache.log4j.Logger;
 import org.mozartspaces.capi3.*;
 import org.mozartspaces.core.*;
+import org.mozartspaces.notifications.Notification;
 import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class GreenhouseServiceImpl extends GreenhouseService {
     final static Logger logger = Logger.getLogger(GreenhouseServiceImpl.class);
@@ -40,6 +38,21 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         }
     }
 
+    List<Notification> notifications = new LinkedList<>();
+
+    boolean exit = false;
+
+    @Override
+    public synchronized boolean isExit() {
+        return exit;
+    }
+
+    @Override
+    public synchronized void setExit(boolean exit) {
+        this.exit = exit;
+    }
+
+
     public GreenhouseServiceImpl(URI spaceUri) throws MzsCoreException, InterruptedException {
         this.spaceUri = spaceUri;
 
@@ -51,7 +64,9 @@ public class GreenhouseServiceImpl extends GreenhouseService {
 
         String greenhouseContainerName = "greenhouseContainer";
 
-        try {
+        greenhouseContainer = CapiUtil.lookupOrCreateContainer(greenhouseContainerName, spaceUri, coordinators, null, capi);
+
+        /*try {
             greenhouseContainer = capi.lookupContainer(greenhouseContainerName, spaceUri, MzsConstants.RequestTimeout.DEFAULT, null);
         } catch (ContainerNotFoundException var9) {
             try {
@@ -59,58 +74,87 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             } catch (ContainerNameNotAvailableException var8) {
                 greenhouseContainer = capi.lookupContainer(greenhouseContainerName, spaceUri, MzsConstants.RequestTimeout.DEFAULT, null);
             }
-        }
+        }*/
 
-        notificationManager.createNotification(greenhouseContainer, (notification, operation, list) -> raiseChangedEvent(), Operation.DELETE, Operation.TAKE, Operation.WRITE);
+        notifications.add(notificationManager.createNotification(greenhouseContainer, (notification, operation, list) -> raiseChangedEvent(), Operation.DELETE, Operation.TAKE, Operation.WRITE));
     }
 
     public void registerPlantAndHarvestRobot(PlantAndHarvestRobot robot) {
         try {
-            notificationManager.createNotification(greenhouseContainer, (notification, operation, list) -> {
-                logger.debug("notify at.ac.tuwien.complang.vpsbcm.robnur.postgres.robot - greenhouseContainer " + operation.name());
+            Notification notificationGreenhouseContainer = notificationManager.createNotification(greenhouseContainer, (notification, operation, list) -> {
+                logger.debug("notify plantandharvest - greenhouseContainer " + operation.name());
                 robot.tryHarvestPlant();
                 robot.tryPlant();
             }, Operation.WRITE, Operation.TAKE, Operation.DELETE);
+
+           notifications.add(notificationGreenhouseContainer);
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
+        }
+    }
+
+    @Override
+    public boolean plantVegetables(List<VegetablePlant> vegetablePlants, Transaction transaction) {
+        TransactionReference ref = TransactionServiceImpl.getTransactionReference(transaction);
+
+        List<Entry> entries = new LinkedList<>();
+        for(VegetablePlant vegetablePlant : vegetablePlants) {
+            entries.add(new Entry(vegetablePlant, LabelCoordinator.newCoordinationData(VEGETABLE_LABEL)));
+        }
+        try {
+            capi.write(entries, greenhouseContainer, MzsConstants.RequestTimeout.INFINITE, ref);
+            return true;
+        } catch (ContainerFullException e) {
+            logger.trace("EXCEPTION", e);
+            return false;
+        } catch (MzsTimeoutException e) {
+            logger.trace("EXCEPTION", e);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
+            return false;
+        }
+        catch (MzsCoreException e) {
+            logger.trace("EXCEPTION", e);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean plantFlowers(List<FlowerPlant> flowerPlants, Transaction transaction) {
+        TransactionReference ref = TransactionServiceImpl.getTransactionReference(transaction);
+
+        List<Entry> entries = new LinkedList<>();
+        for(FlowerPlant flowerPlant : flowerPlants) {
+            entries.add(new Entry(flowerPlant, LabelCoordinator.newCoordinationData(FLOWER_LABEL)));
+        }
+
+        try {
+            capi.write(entries, greenhouseContainer, MzsConstants.RequestTimeout.INFINITE, ref);
+            return true;
+
+        } catch (ContainerFullException e) {
+            logger.trace("EXCEPTION", e);
+            return false;
+        }catch (MzsTimeoutException e) {
+            logger.trace("EXCEPTION", e);
+            TransactionServiceImpl.setTransactionInvalid(transaction);
+            return false;
+        }
+        catch (MzsCoreException e) {
+            logger.trace("EXCEPTION", e);
+            return false;
         }
     }
 
     @Override
     public boolean plant(VegetablePlant vegetablePlant, Transaction transaction) {
-        TransactionReference ref = TransactionServiceImpl.getTransactionReference(transaction);
-
-        Entry entry = new Entry(vegetablePlant, LabelCoordinator.newCoordinationData(VEGETABLE_LABEL));
-        try {
-            capi.write(greenhouseContainer, MzsConstants.RequestTimeout.DEFAULT, ref, entry);
-            return true;
-        } catch (ContainerFullException e) {
-            return false;
-        }
-        catch (MzsCoreException e) {
-            e.printStackTrace();
-            return false;
-        }
+        return plantVegetables(Collections.singletonList(vegetablePlant), transaction);
     }
 
     @Override
     public boolean plant(FlowerPlant flowerPlant, Transaction transaction) {
-        TransactionReference ref = TransactionServiceImpl.getTransactionReference(transaction);
-
-        Entry entry = new Entry(flowerPlant, LabelCoordinator.newCoordinationData(FLOWER_LABEL));
-        try {
-            capi.write(greenhouseContainer, MzsConstants.RequestTimeout.DEFAULT, ref, entry);
-            return true;
-
-        } catch (ContainerFullException e) {
-            return false;
-        }
-        catch (MzsCoreException e) {
-            e.printStackTrace();
-            return false;
-        }
+        return plantFlowers(Collections.singletonList(flowerPlant), transaction);
     }
 
     @Override
@@ -121,12 +165,13 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             List<Selector> selectors = Arrays.asList(
                     LabelCoordinator.newSelector(VEGETABLE_LABEL, MzsConstants.Selecting.COUNT_MAX)
             );
-
             ArrayList<VegetablePlant> vegetablePlants = capi.take(greenhouseContainer, selectors, MzsConstants.RequestTimeout.DEFAULT, transactionReference);
 
             return vegetablePlants;
+        } catch (MzsTimeoutException | TransactionException e) {
+            TransactionServiceImpl.setTransactionInvalid(transaction);
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         return null;
@@ -140,11 +185,13 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             List<Selector> selectors = Arrays.asList(
                     LabelCoordinator.newSelector(FLOWER_LABEL, MzsConstants.Selecting.COUNT_MAX)
             );
-
             ArrayList<FlowerPlant> ps = capi.take(greenhouseContainer, selectors, MzsConstants.RequestTimeout.DEFAULT, tref);
+
             return ps;
+        } catch (MzsTimeoutException | TransactionException e) {
+            TransactionServiceImpl.setTransactionInvalid(transaction);
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
 
@@ -157,8 +204,10 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         List<VegetablePlant> vegetablePlants = null;
         try {
             vegetablePlants = capi.read(greenhouseContainer, LabelCoordinator.newSelector(VEGETABLE_LABEL, LabelCoordinator.LabelSelector.COUNT_MAX), MzsConstants.RequestTimeout.DEFAULT, tref);
+        } catch (MzsTimeoutException | TransactionException e) {
+            TransactionServiceImpl.setTransactionInvalid(transaction);
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
         return vegetablePlants;
     }
@@ -169,16 +218,18 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         List<FlowerPlant> flowerPlants = null;
         try {
             flowerPlants = capi.read(greenhouseContainer, LabelCoordinator.newSelector(FLOWER_LABEL, LabelCoordinator.LabelSelector.COUNT_MAX), MzsConstants.RequestTimeout.DEFAULT, tref);
+        } catch (MzsTimeoutException | TransactionException e) {
+            TransactionServiceImpl.setTransactionInvalid(transaction);
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
         return flowerPlants;
     }
 
 
     @Override
-    public VegetablePlant getHarvestableVegetablePlant(Transaction t) {
-        TransactionReference transactionReference = TransactionServiceImpl.getTransactionReference(t);
+    public VegetablePlant getHarvestableVegetablePlant(Transaction transaction) {
+        TransactionReference transactionReference = TransactionServiceImpl.getTransactionReference(transaction);
 
         try {
             ComparableProperty growthProperty = ComparableProperty.forName("growth");
@@ -194,16 +245,18 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             if (vegetablePlants.size() > 0) {
                 return vegetablePlants.get(0);
             }
+        } catch (MzsTimeoutException | TransactionException e) {
+            TransactionServiceImpl.setTransactionInvalid(transaction);
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         return null;
     }
 
     @Override
-    public FlowerPlant getHarvestableFlowerPlant(Transaction t) {
-        TransactionReference tref = TransactionServiceImpl.getTransactionReference(t);
+    public FlowerPlant getHarvestableFlowerPlant(Transaction transaction) {
+        TransactionReference tref = TransactionServiceImpl.getTransactionReference(transaction);
 
         try {
             ComparableProperty growthProperty = ComparableProperty.forName("growth");
@@ -219,8 +272,10 @@ public class GreenhouseServiceImpl extends GreenhouseService {
                 return ps.get(0);
 
             }
+        } catch (MzsTimeoutException | TransactionException e) {
+            TransactionServiceImpl.setTransactionInvalid(transaction);
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         return null;

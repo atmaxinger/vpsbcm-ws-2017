@@ -60,11 +60,11 @@ public abstract class PackingServiceTest {
         vegetable2 = new Vegetable();
         vegetable2.setParentVegetablePlant(vegetablePlant2);
 
-        packingService.putFlower(flower1);
-        packingService.putFlower(flower2);
+        packingService.putFlower(flower1, null);
+        packingService.putFlower(flower2, null);
 
-        packingService.putVegetable(vegetable1);
-        packingService.putVegetable(vegetable2);
+        packingService.putVegetable(vegetable1,null);
+        packingService.putVegetable(vegetable2,null);
     }
 
     @Test

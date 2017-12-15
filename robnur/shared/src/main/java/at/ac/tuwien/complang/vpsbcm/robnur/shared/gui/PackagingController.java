@@ -73,13 +73,13 @@ public class PackagingController {
     }
 
 
-    private void initVegsData(List<Vegetable> vegs) {
+    private synchronized void initVegsData(List<Vegetable> vegs) {
         ObservableList<Vegetable> obs = tvVegetables.getItems();
         obs.clear();
         obs.addAll(vegs);
     }
 
-    private void initFlowerData(List<Flower> flowers) {
+    private synchronized void initFlowerData(List<Flower> flowers) {
         ObservableList<Flower> obs = tvFlowers.getItems();
         obs.clear();
         obs.addAll(flowers);

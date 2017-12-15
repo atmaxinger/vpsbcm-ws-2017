@@ -1,8 +1,15 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.services;
 
 public interface Transaction {
-    void commit();
-    void rollback();
+    /**
+     * commit the transaction
+     * @return true if successful, false otherwise
+     */
+    boolean commit();
 
-    boolean hasBeenRolledBack();    // TODO: never used
+    /**
+     * roll back the transaction
+     * @return true if successful, false otherwise
+     */
+    boolean rollback();
 }

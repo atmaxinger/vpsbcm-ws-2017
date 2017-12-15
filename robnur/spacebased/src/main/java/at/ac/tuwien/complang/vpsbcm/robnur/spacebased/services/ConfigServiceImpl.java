@@ -4,19 +4,24 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlantCultivationI
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlantCultivationInformation;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableType;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.CompostService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ConfigService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
+import org.apache.log4j.Logger;
 import org.mozartspaces.capi3.*;
 import org.mozartspaces.core.*;
+import org.mozartspaces.notifications.Notification;
 import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ConfigServiceImpl extends ConfigService {
+    final static Logger logger = Logger.getLogger(ConfigServiceImpl.class);
 
     Capi capi;
     private NotificationManager notificationManager;
@@ -24,6 +29,19 @@ public class ConfigServiceImpl extends ConfigService {
     ContainerReference flowerPlantCultivationInformationContainer;
     ContainerReference vegetablePlantCultivationInformationContainer;
 
+    List<Notification> notifications = new LinkedList<>();
+
+    boolean exit = false;
+
+    @Override
+    public synchronized boolean isExit() {
+        return exit;
+    }
+
+    @Override
+    public synchronized void setExit(boolean exit) {
+        this.exit = exit;
+    }
     public ConfigServiceImpl(URI spaceUri) {
         MzsCore core = DefaultMzsCore.newInstanceWithoutSpace();
         capi = new Capi(core);
@@ -35,47 +53,28 @@ public class ConfigServiceImpl extends ConfigService {
             flowerPlantCultivationInformationContainer = CapiUtil.lookupOrCreateContainer("flowerPlantCultivationInformationContainer", spaceUri, coordinators, null, capi);
             vegetablePlantCultivationInformationContainer = CapiUtil.lookupOrCreateContainer("vegetablePlantCultivationInformationContainer", spaceUri, coordinators, null, capi);
 
-            notificationManager.createNotification(flowerPlantCultivationInformationContainer, (notification, operation, list) -> notifyFlowerCultivationInformationChanged(readAllFlowerPlantCultivationInformation(null)), Operation.WRITE);
-            notificationManager.createNotification(vegetablePlantCultivationInformationContainer, (notification, operation, list) -> notifyVegetableCultivationInformationChanged(readAllVegetablePlantCultivationInformation(null)), Operation.WRITE);
+            notifications.add(notificationManager.createNotification(flowerPlantCultivationInformationContainer, (notification, operation, list) -> notifyFlowerCultivationInformationChanged(readAllFlowerPlantCultivationInformation(null)), Operation.WRITE));
+            notifications.add(notificationManager.createNotification(vegetablePlantCultivationInformationContainer, (notification, operation, list) -> notifyVegetableCultivationInformationChanged(readAllVegetablePlantCultivationInformation(null)), Operation.WRITE));
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 
     @Override
-    public FlowerPlantCultivationInformation getFlowerPlantCultivationInformation(String id, Transaction transaction) {
-        return ServiceUtil.getItemById(id,flowerPlantCultivationInformationContainer,transaction,capi);
-    }
-
-    @Override
-    public FlowerPlantCultivationInformation readFlowerPlantCultivationInformation(FlowerType flowerType, Transaction transaction) {
+    public FlowerPlantCultivationInformation getFlowerPlantCultivationInformation(FlowerType flowerType, Transaction transaction) {
         Selector selector = LabelCoordinator.newSelector(flowerType.name(),1);
 
-        return ServiceUtil.readItem(selector,flowerPlantCultivationInformationContainer,transaction,capi);
+        return ServiceUtil.getItem(selector,flowerPlantCultivationInformationContainer,transaction,capi);
     }
 
-    @Override
-    public VegetablePlantCultivationInformation getVegetablePlantCultivationInformation(String id, Transaction transaction) {
-        return ServiceUtil.getItemById(id,vegetablePlantCultivationInformationContainer,transaction,capi);
-    }
 
     @Override
-    public VegetablePlantCultivationInformation readVegetablePlantCultivationInformation(VegetableType vegetableType, Transaction transaction) {
+    public VegetablePlantCultivationInformation getVegetablePlantCultivationInformation(VegetableType vegetableType, Transaction transaction) {
         Selector selector = LabelCoordinator.newSelector(vegetableType.name(),1);
 
-        return ServiceUtil.readItem(selector,vegetablePlantCultivationInformationContainer,transaction,capi);
-    }
-
-    @Override
-    public void deleteFlowerPlantCultivationInformation(String id, Transaction transaction) {
-         ServiceUtil.getItemById(id,flowerPlantCultivationInformationContainer,transaction,capi);
-    }
-
-    @Override
-    public void deleteVegetablePlantCultivationInformation(String id, Transaction transaction) {
-        ServiceUtil.getItemById(id,vegetablePlantCultivationInformationContainer,transaction,capi);
+        return ServiceUtil.getItem(selector,vegetablePlantCultivationInformationContainer,transaction,capi);
     }
 
     @Override

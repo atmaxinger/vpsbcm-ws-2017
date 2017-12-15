@@ -10,24 +10,29 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.SoilPackage;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.Water;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class StorageService {
+public abstract class StorageService implements Exitable {
 
     public interface Callback<T> {
         void handle(T data);
     }
 
-
+    private org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(StorageService.class);
+    
     private Callback<List<FlowerPlant>> flowerSeedsChanged;
     private Callback<List<VegetablePlant>> vegetableSeedChanged;
     private Callback<List<SoilPackage>> soilPackagesChanged;
     private Callback<List<FlowerFertilizer>> flowerFertilizerChanged;
     private Callback<List<VegetableFertilizer>> vegetableFertilizerChanged;
+    private Callback<String> waterRobotChanged;
+
 
     protected void notifyFlowerSeedsChanged(List<FlowerPlant> list) {
         if(flowerSeedsChanged != null) {
+            logger.debug("notify FlowerSeeds Changed");
             flowerSeedsChanged.handle(list);
         }
     }
@@ -40,12 +45,14 @@ public abstract class StorageService {
 
     protected void notifySoilPackagesChanged(List<SoilPackage> list) {
         if(soilPackagesChanged != null) {
+            logger.debug("notify SoilPackages Changed");
             soilPackagesChanged.handle(list);
         }
     }
 
     protected void notifyFlowerFertilizerChanged(List<FlowerFertilizer> list) {
         if(flowerFertilizerChanged != null) {
+            logger.debug("notify FlowerFertilizer Changed");
             flowerFertilizerChanged.handle(list);
         }
     }
@@ -53,6 +60,12 @@ public abstract class StorageService {
     protected void notifyVegetableFertilizerChanged(List<VegetableFertilizer> list) {
         if(vegetableFertilizerChanged != null) {
             vegetableFertilizerChanged.handle(list);
+        }
+    }
+
+    protected void notifyWaterRobotChanged(String id) {
+        if(waterRobotChanged != null) {
+            waterRobotChanged.handle(id);
         }
     }
 
@@ -76,138 +89,240 @@ public abstract class StorageService {
         this.vegetableFertilizerChanged = vegetableFertilizerChanged;
     }
 
+    public void onWaterRobotChanged(Callback<String> waterRobotChanged) {
+        this.waterRobotChanged = waterRobotChanged;
+    }
+
     /**
      * Trys to get a seed of the specified type that can be planted.
      * This means that there is enough fertilizer and enough soil available.
+     * Automatically takes the amount of fertilizer and soil from the storage.
      *
      * @param type The type of the seed
      * @param transaction the transaction
      * @return seed that can be planted or null
      */
     public VegetablePlant tryGetSeed(VegetableType type, Transaction transaction) {
-        List<VegetablePlant> availiableSeeds = getSeeds(type, transaction);
-        int numberOfFertilizers = readAllVegetableFertilizer(transaction).size();
-        int soilAmount = availableSoilAmount(transaction);
+        VegetablePlant plant = getSeed(type, transaction);
 
-        for(VegetablePlant plant : availiableSeeds) {
-            if(plant.getCultivationInformation().getVegetableType() == type) {
-                if(numberOfFertilizers >= plant.getCultivationInformation().getFertilizerAmount()) {
-                    if(soilAmount >= plant.getCultivationInformation().getSoilAmount()) {
-                        availiableSeeds.remove(plant);
-                        // Put remaining seeds back
-                        putVegetableSeeds(availiableSeeds, transaction);
-                        return plant;
-                    }
-                }
-            }
+        if(plant == null) {
+            logger.debug(String.format("did not get any seed for vegetable %s", type));
+            return null;
         }
 
-        return null;
+        List<VegetableFertilizer> fertilizers = getVegetableFertilizer(plant.getCultivationInformation().getFertilizerAmount(), transaction);
+        if(fertilizers == null) {
+            putVegetableSeeds(Collections.singletonList(plant), transaction);
+            logger.debug(String.format("did not get enough vegetable fertilizer (%d) for %s", plant.getCultivationInformation().getFertilizerAmount(), type));
+            return null;
+        }
+
+        if(!tryGetExactAmountOfSoil(plant.getCultivationInformation().getSoilAmount(), transaction)) {
+            putVegetableSeeds(Collections.singletonList(plant), transaction);
+            putVegetableFertilizers(fertilizers, transaction);
+            logger.debug(String.format("did not get enough soil (%d) for %s", plant.getCultivationInformation().getSoilAmount(), type));
+            return null;
+        }
+
+        return plant;
     }
+
 
     /**
      * Trys to get a seed of the specified type that can be planted.
      * This means that there is enough fertilizer and enough soil available.
+     * Automatically takes the amount of fertilizer and soil from the storage.
      *
      * @param type The type of the seed
      * @param transaction the transaction
      * @return seed that can be planted or null
      */
     public FlowerPlant tryGetSeed(FlowerType type, Transaction transaction) {
-        List<FlowerPlant> availiableSeeds = getSeeds(type, transaction);
-        int numberOfFertilizers = readAllFlowerFertilizer(transaction).size();
-        int soilAmount = availableSoilAmount(transaction);
+        FlowerPlant plant = getSeed(type, transaction);
 
-        for (FlowerPlant plant : availiableSeeds) {
-            if (plant.getCultivationInformation().getFlowerType() == type) {
-                if (numberOfFertilizers >= plant.getCultivationInformation().getFertilizerAmount()) {
-                    if (soilAmount >= plant.getCultivationInformation().getSoilAmount()) {
-                        availiableSeeds.remove(plant);
-                        // Put remaining seeds back
-                        putFlowerSeeds(availiableSeeds, transaction);
-                        return plant;
-                    }
-                }
-            }
+        if(plant == null) {
+            logger.debug(String.format("did not get any seed for flower %s", type));
+            return null;
         }
 
-        return null;
+        List<FlowerFertilizer> fertilizers = getFlowerFertilizer(plant.getCultivationInformation().getFertilizerAmount(), transaction);
+        if(fertilizers == null) {
+            putFlowerSeeds(Collections.singletonList(plant), transaction);
+            logger.debug(String.format("did not get enough flower fertilizer (%d) for %s", plant.getCultivationInformation().getFertilizerAmount(), type));
+            return null;
+        }
+
+        if(!tryGetExactAmountOfSoil(plant.getCultivationInformation().getSoilAmount(), transaction)) {
+            putFlowerSeeds(Collections.singletonList(plant), transaction);
+            putFlowerFertilizers(fertilizers, transaction);
+            logger.debug(String.format("did not get enough soil (%d) for %s", plant.getCultivationInformation().getSoilAmount(), type));
+            return null;
+        }
+
+        return plant;
     }
 
-    protected abstract List<FlowerPlant> getSeeds(FlowerType type, Transaction transaction);
-    protected abstract List<VegetablePlant> getSeeds(VegetableType type, Transaction transaction);
+    /**
+     * Get a flower seed with the specified flower type
+     *
+     * @param type type of flower
+     * @param transaction the transaction
+     * @return seed of flower if successful, null otherwise
+     */
+    protected abstract FlowerPlant getSeed(FlowerType type, Transaction transaction);
+    /**
+     * Get a vegetable seed with the specified vegetable type
+     *
+     * @param type type of vegetable
+     * @param transaction the transaction
+     * @return seed of vegetable if successful, null otherwise
+     */
+    protected abstract VegetablePlant getSeed(VegetableType type, Transaction transaction);
 
+    /**
+     * Put the seed into the storage
+     *
+     * @param plant the seed
+     * @param transaction the transaction
+     */
     public abstract void putSeed(FlowerPlant plant, Transaction transaction);
+    /**
+     * Put the seed into the storage
+     *
+     * @param plant the seed
+     * @param transaction the transaction
+     */
     public abstract void putSeed(VegetablePlant plant, Transaction transaction);
 
+    /**
+     * Put a list of seeds into the storage
+     *
+     * @param plants the seeds
+     * @param transaction the transaction
+     */
     public abstract void putFlowerSeeds(List<FlowerPlant> plants, Transaction transaction);
+    /**
+     * Put a list of seeds into the storage
+     *
+     * @param plants the seeds
+     * @param transaction the transaction
+     */
     public abstract void putVegetableSeeds(List<VegetablePlant> plants, Transaction transaction);
 
 
+    /**
+     * Read all currently available flower seeds (without setting a lock)
+     * @return list of all currently available flower seeds if successful, or null otherwise
+     */
     public List<FlowerPlant> readAllFlowerSeeds() {
         return readAllFlowerSeeds(null);
     }
+    /**
+     * Read all currently available flower seeds
+     * @param transaction the transaction
+     * @return list of all currently available flower seeds if successful, or null otherwise
+     */
     public abstract List<FlowerPlant> readAllFlowerSeeds(Transaction transaction);
+
+    /**
+     * Read all currently available vegetable seeds (without setting a lock)
+     * @return list of all currently available vegetable seeds if successful, or null otherwise
+     */
     public List<VegetablePlant> readAllVegetableSeeds() {
         return readAllVegetableSeeds(null);
     }
+    /**
+     * Read all currently available vegetable seeds
+     * @param transaction the transaction
+     * @return list of all currently available vegetable seeds if successful, or null otherwise
+     */
     public abstract List<VegetablePlant> readAllVegetableSeeds(Transaction transaction);
 
-    protected abstract List<SoilPackage> getAllSoilPackages(Transaction transaction);
-
-    public abstract void putSoilPackage(SoilPackage soilPackage, Transaction transaction);
-    public abstract void putSoilPackages(List<SoilPackage> soilPackage, Transaction transaction);
-
-
-    public int availableSoilAmount(Transaction t) {
-        List<SoilPackage> soilPackages = readAllSoilPackage(null);
-        int available = 0;
-
-        for(SoilPackage soilPackage : soilPackages) {
-            available += soilPackage.getAmount();
-        }
-
-        return available;
-    }
-    public List<SoilPackage> readAllSoilPackage() {
-        return readAllSoilPackage(null);
-    }
-    public abstract List<SoilPackage> readAllSoilPackage(Transaction transaction);
-
+    /**
+     * Take the amount of flower fertilizers from the storage (read + delete)
+     * @param amount the amount to get
+     * @param transaction the transaction
+     * @return list of flower fertilizers if successful, or null otherwise
+     */
     public abstract List<FlowerFertilizer> getFlowerFertilizer(int amount, Transaction transaction);
 
+    /**
+     * Put one flower fertilizer into the storage
+     * @param flowerFertilizer the fertilizer
+     */
     public abstract void putFlowerFertilizer(FlowerFertilizer flowerFertilizer);
+    /**
+     * Put multiple flower fertilizers into the storage
+     * @param flowerFertilizers the fertilizers
+     */
     public abstract void putFlowerFertilizers(List<FlowerFertilizer> flowerFertilizers);
-    public abstract void putFlowerFertilizers(List<FlowerFertilizer> flowerFertilizers, Transaction t);
+    /**
+     * Put multiple flower fertilizers into the storage
+     * @param flowerFertilizers the fertilizers
+     * @param transaction transaction
+     */
+    public abstract void putFlowerFertilizers(List<FlowerFertilizer> flowerFertilizers, Transaction transaction);
 
-
+    /**
+     * read all available flower fertilizer (without lock)
+     * @return list of flower fertilizers if successful, or null otherwise
+     */
     public List<FlowerFertilizer> readAllFlowerFertilizer() {
         return readAllFlowerFertilizer(null);
     }
+    /**
+     * read all available flower fertilizer
+     * @param transaction the transaction
+     * @return list of flower fertilizers if successful, or null otherwise
+     */
     public abstract List<FlowerFertilizer> readAllFlowerFertilizer(Transaction transaction);
-
-    public abstract List<VegetableFertilizer> getVegetableFertilizer(int amount, Transaction transaction);
-
-    public abstract void putVegetableFertilizer(VegetableFertilizer vegetableFertilizer);
-    public abstract void putVegetableFertilizers(List<VegetableFertilizer> vegetableFertilizers);
-    public abstract void putVegetableFertilizers(List<VegetableFertilizer> vegetableFertilizers, Transaction t);
-
-
-    public List<VegetableFertilizer> readAllVegetableFertilizer() {
-        return readAllVegetableFertilizer(null);
-    }
-    public abstract List<VegetableFertilizer> readAllVegetableFertilizer(Transaction transaction);
-
-    public abstract Water accessTap();
-
-    public abstract void putWater(Water water);
 
 
     /**
-     * Trys to get the exact amount of soil
+     * Take the amount of vegetable fertilizers from the storage (read + delete)
+     * @param amount the amount to get
+     * @param transaction the transaction
+     * @return list of vegetable fertilizers if successful, or null otherwise
+     */
+    public abstract List<VegetableFertilizer> getVegetableFertilizer(int amount, Transaction transaction);
+
+    /**
+     * Put 1 vegetable fertilizers into the storage
+     * @param vegetableFertilizer the fertilizer
+     */
+    public abstract void putVegetableFertilizer(VegetableFertilizer vegetableFertilizer);
+    /**
+     * Put multiple vegetable fertilizers into the storage
+     * @param vegetableFertilizers the fertilizers
+     */
+    public abstract void putVegetableFertilizers(List<VegetableFertilizer> vegetableFertilizers);
+    /**
+     * Put multiple vegetable fertilizers into the storage
+     * @param vegetableFertilizers the fertilizers
+     * @param t the transaction
+     */
+    public abstract void putVegetableFertilizers(List<VegetableFertilizer> vegetableFertilizers, Transaction t);
+
+    /**
+     * read all available flower fertilizer (without blocking)
+     * @return list of flower fertilizers if successful, or null otherwise
+     */
+    public List<VegetableFertilizer> readAllVegetableFertilizer() {
+        return readAllVegetableFertilizer(null);
+    }
+    /**
+     * read all available flower fertilizer
+     * @param transaction the transaction
+     * @return list of flower fertilizers if successful, or null otherwise
+     */
+    public abstract List<VegetableFertilizer> readAllVegetableFertilizer(Transaction transaction);
+
+
+    /**
+     * Tries to get the exact amount of soil
      *
-     * @param amount
-     * @param transaction
+     * @param amount the amount
+     * @param transaction the transaction
      * @return true if exact amount is available
      */
     public boolean tryGetExactAmountOfSoil(int amount, Transaction transaction) {
@@ -235,12 +350,12 @@ public abstract class StorageService {
     }
 
     /**
-     * Trys to get enough soil packages to satisfy the amount.
+     * Tries to get enough soil packages to satisfy the amount.
      * You need to return the packages that you don't need
      *
-     * @param amount
-     * @param transaction
-     * @return
+     * @param amount the amount
+     * @param transaction the transaction
+     * @return the soil packages if successful, or null otherwise
      */
     public List<SoilPackage> tryGetSoilPackages(int amount, Transaction transaction){
         List<SoilPackage> selectedSoilPackages = new ArrayList<>();
@@ -282,16 +397,64 @@ public abstract class StorageService {
         return selectedSoilPackages;
     }
 
-    public Water getWater(int amount){
+    /**
+     * Gets (read + delete) all available soil packages
+     * @param transaction the transaction
+     * @return List of soil packages if successful, or null otherwise
+     */
+    protected abstract List<SoilPackage> getAllSoilPackages(Transaction transaction);
+
+    /**
+     * Put a soil package in the storage
+     * @param soilPackage the soil package
+     * @param transaction the transaction
+     */
+    public abstract void putSoilPackage(SoilPackage soilPackage, Transaction transaction);
+    /**
+     * Put multiple soil packages in the storage
+     * @param soilPackage the soil packages
+     * @param transaction the transaction
+     */
+    public abstract void putSoilPackages(List<SoilPackage> soilPackage, Transaction transaction);
+
+    /**
+     * Read all available soil packages (without lock)
+     * @return all availbale soil packages if successful, or null otherwise
+     */
+    public List<SoilPackage> readAllSoilPackage() {
+        return readAllSoilPackage(null);
+    }
+    /**
+     * Read all available soil packages
+     * @param transaction the transaction
+     * @return all availbale soil packages if successful, or null otherwise
+     */
+    public abstract List<SoilPackage> readAllSoilPackage(Transaction transaction);
+
+
+    /**
+     * Blocks until the specified amount of water has been taken
+     *
+     * @param amount the amount of water
+     * @param robotId the id of the accessor
+     */
+    public void getWater(int amount, String robotId){
         Water water = new Water();
 
         int howMany = (int)Math.ceil((float)amount / 250.0f);
 
         for (int i = 0; i < howMany; i++){
-            Water w = accessTap();
+            Water w = accessTap(robotId);
             water.setAmount(water.getAmount()+ w.getAmount());
         }
-
-        return water;
     }
+
+    /**
+     * Access the water tap
+     * Blocks until 1 water is retrieved
+     *
+     * @param robotId the id of the accessor
+     * @return 1 water
+     */
+    public abstract Water accessTap(String robotId);
 }

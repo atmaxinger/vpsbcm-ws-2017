@@ -1,5 +1,6 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.postgres.service;
 
+import at.ac.tuwien.complang.vpsbcm.robnur.postgres.robots.PostgresMonitoringRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Plant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
@@ -8,82 +9,128 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.GreenhouseService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.impossibl.postgres.api.jdbc.PGNotificationListener;
 
+import javax.xml.stream.FactoryConfigurationError;
 import java.io.IOException;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class GreenhouseServiceImpl extends GreenhouseService {
+
+    private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(GreenhouseServiceImpl.class);
 
     private static final String GREENHOUSE_FLOWER_PLANT_TABLE = "gfp";
     private static final String GREENHOUSE_VEGETABLE_PLANT_TABLE = "gvp";
 
-    public GreenhouseServiceImpl() {
-        PGNotificationListener listener = new PGNotificationListener() {
-            @Override
-            public void notification(int processId, String channelName, String payload) {
-                String table = ServiceUtil.getTableName(channelName, payload);
-                switch (table) {
-                    case GREENHOUSE_FLOWER_PLANT_TABLE:
-                    case GREENHOUSE_VEGETABLE_PLANT_TABLE:
+    private List<Listener> listeners = new LinkedList<>();
 
-                        if (greenhouseChanged != null) {
-                            List<FlowerPlant> flowerPlants = readAllFlowerPlants();
-                            List<VegetablePlant> vegetablePlants = readAllVegetablePlants();
-                            List<Plant> plants = new LinkedList<>();
-                            plants.addAll(flowerPlants);
-                            plants.addAll(vegetablePlants);
+    private boolean exit = false;
 
-                            greenhouseChanged.handle(plants);
-                        }
+    @Override
+    public synchronized boolean isExit() {
+        return exit;
+    }
 
-                        break;
-                }
-
+    @Override
+    public synchronized void setExit(boolean exit) {
+        this.exit = exit;
+        if(exit == true) {
+            for(Listener listener : listeners) {
+                listener.shutdown();
             }
-        };
+        }
+    }
 
-        PostgresHelper.getConnection().addNotificationListener(listener);
+    public GreenhouseServiceImpl() {
 
-        PostgresHelper.setUpListen(GREENHOUSE_FLOWER_PLANT_TABLE);
-        PostgresHelper.setUpListen(GREENHOUSE_VEGETABLE_PLANT_TABLE);
+        try {
+            Listener flowerListener = new Listener(GREENHOUSE_FLOWER_PLANT_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    if (greenhouseChanged != null) {
+                        List<FlowerPlant> flowerPlants = readAllFlowerPlants();
+                        List<VegetablePlant> vegetablePlants = readAllVegetablePlants();
+                        List<Plant> plants = new LinkedList<>();
+                        plants.addAll(flowerPlants);
+                        plants.addAll(vegetablePlants);
+                        greenhouseChanged.handle(plants);
+                    }
+                }
+            };
+            flowerListener.start();
+
+            Listener vegetableListener = new Listener(GREENHOUSE_VEGETABLE_PLANT_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    if (greenhouseChanged != null) {
+                        List<FlowerPlant> flowerPlants = readAllFlowerPlants();
+                        List<VegetablePlant> vegetablePlants = readAllVegetablePlants();
+                        List<Plant> plants = new LinkedList<>();
+                        plants.addAll(flowerPlants);
+                        plants.addAll(vegetablePlants);
+                        greenhouseChanged.handle(plants);
+                    }
+                }
+            };
+            vegetableListener.start();
+
+            listeners.add(flowerListener);
+            listeners.add(vegetableListener);
+        } catch (SQLException e) {
+            logger.trace("EXCEPTION", e);
+        }
+    }
+
+    @Override
+    public boolean plantVegetables(List<VegetablePlant> vegetablePlants, Transaction transaction) {
+        for(VegetablePlant vegetablePlant : vegetablePlants) {
+            if(!ServiceUtil.writeItem(vegetablePlant, GREENHOUSE_VEGETABLE_PLANT_TABLE, transaction)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean plantFlowers(List<FlowerPlant> flowerPlants, Transaction transaction) {
+        for(FlowerPlant flowerPlant : flowerPlants) {
+            if(!ServiceUtil.writeItem(flowerPlant, GREENHOUSE_FLOWER_PLANT_TABLE, transaction)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override
     public boolean plant(VegetablePlant vegetablePlant, Transaction transaction) {
-        if (readAllFlowerPlants(transaction).size() + readAllVegetablePlants(transaction).size() >= 20) {
-            return false;
-        }
-        ServiceUtil.writeItem(vegetablePlant, GREENHOUSE_VEGETABLE_PLANT_TABLE, transaction);
-        return true;
+        return plantVegetables(Collections.singletonList(vegetablePlant), transaction);
     }
 
     @Override
     public boolean plant(FlowerPlant flowerPlant, Transaction transaction) {
-        if (readAllFlowerPlants(transaction).size() + readAllVegetablePlants(transaction).size() >= 20) {
-            return false;
-        }
-        ServiceUtil.writeItem(flowerPlant, GREENHOUSE_FLOWER_PLANT_TABLE, transaction);
-        return true;
+        return plantFlowers(Collections.singletonList(flowerPlant), transaction);
     }
 
     @Override
     public List<VegetablePlant> getAllVegetablePlants(Transaction transaction) {
         List<VegetablePlant> vegetablePlants = readAllVegetablePlants(transaction);
-        for (VegetablePlant vp : vegetablePlants) {
-            try {
-                ServiceUtil.deleteItemById(vp.getId(), GREENHOUSE_VEGETABLE_PLANT_TABLE);
-            } catch (SQLException e) {
-                System.err.println("SQLException in getAllVegetablePlants - returning null");
-                return null;
-            }
+
+        try {
+            Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
+            int cnt = statement.executeUpdate("DELETE FROM " + GREENHOUSE_VEGETABLE_PLANT_TABLE);
+        } catch (SQLException e) {
+            logger.trace("EXCEPTION", e);
+            return null;
         }
         return vegetablePlants;
     }
@@ -91,14 +138,15 @@ public class GreenhouseServiceImpl extends GreenhouseService {
     @Override
     public List<FlowerPlant> getAllFlowerPlants(Transaction transaction) {
         List<FlowerPlant> flowerPlants = readAllFlowerPlants(transaction);
-        for (FlowerPlant fp : flowerPlants) {
-            try {
-                ServiceUtil.deleteItemById(fp.getId(), GREENHOUSE_FLOWER_PLANT_TABLE);
-            } catch (SQLException e) {
-                System.err.println("SQLException in getAllFlowerPlants - returning null");
-                return null;
-            }
+
+        try {
+            Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
+            int cnt = statement.executeUpdate("DELETE FROM " + GREENHOUSE_FLOWER_PLANT_TABLE);
+        } catch (SQLException e) {
+            logger.trace("EXCEPTION", e);
+            return null;
         }
+
         return flowerPlants;
     }
 
@@ -123,8 +171,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         try {
             statement = ((TransactionImpl) transaction).getConnection().createStatement();
         } catch (SQLException e) {
-            System.err.println("returning null");
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
             return null;
         }
 
@@ -140,15 +187,13 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             }
         } catch (SQLException | IOException e) {
             result = null;
-            System.err.println("returning null");
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         try {
             statement.close();
         } catch (SQLException e) {
-            System.err.println("Ignoring");
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         return result;
@@ -166,8 +211,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         try {
             statement = ((TransactionImpl) transaction).getConnection().createStatement();
         } catch (SQLException e) {
-            System.err.println("Returning null");
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
             return null;
         }
 
@@ -183,42 +227,44 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             }
         } catch (SQLException | IOException e) {
             result = null;
-            System.err.println("Returning null");
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         try {
             statement.close();
         } catch (SQLException e) {
-            System.err.println("Ignoring");
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         return result;
     }
 
     public void registerPlantAndHarvestRobot(PlantAndHarvestRobot robot) {
-
-        PGNotificationListener listener = new PGNotificationListener() {
-            @Override
-            public void notification(int processId, String channelName, String payload) {
-                String table = ServiceUtil.getTableName(channelName, payload);
-                if (ServiceUtil.getOperation(channelName, payload) == ServiceUtil.DBOPERATION.INSERT) {
-                    switch (table) {
-                        case GREENHOUSE_FLOWER_PLANT_TABLE:
-                        case GREENHOUSE_VEGETABLE_PLANT_TABLE:
-                            robot.tryHarvestPlant();
-                            robot.tryPlant();
-                            break;
-                    }
+        try {
+            Listener flowerListener = new Listener(GREENHOUSE_FLOWER_PLANT_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    robot.tryHarvestPlant();
+                    robot.tryPlant();
                 }
-            }
-        };
+            };
+            flowerListener.start();
 
-        PostgresHelper.getConnection().addNotificationListener(listener);
 
-        PostgresHelper.setUpListen(GREENHOUSE_FLOWER_PLANT_TABLE);
-        PostgresHelper.setUpListen(GREENHOUSE_VEGETABLE_PLANT_TABLE);
+            Listener vegetableListener = new Listener(GREENHOUSE_VEGETABLE_PLANT_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    robot.tryHarvestPlant();
+                    robot.tryPlant();
+                }
+            };
+            vegetableListener.start();
+
+            listeners.add(flowerListener);
+            listeners.add(vegetableListener);
+        } catch (SQLException e) {
+            logger.trace("EXCEPTION", e);
+        }
     }
 
     public static List<String> getTables() {

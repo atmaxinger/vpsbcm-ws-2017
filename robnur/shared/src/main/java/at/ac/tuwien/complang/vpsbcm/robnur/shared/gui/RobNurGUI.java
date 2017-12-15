@@ -6,11 +6,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.net.URL;
 
 public class RobNurGUI extends Application {
+    final static Logger logger = Logger.getLogger(RobNurGUI.class);
 
     public static CompostService compostService;
     public static ConfigService configService;
@@ -34,7 +36,7 @@ public class RobNurGUI extends Application {
         try {
             root = FXMLLoader.load(getClass().getResource("main.fxml"));
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
         Scene scene = new Scene(root);
 

@@ -6,39 +6,83 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlantCultivati
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ConfigService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
+import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ConfigServiceImpl extends ConfigService {
+    final static Logger logger = Logger.getLogger(ConfigServiceImpl.class);
 
     private static final String CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE = "cfpci";
     private static final String CONFIG_VEGETABLE_PLANT_CULTIVATION_INFORMATION_TABLE = "cvpci";
+
+    private List<Listener> listeners = new LinkedList<>();
+
+    private boolean exit = false;
+
+    @Override
+    public synchronized boolean isExit() {
+        return exit;
+    }
+
+    @Override
+    public synchronized void setExit(boolean exit) {
+        this.exit = exit;
+        if(exit == true) {
+            for(Listener listener : listeners) {
+                listener.shutdown();
+            }
+        }
+    }
+
+    public ConfigServiceImpl() {
+        try {
+            Listener flowerPlantListener = new Listener(CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    notifyFlowerCultivationInformationChanged(readAllFlowerPlantCultivationInformation(null));
+                }
+            };
+            flowerPlantListener.start();
+
+            Listener flowersListener = new Listener(CONFIG_VEGETABLE_PLANT_CULTIVATION_INFORMATION_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    notifyVegetableCultivationInformationChanged(readAllVegetablePlantCultivationInformation(null));
+                }
+            };
+            flowersListener.start();
+
+            listeners.add(flowerPlantListener);
+            listeners.add(flowersListener);
+
+        } catch (SQLException e) {
+            logger.trace("EXCEPTION", e);
+        }
+    }
 
     public FlowerPlantCultivationInformation getFlowerPlantCultivationInformation(String id, Transaction transaction) {
         return ServiceUtil.getItemById(id,CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE,FlowerPlantCultivationInformation.class,transaction);
     }
 
     @Override
-    public FlowerPlantCultivationInformation readFlowerPlantCultivationInformation(FlowerType flowerType, Transaction transaction) {
-        return ServiceUtil.readItemByParameter("flowerType",flowerType.name(),CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE,FlowerPlantCultivationInformation.class,transaction);
-    }
-
-    public VegetablePlantCultivationInformation getVegetablePlantCultivationInformation(String id, Transaction transaction) {
-        return ServiceUtil.getItemById(id,CONFIG_VEGETABLE_PLANT_CULTIVATION_INFORMATION_TABLE,VegetablePlantCultivationInformation.class,transaction);
+    public FlowerPlantCultivationInformation getFlowerPlantCultivationInformation(FlowerType flowerType, Transaction transaction) {
+        return ServiceUtil.getItemByParameter("'flowerType'",flowerType.name(),CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE,FlowerPlantCultivationInformation.class,transaction);
     }
 
     @Override
-    public VegetablePlantCultivationInformation readVegetablePlantCultivationInformation(VegetableType vegetableType, Transaction transaction) {
-        return ServiceUtil.readItemByParameter("flowerType",vegetableType.name(),CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE,VegetablePlantCultivationInformation.class,transaction);
+    public VegetablePlantCultivationInformation getVegetablePlantCultivationInformation(VegetableType vegetableType, Transaction transaction) {
+        return ServiceUtil.getItemByParameter("'vegetableType'",vegetableType.name(), CONFIG_VEGETABLE_PLANT_CULTIVATION_INFORMATION_TABLE,VegetablePlantCultivationInformation.class,transaction);
     }
 
     public void deleteFlowerPlantCultivationInformation(String id, Transaction transaction) {
         try {
             ServiceUtil.deleteItemById(id,CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE,transaction);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 
@@ -46,7 +90,7 @@ public class ConfigServiceImpl extends ConfigService {
         try {
             ServiceUtil.deleteItemById(id,CONFIG_VEGETABLE_PLANT_CULTIVATION_INFORMATION_TABLE,transaction);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 

@@ -3,24 +3,21 @@ package at.ac.tuwien.complang.vpsbcm.robnur.shared.robots;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.*;
 import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class PlantAndHarvestRobot extends Robot {
 
     final static Logger logger = Logger.getLogger(PlantAndHarvestRobot.class);
+    private HashMap<String, Integer> plantCount = new HashMap<>();
     private StorageService storageService;
     private GreenhouseService greenhouseService;
     private TransactionService transactionService;
     private PackingService packingService;
     private CompostService compostService;
 
-    private int plantTransactionTimeout = 60*1000;
-    private int harvestTransactionTimeout = 1000;
+    private int plantTransactionTimeout = -1;
+    private int harvestTransactionTimeout = -1;
 
     public PlantAndHarvestRobot(String id, int plantTransactionTimeout, int harvestTransactionTimeout, StorageService storageService, GreenhouseService greenhouseService, TransactionService transactionService, PackingService packingService, CompostService compostService) {
         this.setId(id);
@@ -40,7 +37,12 @@ public class PlantAndHarvestRobot extends Robot {
     /**
      * Try to harvest all harvestable plants
      */
-    public void tryHarvestPlant() {
+    public synchronized void tryHarvestPlant() {
+        if (storageService.isExit()) {
+            logger.info("you can quit me now...");
+            return;
+        }
+
         tryHarvestFlower();
         tryHarvestVegetable();
     }
@@ -48,7 +50,12 @@ public class PlantAndHarvestRobot extends Robot {
     /**
      * try to plant either a vegetable or a flower
      */
-    public void tryPlant() {
+    public synchronized void tryPlant() {
+        if (storageService.isExit()) {
+            logger.info("you can quit me now...");
+            return;
+        }
+
         boolean hasPlantedSomething = false;
 
         // Step 1: get current planted plants from greenhouse
@@ -59,17 +66,27 @@ public class PlantAndHarvestRobot extends Robot {
         if (vegetablePlants.size() < flowerPlants.size()) {
             // As there are more flowers planted, try to plant a vegetable
             hasPlantedSomething = tryPlantPlant(vegetablePlants, VegetableType.values());
+            if (storageService.isExit()) {
+                return;
+            }
             if (!hasPlantedSomething) {
                 // If the vegetable could not be planted, try to plant a flower
                 hasPlantedSomething = tryPlantPlant(flowerPlants, FlowerType.values());
             }
         } else if (vegetablePlants.size() > flowerPlants.size()) {
             hasPlantedSomething = tryPlantPlant(flowerPlants, FlowerType.values());
+            if (storageService.isExit()) {
+                return;
+            }
             if (!hasPlantedSomething) {
                 hasPlantedSomething = tryPlantPlant(vegetablePlants, VegetableType.values());
             }
         } else {
             // There are equal amounts of flowers and vegetables planted. Flip a coin.
+
+            if (storageService.isExit()) {
+                return;
+            }
             Random random = new Random();
             if (random.nextBoolean()) {
                 hasPlantedSomething = tryPlantPlant(vegetablePlants, VegetableType.values());
@@ -84,8 +101,13 @@ public class PlantAndHarvestRobot extends Robot {
             }
         }
 
+        if (storageService.isExit()) {
+            logger.info("you can quit me now...");
+            return;
+        }
+
         // If something has been planted, try again to harvest and plant
-        if(hasPlantedSomething) {
+        if (hasPlantedSomething) {
             tryHarvestPlant();
             tryPlant();
         }
@@ -93,19 +115,22 @@ public class PlantAndHarvestRobot extends Robot {
 
 
     private List<Vegetable> tryHarvestVegetablePlant(Transaction transaction) {
+
         VegetablePlant plant = greenhouseService.getHarvestableVegetablePlant(transaction);
 
-        if(plant != null) {
-            logger.info(String.format("harvested vegetables (%s) from plant %s", plant.getTypeName(), plant.getId()));
-
+        if (plant != null) {
             List<Vegetable> vegetables = Vegetable.harvestVegetablesFormPlant(plant);
+            logger.info(String.format("harvested vegetables (%s) from plant %s", plant.getTypeName(), plant.getId()));
 
             // if this plant can still be harvested then "plant" it again
             if (plant.getCultivationInformation().getRemainingNumberOfHarvests() > 0) {
-                greenhouseService.plant(plant, transaction);
+                if (!greenhouseService.plant(plant, transaction)) {
+                    return null;
+                }
+
             } else {
                 plant.setCompostRobot(getId());
-                compostService.putVegetablePlant(plant);
+                compostService.putVegetablePlant(plant, transaction);
             }
 
             return vegetables;
@@ -117,19 +142,22 @@ public class PlantAndHarvestRobot extends Robot {
     /**
      * try to harvest all harvestable vegetables
      */
-    private void tryHarvestVegetable() {
-        logger.debug(String.format("PlantAndHarvestRobot %s: Try harvest vegetable", getId()));
+    public void tryHarvestVegetable() {
+        if (storageService.isExit()) {
+            logger.info("you can quit me now...");
+            return;
+        }
 
-        Transaction t = transactionService.beginTransaction(harvestTransactionTimeout);
+        Transaction t = transactionService.beginTransaction(harvestTransactionTimeout, "Harvest Vegetable");
         List<Vegetable> harvested = tryHarvestVegetablePlant(t);
 
         if (harvested != null && harvested.size() > 0) {
 
             for (Vegetable veg : harvested) {
-                logger.info(String.format("PlantAndHarvestRobot %s: put vegetable(%s) into packing", getId(), veg.getId()));
+                logger.info(String.format("PlantAndHarvestRobot %s: put vegetable(%s) into packing, threadid = %s", getId(), veg.getId(), Thread.currentThread().getId()));
 
                 veg.setHarvestRobot(this.getId());
-                packingService.putVegetable(veg);
+                packingService.putVegetable(veg, t);
             }
 
             t.commit();
@@ -141,14 +169,14 @@ public class PlantAndHarvestRobot extends Robot {
     }
 
 
-    public List<Flower> tryHarvestFlowerPlant(Transaction transaction) {
+    private List<Flower> tryHarvestFlowerPlant(Transaction transaction) {
         FlowerPlant plant = greenhouseService.getHarvestableFlowerPlant(transaction);
 
-        if(plant != null) {
+        if (plant != null) {
             logger.info(String.format("PlantAndHarvestRobot %s: harvested flowers(%s) from plant(%s)", getId(), plant.getTypeName(), plant.getId()));
 
             plant.setCompostRobot(getId());
-            compostService.putFlowerPlant(plant);
+            compostService.putFlowerPlant(plant, transaction);
             return Flower.harvestFlowerFromFlowerPlant(plant);
         }
 
@@ -158,10 +186,13 @@ public class PlantAndHarvestRobot extends Robot {
     /**
      * try to harvest all harvestable flowers
      */
-    private void tryHarvestFlower() {
-        logger.debug(String.format("PlantAndHarvestRobot %s: Try harvest flower", getId()));
+    public void tryHarvestFlower() {
+        if (storageService.isExit()) {
+            logger.info("you can quit me now...");
+            return;
+        }
 
-        Transaction t = transactionService.beginTransaction(harvestTransactionTimeout);
+        Transaction t = transactionService.beginTransaction(harvestTransactionTimeout, "Harvest Flower");
         List<Flower> harvested = tryHarvestFlowerPlant(t);
         if (harvested != null && harvested.size() > 0) {
 
@@ -169,7 +200,7 @@ public class PlantAndHarvestRobot extends Robot {
                 logger.info(String.format("PlantAndHarvestRobot %s: put flower(%s) into packing", getId(), flo.getId()));
 
                 flo.setHarvestRobot(this.getId());
-                packingService.putFlower(flo);
+                packingService.putFlower(flo, t);
             }
 
             t.commit();
@@ -184,14 +215,13 @@ public class PlantAndHarvestRobot extends Robot {
      * Find a new seed to plant (veg or flo)
      *
      * @param plantedPlants the plants (veg or flo) that have already been planted
-     * @param types types (either VegetableType.values() or FlowerType.values())
-     * @param t the transaction
-     * @param <P> VegetablePlant or FlowerPlant
-     * @param <E> VegetableType or FlowerType
+     * @param types         types (either VegetableType.values() or FlowerType.values())
+     * @param t             the transaction
+     * @param <P>           VegetablePlant or FlowerPlant
+     * @param <E>           VegetableType or FlowerType
      * @return a suitable seed or null
      */
     private <P extends Plant, E extends Enum<E>> P tryToGetNextSeed(List<P> plantedPlants, E[] types, Transaction t) {
-
         List<PlantCount<E>> counts = new LinkedList<>();
 
         // Step 1: count how many times a plant with the type has been planted
@@ -209,7 +239,6 @@ public class PlantAndHarvestRobot extends Robot {
                 }
             }
             if (i == -1) {
-                System.err.println("plant type not found");
                 return null;
             }
 
@@ -238,7 +267,6 @@ public class PlantAndHarvestRobot extends Robot {
             }
 
             if (plant != null) {
-                logger.info(String.format("PlantAndHarvestRobot %s: Got a plant(%s, %s) to plant", getId(), plant.getTypeName(), plant.getId()));
                 return (P) plant;
             }
         }
@@ -248,73 +276,58 @@ public class PlantAndHarvestRobot extends Robot {
 
     /**
      * Trys to plant a new plant
+     *
      * @param planted the plants (veg or flo) that have already been planted
-     * @param types types (either VegetableType.values() or FlowerType.values())
-     * @param <P> VegetablePlant or FlowerPlant
-     * @param <E> VegetableType or FlowerType
+     * @param types   types (either VegetableType.values() or FlowerType.values())
+     * @param <P>     VegetablePlant or FlowerPlant
+     * @param <E>     VegetableType or FlowerType
      * @return true if a new plant has been planted, false otherwise
      */
     private <P extends Plant, E extends Enum<E>> boolean tryPlantPlant(List<P> planted, E[] types) {
-        Transaction t = transactionService.beginTransaction(plantTransactionTimeout);
+        if (storageService.isExit()) {
+            return false;
+        }
+
+        Transaction transaction = transactionService.beginTransaction(plantTransactionTimeout, "Plant Plant");
 
         // Step 1: First of all, try to get a seed
-        P nextSeed = tryToGetNextSeed(planted, types, t);
+        P nextSeed = tryToGetNextSeed(planted, types, transaction);
         if (nextSeed != null) {
             logger.info(String.format("PlantAndHarvestRobot %s: got %s seed", this.getId(), nextSeed.getTypeName()));
 
-            // Step 2: try to get the amount of soil needed for the plant
-            if (!storageService.tryGetExactAmountOfSoil(nextSeed.getCultivationInformation().getSoilAmount(), t)) {
-                logger.info(String.format("PlantAndHarvestRobot %s: did not get exact amount of soil(%d) for seed(%s, %s)", this.getId(), nextSeed.getCultivationInformation().getSoilAmount(), nextSeed.getTypeName(), nextSeed.getId()));
-                t.rollback();
-                return false;
-            }
-
-            // Step 3: try to get the amount of fertilizer needed for the plant
-            List fertilizers = null;
-            if (nextSeed instanceof VegetablePlant) {
-                fertilizers = storageService.getVegetableFertilizer(nextSeed.getCultivationInformation().getFertilizerAmount(), t);
-            } else if (nextSeed instanceof FlowerPlant) {
-                fertilizers = storageService.getFlowerFertilizer(nextSeed.getCultivationInformation().getFertilizerAmount(), t);
-            }
-            if (fertilizers == null || fertilizers.isEmpty()) {
-                logger.info(String.format("PlantAndHarvestRobot %s: did not get enough fertilizer(%d) for seed(%s, %s)", this.getId(), nextSeed.getCultivationInformation().getFertilizerAmount(), nextSeed.getTypeName(), nextSeed.getId()));
-                t.rollback();
-                return false;
-            }
-
-            // Step 4: get the water needed for the plant
-            storageService.getWater(nextSeed.getCultivationInformation().getWaterAmount());
+            // Step 2: get the water needed for the plant
+            storageService.getWater(nextSeed.getCultivationInformation().getWaterAmount(), this.getId());
 
             nextSeed.setPlantRobot(this.getId());
 
-            // Step 5: plant the plant
+            // Step 3: plant the plant
             if (nextSeed instanceof VegetablePlant) {
-                if(!greenhouseService.plant((VegetablePlant) nextSeed, t)) {
+                if (!greenhouseService.plant((VegetablePlant) nextSeed, transaction)) {
                     logger.info(String.format("PlantAndHarvestRobot %s: could not plant seed(%s, %s)", this.getId(), nextSeed.getTypeName(), nextSeed.getId()));
-                    t.rollback();
+                    transaction.rollback();
                     return false;
                 }
-                logger.debug(String.format("tryPlantPlant - planted vegetable %s", nextSeed.getTypeName()));
             } else if (nextSeed instanceof FlowerPlant) {
-                if(!greenhouseService.plant((FlowerPlant) nextSeed, t)) {
+                if (!greenhouseService.plant((FlowerPlant) nextSeed, transaction)) {
                     logger.info(String.format("PlantAndHarvestRobot %s: could not plant seed(%s, %s)", this.getId(), nextSeed.getTypeName(), nextSeed.getId()));
-                    t.rollback();
+                    transaction.rollback();
                     return false;
                 }
-                logger.info(String.format("PlantAndHarvestRobot %s: planted seed(%s, %s)", this.getId(), nextSeed.getTypeName(), nextSeed.getId()));
+
             } else {
-                logger.log(Priority.toPriority(Priority.ERROR_INT), String.format("tryPlantPlant - not planted - unknown plant"));
-                t.rollback();
+                transaction.rollback();
                 return false;
             }
 
-            t.commit();
+
+            transaction.commit();
+            logger.debug(String.format("PlantAndHarvestRobot %s: planted %s plant %s", this.getId(), nextSeed.getTypeName(), nextSeed.getId()));
             return true;
         }
 
         // If we did not get any seed to plant, rollback the transaction
         logger.info(String.format("PlantAndHarvestRobot %s: did not get any seed", this.getId()));
-        t.rollback();
+        transaction.rollback();
         return false;
     }
 

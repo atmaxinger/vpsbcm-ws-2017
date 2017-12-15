@@ -1,51 +1,83 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.postgres.service;
 
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Bouquet;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableBasket;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.MarketService;
-import com.impossibl.postgres.api.jdbc.PGNotificationListener;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
+import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class MarketServiceImpl extends MarketService {
+    final static Logger logger = Logger.getLogger(MarketServiceImpl.class);
 
     private static final String MARKET_BOUQUET_TABLE = "mbt";
     private static final String MARKET_VEGETABLE_BASKET_TABLE = "mvb";
 
-    public MarketServiceImpl() {
-        PGNotificationListener listener = new PGNotificationListener() {
-            @Override
-            public void notification(int processId, String channelName, String payload) {
-                String table = ServiceUtil.getTableName(channelName, payload);
+    private List<Listener> listeners = new LinkedList<>();
 
-                switch (table) {
-                    case MARKET_BOUQUET_TABLE:
-                    case MARKET_VEGETABLE_BASKET_TABLE:
-                        raiseChangedEvent();
-                        break;
-                }
+    private boolean exit = false;
 
-            }
-        };
-
-        PostgresHelper.getConnection().addNotificationListener(listener);
-
-        PostgresHelper.setUpListen(MARKET_BOUQUET_TABLE);
-        PostgresHelper.setUpListen(MARKET_VEGETABLE_BASKET_TABLE);
+    @Override
+    public synchronized boolean isExit() {
+        return exit;
     }
 
-    public void putBouquet(Bouquet bouquet) {
-        ServiceUtil.writeItem(bouquet,MARKET_BOUQUET_TABLE);
+    @Override
+    public synchronized void setExit(boolean exit) {
+        this.exit = exit;
+        if(exit == true) {
+            for(Listener listener : listeners) {
+                listener.shutdown();
+            }
+        }
+    }
+
+    public MarketServiceImpl() {
+        try {
+            Listener flowerListener = new Listener(MARKET_BOUQUET_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    raiseChangedEvent();
+                }
+            };
+            flowerListener.start();
+
+            Listener vegetableListener = new Listener(MARKET_VEGETABLE_BASKET_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    raiseChangedEvent();
+                }
+            };
+            vegetableListener.start();
+
+            listeners.add(flowerListener);
+            listeners.add(vegetableListener);
+        } catch (SQLException e) {
+            logger.trace("EXCEPTION", e);
+        }
+    }
+
+    public void putBouquet(Bouquet bouquet, Transaction transaction) {
+        if(transaction == null) {
+            ServiceUtil.writeItem(bouquet,MARKET_BOUQUET_TABLE);
+            return;
+        }
+        ServiceUtil.writeItem(bouquet,MARKET_BOUQUET_TABLE, transaction);
     }
 
     public int getAmountOfBouquets() {
         return readAllBouquets().size();
     }
 
-    public void putVegetableBasket(VegetableBasket vegetableBasket) {
-        ServiceUtil.writeItem(vegetableBasket,MARKET_VEGETABLE_BASKET_TABLE);
+    public void putVegetableBasket(VegetableBasket vegetableBasket, Transaction transaction) {
+        if(transaction == null) {
+            ServiceUtil.writeItem(vegetableBasket,MARKET_VEGETABLE_BASKET_TABLE);
+            return;
+        }
+        ServiceUtil.writeItem(vegetableBasket,MARKET_VEGETABLE_BASKET_TABLE, transaction);
     }
 
     public int getAmountOfVegetableBaskets() {
@@ -60,7 +92,7 @@ public class MarketServiceImpl extends MarketService {
         try {
             ServiceUtil.deleteItemById(bouquet.getId(),MARKET_BOUQUET_TABLE);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 
@@ -72,7 +104,7 @@ public class MarketServiceImpl extends MarketService {
         try {
             ServiceUtil.deleteItemById(vegetableBasket.getId(),MARKET_VEGETABLE_BASKET_TABLE);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 

@@ -65,18 +65,6 @@ public abstract class ConfigServiceTest {
     }
 
     @Test
-    public void getFlowerPlantCultivationInformation_ShouldWork(){
-        Assert.assertTrue(Objects.equals(configService.getFlowerPlantCultivationInformation(flowerPlantCultivationInformation1.getId(), null).getId(), flowerPlantCultivationInformation1.getId()));
-        Assert.assertTrue(configService.readAllFlowerPlantCultivationInformation(null).size() == 1);
-    }
-
-    @Test
-    public void getVegetablePlantCultivationInformation_ShouldWork(){
-        Assert.assertTrue(configService.getVegetablePlantCultivationInformation(vegetablePlantCultivationInformation1.getId(),null).getId().equals(vegetablePlantCultivationInformation1.getId()));
-        Assert.assertTrue(configService.readAllVegetablePlantCultivationInformation(null).size() == 1);
-    }
-
-    @Test
     public void putFlowerPlantCultivationInformation_ShouldWork(){
         Assert.assertTrue(configService.readAllFlowerPlantCultivationInformation(null).size() == 2);
         Assert.assertTrue(configService.readAllFlowerPlantCultivationInformation(null).get(0).equals(flowerPlantCultivationInformation1) || configService.readAllFlowerPlantCultivationInformation(null).get(1).equals(flowerPlantCultivationInformation1));

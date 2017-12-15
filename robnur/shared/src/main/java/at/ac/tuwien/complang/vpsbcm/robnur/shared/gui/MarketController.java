@@ -28,7 +28,7 @@ public class MarketController {
 
     private MarketService marketService = RobNurGUI.marketService;
 
-    private void updateData(List<VegetableBasket> vegetableBasketList, List<Bouquet> bouquetList) {
+    private synchronized void updateData(List<VegetableBasket> vegetableBasketList, List<Bouquet> bouquetList) {
         ObservableList<EndProduct> obs = tvMarket.getItems();
         obs.clear();
 

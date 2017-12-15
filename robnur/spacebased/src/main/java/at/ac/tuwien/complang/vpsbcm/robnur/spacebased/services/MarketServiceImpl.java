@@ -3,18 +3,23 @@ package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Bouquet;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableBasket;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.MarketService;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
+import org.apache.log4j.Logger;
 import org.mozartspaces.capi3.AnyCoordinator;
 import org.mozartspaces.capi3.Coordinator;
 import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.core.*;
+import org.mozartspaces.notifications.Notification;
 import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class MarketServiceImpl extends MarketService {
+    final static Logger logger = Logger.getLogger(MarketServiceImpl.class);
 
     private URI spaceUri;
     private Capi capi;
@@ -22,6 +27,21 @@ public class MarketServiceImpl extends MarketService {
 
     private ContainerReference bouquetContainer;
     private ContainerReference vegetableBasketContainer;
+
+
+    List<Notification> notifications = new LinkedList<>();
+
+    boolean exit = false;
+
+    @Override
+    public synchronized boolean isExit() {
+        return exit;
+    }
+
+    @Override
+    public synchronized void setExit(boolean exit) {
+        this.exit = exit;
+    }
 
     public MarketServiceImpl(URI spaceUri) {
 
@@ -34,25 +54,21 @@ public class MarketServiceImpl extends MarketService {
         List<Coordinator> coordinators = Arrays.asList(new AnyCoordinator(), new QueryCoordinator());
 
         try {
-            bouquetContainer = CapiUtil.lookupOrCreateContainer("bouquetContainer", spaceUri, coordinators, null,capi);
-            vegetableBasketContainer = CapiUtil.lookupOrCreateContainer("vegetableBasketContainer", spaceUri, coordinators, null,capi);
+            bouquetContainer = CapiUtil.lookupOrCreateContainer("marketBouquetContainer", spaceUri, coordinators, null,capi);
+            vegetableBasketContainer = CapiUtil.lookupOrCreateContainer("marketVegetableBasketContainer", spaceUri, coordinators, null,capi);
 
-            notificationManager.createNotification(bouquetContainer, (notification, operation, list) -> raiseChangedEvent(), Operation.DELETE, Operation.TAKE, Operation.WRITE);
-            notificationManager.createNotification(vegetableBasketContainer, (notification, operation, list) -> raiseChangedEvent(), Operation.DELETE, Operation.TAKE, Operation.WRITE);
+            notifications.add(notificationManager.createNotification(bouquetContainer, (notification, operation, list) -> raiseChangedEvent(), Operation.DELETE, Operation.TAKE, Operation.WRITE));
+            notifications.add(notificationManager.createNotification(vegetableBasketContainer, (notification, operation, list) -> raiseChangedEvent(), Operation.DELETE, Operation.TAKE, Operation.WRITE));
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
     }
 
     @Override
-    public void putBouquet(Bouquet bouquet) {
-        try {
-            capi.write(bouquetContainer,new Entry(bouquet));
-        } catch (MzsCoreException e) {
-            e.printStackTrace();
-        }
+    public void putBouquet(Bouquet bouquet, Transaction transaction) {
+        ServiceUtil.writeItem(new Entry(bouquet), bouquetContainer, transaction, capi);
     }
 
     @Override
@@ -61,12 +77,8 @@ public class MarketServiceImpl extends MarketService {
     }
 
     @Override
-    public void putVegetableBasket(VegetableBasket vegetableBasket) {
-        try {
-            capi.write(vegetableBasketContainer,new Entry(vegetableBasket));
-        } catch (MzsCoreException e) {
-            e.printStackTrace();
-        }
+    public void putVegetableBasket(VegetableBasket vegetableBasket, Transaction transaction) {
+        ServiceUtil.writeItem(new Entry(vegetableBasket), vegetableBasketContainer, transaction, capi);
     }
 
     @Override
@@ -81,7 +93,7 @@ public class MarketServiceImpl extends MarketService {
         try {
             bouquets = capi.read(bouquetContainer,AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX),MzsConstants.RequestTimeout.DEFAULT,null);
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         return bouquets;
@@ -98,7 +110,7 @@ public class MarketServiceImpl extends MarketService {
 
             for (Bouquet b: bouquets) {
                 if(!b.equals(bouquet)){
-                    putBouquet(b);
+                    putBouquet(b, null);
                 }
             }
 
@@ -120,7 +132,7 @@ public class MarketServiceImpl extends MarketService {
         try {
             vegetableBaskets = capi.read(vegetableBasketContainer,AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX),MzsConstants.RequestTimeout.DEFAULT,null);
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         return vegetableBaskets;
@@ -143,7 +155,7 @@ public class MarketServiceImpl extends MarketService {
 
             for (VegetableBasket vb: vegetableBaskets) {
                 if(!vb.equals(vegetableBasket)){
-                    putVegetableBasket(vb);
+                    putVegetableBasket(vb, null);
                 }
             }
 
@@ -165,7 +177,7 @@ public class MarketServiceImpl extends MarketService {
         try {
             vegetableBaskets = capi.take(vegetableBasketContainer,AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX),MzsConstants.RequestTimeout.DEFAULT,null);
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         return vegetableBaskets;
@@ -177,7 +189,7 @@ public class MarketServiceImpl extends MarketService {
         try {
             bouquets = capi.take(bouquetContainer,AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX),MzsConstants.RequestTimeout.DEFAULT,null);
         } catch (MzsCoreException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
 
         return bouquets;

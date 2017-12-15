@@ -5,63 +5,82 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.ResearchRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ResearchService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
-import com.impossibl.postgres.api.jdbc.PGNotificationListener;
+import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ResearchServiceImpl extends ResearchService {
+    final static Logger logger = Logger.getLogger(ResearchServiceImpl.class);
 
     private static final String RESEARCH_FLOWER_TABLE = "rf";
     private static final String RESEARCH_VEGETABLE_TABLE = "rv";
 
-    public void ResearchServiceImpl() {
+    private List<Listener> listeners = new LinkedList<>();
 
-        PGNotificationListener listener = new PGNotificationListener() {
-            @Override
-            public void notification(int processId, String channelName, String payload) {
-                String table = ServiceUtil.getTableName(channelName, payload);
-                switch (table) {
-                    case RESEARCH_FLOWER_TABLE:
-                        notifyFlowersChanged(readAllFlowers(null));
-                        break;
-                    case RESEARCH_VEGETABLE_TABLE:
-                        notifyVegetablesChanged(readAllVegetables(null));
-                        break;
-                }
+    private boolean exit = false;
 
+    @Override
+    public synchronized boolean isExit() {
+        return exit;
+    }
+
+    @Override
+    public synchronized void setExit(boolean exit) {
+        this.exit = exit;
+        if(exit == true) {
+            for(Listener listener : listeners) {
+                listener.shutdown();
             }
-        };
-
-        PostgresHelper.getConnection().addNotificationListener(listener);
-
-        PostgresHelper.setUpListen(RESEARCH_FLOWER_TABLE);
-        PostgresHelper.setUpListen(RESEARCH_VEGETABLE_TABLE);
-    }
-
-    public void putFlower(Flower flower) {
-        ServiceUtil.writeItem(flower,RESEARCH_FLOWER_TABLE);
-    }
-
-    public void putVegetable(Vegetable vegetable) {
-        ServiceUtil.writeItem(vegetable,RESEARCH_VEGETABLE_TABLE);
-    }
-
-    public void deleteFlower(Flower flower, Transaction transaction) {
-        try {
-            ServiceUtil.deleteItemById(flower.getId(),RESEARCH_FLOWER_TABLE,transaction);
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 
-    public void deleteVegetable(Vegetable vegetable, Transaction transaction) {
+    public ResearchServiceImpl() {
+
         try {
-            ServiceUtil.deleteItemById(vegetable.getId(),RESEARCH_VEGETABLE_TABLE,transaction);
+            Listener flowerListener = new Listener(RESEARCH_FLOWER_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    notifyFlowersChanged(readAllFlowers(null));
+                }
+            };
+            flowerListener.start();
+
+            Listener vegetableListener = new Listener(RESEARCH_VEGETABLE_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    notifyVegetablesChanged(readAllVegetables(null));
+                }
+            };
+            vegetableListener.start();
+
+            listeners.add(flowerListener);
+            listeners.add(vegetableListener);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace("EXCEPTION", e);
         }
+    }
+
+    @Override
+    public void putFlower(Flower flower, Transaction transaction) {
+        ServiceUtil.writeItem(flower,RESEARCH_FLOWER_TABLE, transaction);
+    }
+
+    @Override
+    public void putVegetable(Vegetable vegetable, Transaction transaction) {
+        ServiceUtil.writeItem(vegetable,RESEARCH_VEGETABLE_TABLE, transaction);
+    }
+
+    @Override
+    public List<Flower> getAllFlowers(Transaction transaction) {
+        return ServiceUtil.getAllItems(RESEARCH_FLOWER_TABLE,Flower.class,transaction);
+    }
+
+    @Override
+    public List<Vegetable> getAllVegetables(Transaction transaction) {
+        return ServiceUtil.getAllItems(RESEARCH_VEGETABLE_TABLE,Vegetable.class,transaction);
     }
 
     public List<Flower> readAllFlowers(Transaction transaction) {
@@ -78,26 +97,27 @@ public class ResearchServiceImpl extends ResearchService {
 
     public void registerResearchRobot(ResearchRobot researchRobot) {
 
-        PGNotificationListener listener = new PGNotificationListener() {
-            @Override
-            public void notification(int processId, String channelName, String payload) {
-                String table = ServiceUtil.getTableName(channelName, payload);
-                if(ServiceUtil.getOperation(channelName, payload) == ServiceUtil.DBOPERATION.INSERT) {
-                    switch (table) {
-                        case RESEARCH_FLOWER_TABLE:
-                            researchRobot.tryUpgradeFlowerPlant();
-                            break;
-                        case RESEARCH_VEGETABLE_TABLE:
-                            researchRobot.tryUpgradeVegetablePlant();
-                            break;
-                    }
+        try {
+            Listener flowerListener = new Listener(RESEARCH_FLOWER_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    researchRobot.tryUpgradeFlowerPlant();
                 }
-            }
-        };
+            };
+            flowerListener.start();
 
-        PostgresHelper.getConnection().addNotificationListener(listener);
+            Listener vegetableListener = new Listener(RESEARCH_VEGETABLE_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    researchRobot.tryUpgradeVegetablePlant();
+                }
+            };
+            vegetableListener.start();
 
-        PostgresHelper.setUpListen(RESEARCH_FLOWER_TABLE);
-        PostgresHelper.setUpListen(RESEARCH_VEGETABLE_TABLE);
+            listeners.add(flowerListener);
+            listeners.add(vegetableListener);
+        } catch (SQLException e) {
+            logger.trace("EXCEPTION", e);
+        }
     }
 }

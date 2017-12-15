@@ -58,7 +58,7 @@ public class ConfigController {
     }
 
 
-    private void setVegeTableData(List<VegetablePlantCultivationInformation> cis) {
+    private synchronized void setVegeTableData(List<VegetablePlantCultivationInformation> cis) {
         ObservableList<VegetablePlantCultivationInformation> obs = tvVegetables.getItems();
         obs.clear();
         obs.addAll(cis);
@@ -80,7 +80,7 @@ public class ConfigController {
     }
 
 
-    private void setFlowerTableData(List<FlowerPlantCultivationInformation> cis) {
+    private synchronized void setFlowerTableData(List<FlowerPlantCultivationInformation> cis) {
         ObservableList<FlowerPlantCultivationInformation> obs = tvFlowers.getItems();
         obs.clear();
         obs.addAll(cis);
