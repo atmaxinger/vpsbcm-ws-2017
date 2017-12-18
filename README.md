@@ -1,6 +1,9 @@
 # Roboter Gärtnerei
 Dies ist eine Implementierung einer Roboter Gärtnerei
 
+ - master: [![Build Status](https://travis-ci.org/atmaxinger/vpsbcm-ws-2017.svg?branch=master)](https://travis-ci.org/atmaxinger/vpsbcm-ws-2017)
+ - development: [![Build Status](https://travis-ci.org/atmaxinger/vpsbcm-ws-2017.svg?branch=development)](https://travis-ci.org/atmaxinger/vpsbcm-ws-2017)
+
 ## Prequesites
  - JDK 8
  - Maven
