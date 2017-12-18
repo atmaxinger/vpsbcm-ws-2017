@@ -1,4 +1,16 @@
 language: java
 jdk: oraclejdk8
+services:
+  - postgresql
 before_install:
-    - cd robnur
+  - cd robnur
+  - psql -c 'create database robnur;' -U postgres
+  - mkdir ~/robnur
+  - sudo dd of=~/robnur/postgres.properties << EOF
+db.server=localhost
+db.port=5432
+db.database=robnur
+db.user=postgres
+db.password=
+EOF
+    
