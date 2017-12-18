@@ -10,6 +10,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.StorageService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlantCultivationInformation;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlantCultivationInformation;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
 import org.apache.log4j.Logger;
 
 import java.sql.*;
@@ -192,6 +193,9 @@ public class InitDb {
 
         if (configService.readAllFlowerPlantCultivationInformation(null).size() == 0) {
 
+            TransactionService transactionService = new TransactionServiceImpl();
+            Transaction transaction = transactionService.beginTransaction(-1);
+
             FlowerPlantCultivationInformation flowerPlantCultivationInformation = new FlowerPlantCultivationInformation();
             flowerPlantCultivationInformation.setFlowerType(FlowerType.ROSE);
             flowerPlantCultivationInformation.setSoilAmount(20);
@@ -203,7 +207,7 @@ public class InitDb {
             flowerPlantCultivationInformation.setVulnerability(25);
             flowerPlantCultivationInformation.setPrice(50);
 
-            configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, null);
+            configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation,transaction);
 
             flowerPlantCultivationInformation = new FlowerPlantCultivationInformation();
             flowerPlantCultivationInformation.setFlowerType(FlowerType.TULIP);
@@ -216,7 +220,7 @@ public class InitDb {
             flowerPlantCultivationInformation.setVulnerability(18);
             flowerPlantCultivationInformation.setPrice(60);
 
-            configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, null);
+            configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, transaction);
 
             flowerPlantCultivationInformation = new FlowerPlantCultivationInformation();
             flowerPlantCultivationInformation.setFlowerType(FlowerType.DAISY);
@@ -229,7 +233,7 @@ public class InitDb {
             flowerPlantCultivationInformation.setVulnerability(20);
             flowerPlantCultivationInformation.setPrice(70);
 
-            configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, null);
+            configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, transaction);
 
             flowerPlantCultivationInformation = new FlowerPlantCultivationInformation();
             flowerPlantCultivationInformation.setFlowerType(FlowerType.VIOLET);
@@ -242,13 +246,18 @@ public class InitDb {
             flowerPlantCultivationInformation.setVulnerability(90);
             flowerPlantCultivationInformation.setPrice(80);
 
-            configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, null);
+            configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, transaction);
+
+            transaction.commit();
         }
     }
 
     public static void putInitialVegetablePlantCultivationInformation(ConfigService configService) {
 
         if (configService.readAllVegetablePlantCultivationInformation(null).size() == 0) {
+
+            TransactionService transactionService = new TransactionServiceImpl();
+            Transaction transaction = transactionService.beginTransaction(-1);
 
             VegetablePlantCultivationInformation vegetablePlantCultivationInformation = new VegetablePlantCultivationInformation();
             vegetablePlantCultivationInformation.setVegetableType(VegetableType.PEPPER);
@@ -262,7 +271,7 @@ public class InitDb {
             vegetablePlantCultivationInformation.setVulnerability(5);
             vegetablePlantCultivationInformation.setPrice(50);
 
-            configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation,null);
+            configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation,transaction);
 
             vegetablePlantCultivationInformation = new VegetablePlantCultivationInformation();
             vegetablePlantCultivationInformation.setVegetableType(VegetableType.TOMATO);
@@ -276,7 +285,7 @@ public class InitDb {
             vegetablePlantCultivationInformation.setVulnerability(12);
             vegetablePlantCultivationInformation.setPrice(60);
 
-            configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation,null);
+            configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation,transaction);
 
             vegetablePlantCultivationInformation = new VegetablePlantCultivationInformation();
             vegetablePlantCultivationInformation.setVegetableType(VegetableType.CARROT);
@@ -290,7 +299,7 @@ public class InitDb {
             vegetablePlantCultivationInformation.setVulnerability(20);
             vegetablePlantCultivationInformation.setPrice(70);
 
-            configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation,null);
+            configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation,transaction);
 
             vegetablePlantCultivationInformation = new VegetablePlantCultivationInformation();
             vegetablePlantCultivationInformation.setVegetableType(VegetableType.SALAD);
@@ -304,7 +313,7 @@ public class InitDb {
             vegetablePlantCultivationInformation.setVulnerability(30);
             vegetablePlantCultivationInformation.setPrice(80);
 
-            configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation,null);
+            configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation,transaction);
         }
     }
     private static void insertInitialWaterToken(){

@@ -120,8 +120,6 @@ public class FosterRobot extends Robot {
         infestation = Math.max(0, infestation-0.25f);
         plant.setInfestation(infestation);
 
-
-
         plant.addFosterRobot(String.format("%s (%d%%, %d%%, %s)", getId(), Math.round(infestationBefore*100), Math.round(infestation*100), new Date()));
 
         waitFosterTime();

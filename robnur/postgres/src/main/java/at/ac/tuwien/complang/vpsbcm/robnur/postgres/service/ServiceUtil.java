@@ -284,6 +284,53 @@ public class ServiceUtil {
     }
 
     /**
+     * get one item arbitrary item (read + delete)
+     * @param table the name of the table
+     * @param resultClass the expected class of the result
+     * @param transaction the transaction
+     * @param <T> type
+     * @return The item if successful, null if unsuccessful
+     */
+    public static <T extends Serializable> T getItem(String table, Class<T> resultClass, Transaction transaction) {
+
+        T result = null;
+
+        ObjectMapper mapper = new ObjectMapper()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        Statement statement = null;
+        try {
+            statement = ((TransactionImpl) transaction).getConnection().createStatement();
+        } catch (SQLException e) {
+            logger.trace("EXCEPTION", e);
+            return null;
+        }
+
+        ResultSet rs = null;
+        try {
+            rs = statement.executeQuery(String.format("SELECT * FROM %s LIMIT 1", table));
+
+            rs.next();
+            String data = rs.getString("data");
+            result = mapper.readValue(data, resultClass);
+            long databaseId = rs.getLong("id");
+
+            deleteItemByDatabaseId(databaseId, table, transaction);
+        } catch (SQLException | IOException e) {
+            result = null;
+            logger.trace("EXCEPTION", e);
+        }
+
+        try {
+            statement.close();
+        } catch (SQLException e) {
+            logger.trace("EXCEPTION", e);
+        }
+
+        return result;
+    }
+
+    /**
      * get all items matching a parameter of the JSON (read + delete)
      * @param parameterName the name of the JSON parameter
      * @param parameterValue the value of the JSON parameter

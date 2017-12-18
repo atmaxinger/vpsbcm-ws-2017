@@ -1,13 +1,11 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.postgres.service;
 
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.FlowerFertilizer;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.*;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableType;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.SoilPackage;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.VegetableFertilizer;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.Water;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.FosterRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PlantAndHarvestRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.StorageService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
@@ -33,6 +31,8 @@ public class StorageServiceImpl extends StorageService {
     private static final String STORAGE_VEGETABLE_FERTILIZER_TABLE = "svf";
     private static final String STORAGE_WATER_TABLE = "sw";
     private static final String STORAGE_WATER_TOKEN_TABLE = "wt";
+    private static final String STORAGE_FLOWER_PESTICIDE_TABLE = "fp";
+    private static final String STORAGE_VEGETABLE_PESTICIDE_TABLE = "vp";
     public static final String STORAGE_WATER_ACCESS_TABLE = "wa";
 
     final static Logger logger = Logger.getLogger(StorageServiceImpl.class);
@@ -314,6 +314,40 @@ public class StorageServiceImpl extends StorageService {
     }
 
     @Override
+    public void putFlowerPesticides(List<FlowerPesticide> pesticides, Transaction transaction) {
+        for (FlowerPesticide fp:pesticides) {
+            ServiceUtil.writeItem(fp,STORAGE_FLOWER_PESTICIDE_TABLE,transaction);
+        }
+    }
+
+    @Override
+    public FlowerPesticide getFlowerPesticide(Transaction transaction) {
+        return ServiceUtil.getItem(STORAGE_FLOWER_PESTICIDE_TABLE,FlowerPesticide.class,transaction);
+    }
+
+    @Override
+    public List<FlowerPesticide> readAllFlowerPesticides(Transaction transaction) {
+        return ServiceUtil.readAllItems(STORAGE_FLOWER_PESTICIDE_TABLE,FlowerPesticide.class,transaction);
+    }
+
+    @Override
+    public void putVegetablePesticides(List<VegetablePesticide> pesticides, Transaction transaction) {
+        for (VegetablePesticide vp:pesticides) {
+            ServiceUtil.writeItem(vp,STORAGE_VEGETABLE_PESTICIDE_TABLE,transaction);
+        }
+    }
+
+    @Override
+    public VegetablePesticide getVegetablePesticide(Transaction transaction) {
+        return ServiceUtil.getItem(STORAGE_VEGETABLE_PESTICIDE_TABLE,VegetablePesticide.class,transaction);
+    }
+
+    @Override
+    public List<VegetablePesticide> readAllVegetablePesticides(Transaction transaction) {
+        return ServiceUtil.readAllItems(STORAGE_VEGETABLE_PESTICIDE_TABLE,VegetablePesticide.class,transaction);
+    }
+
+    @Override
     public Water accessTap(String robotId) {
 
         try {
@@ -364,8 +398,7 @@ public class StorageServiceImpl extends StorageService {
             Listener flowerSeedListener = new Listener(STORAGE_FLOWER_SEED_TABLE) {
                 @Override
                 public void onNotify(int pid, DBMETHOD method) {
-                    robot.tryHarvestPlant();
-                    robot.tryPlant();
+                    robot.doStuff();
                 }
             };
             flowerSeedListener.start();
@@ -373,8 +406,7 @@ public class StorageServiceImpl extends StorageService {
             Listener vegetableSeedListener = new Listener(STORAGE_VEGETABLE_SEED_TABLE) {
                 @Override
                 public void onNotify(int pid, DBMETHOD method) {
-                    robot.tryHarvestPlant();
-                    robot.tryPlant();
+                    robot.doStuff();
                 }
             };
             vegetableSeedListener.start();
@@ -382,8 +414,7 @@ public class StorageServiceImpl extends StorageService {
             Listener soilListener = new Listener(STORAGE_SOIL_TABLE) {
                 @Override
                 public void onNotify(int pid, DBMETHOD method) {
-                    robot.tryHarvestPlant();
-                    robot.tryPlant();
+                    robot.doStuff();
                 }
             };
             soilListener.start();
@@ -391,8 +422,7 @@ public class StorageServiceImpl extends StorageService {
             Listener flowerFertilizerListener = new Listener(STORAGE_FLOWER_FERTILIZER_TABLE) {
                 @Override
                 public void onNotify(int pid, DBMETHOD method) {
-                    robot.tryHarvestPlant();
-                    robot.tryPlant();
+                    robot.doStuff();
                 }
             };
             flowerFertilizerListener.start();
@@ -400,8 +430,7 @@ public class StorageServiceImpl extends StorageService {
             Listener vegetableVerbalizeListener = new Listener(STORAGE_VEGETABLE_FERTILIZER_TABLE) {
                 @Override
                 public void onNotify(int pid, DBMETHOD method) {
-                    robot.tryHarvestPlant();
-                    robot.tryPlant();
+                    robot.doStuff();
                 }
             };
             vegetableVerbalizeListener.start();
@@ -409,8 +438,7 @@ public class StorageServiceImpl extends StorageService {
             Listener waterListener = new Listener(STORAGE_WATER_TABLE) {
                 @Override
                 public void onNotify(int pid, DBMETHOD method) {
-                    robot.tryHarvestPlant();
-                    robot.tryPlant();
+                    robot.doStuff();
                 }
             };
             waterListener.start();
@@ -426,7 +454,37 @@ public class StorageServiceImpl extends StorageService {
         }
     }
 
+    public void registerFosterRobot(FosterRobot robot) {
+
+        try {
+            Listener flowerPesticideListener = new Listener(STORAGE_FLOWER_PESTICIDE_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    if(method == DBMETHOD.INSERT) {
+                        robot.foster();
+                    }
+                }
+            };
+
+            flowerPesticideListener.start();
+
+            Listener vegetablePesticideListener = new Listener(STORAGE_VEGETABLE_PESTICIDE_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    if(method == DBMETHOD.INSERT) {
+                        robot.foster();
+                    }
+                }
+            };
+
+            vegetablePesticideListener.start();
+
+        } catch (SQLException e) {
+            logger.trace("EXCEPTION", e);
+        }
+    }
+
     public static List<String> getTables() {
-        return Arrays.asList(STORAGE_FLOWER_SEED_TABLE,STORAGE_VEGETABLE_SEED_TABLE,STORAGE_SOIL_TABLE,STORAGE_FLOWER_FERTILIZER_TABLE,STORAGE_VEGETABLE_FERTILIZER_TABLE,STORAGE_WATER_TABLE,STORAGE_WATER_TOKEN_TABLE);
+        return Arrays.asList(STORAGE_FLOWER_SEED_TABLE,STORAGE_VEGETABLE_SEED_TABLE,STORAGE_SOIL_TABLE,STORAGE_FLOWER_FERTILIZER_TABLE,STORAGE_VEGETABLE_FERTILIZER_TABLE,STORAGE_WATER_TABLE,STORAGE_WATER_TOKEN_TABLE,STORAGE_VEGETABLE_PESTICIDE_TABLE,STORAGE_FLOWER_PESTICIDE_TABLE);
     }
 }

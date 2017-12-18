@@ -322,7 +322,8 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             logger.trace("EXCEPTION", e);
         }
 
-        return null;    }
+        return null;
+    }
 
     @Override
     public FlowerPlant getLimpFlowerPlant(Transaction transaction) {
