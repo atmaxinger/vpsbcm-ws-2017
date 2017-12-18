@@ -91,4 +91,32 @@ public abstract class GreenhouseService implements Exitable {
      * @return a flower plant that can be harvested, null if no harvestable flower plant was found
      */
     public abstract FlowerPlant getHarvestableFlowerPlant(Transaction transaction);
+
+    /**
+     * takes a vegetable plant form the greenhouse that is limp
+     * @param transaction
+     * @return a vegetable plant that is limp, null if no limp vegetable plant was found
+     */
+    public abstract VegetablePlant getLimpVegetablePlant(Transaction transaction);
+
+    /**
+     * takes a flower plant form the greenhouse that is limp
+     * @param transaction
+     * @return a flower plant that is limp, null if no limp flower plant was found
+     */
+    public abstract FlowerPlant getLimpFlowerPlant(Transaction transaction);
+
+    /**
+     * takes a flower plant from the greenhouse that is infested (infestation >= 0.2) but not yet limp
+     * @param transaction
+     * @return
+     */
+    public abstract FlowerPlant getInfestedFlowerPlant(Transaction transaction);
+
+    /**
+     * takes a vegetable plant from the greenhouse that is infested (infestation >= 0.2) but not yet limp
+     * @param transaction
+     * @return
+     */
+    public abstract VegetablePlant getInfestedVegetablePlant(Transaction transaction);
 }

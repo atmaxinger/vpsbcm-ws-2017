@@ -1,6 +1,8 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.plants;
 
 import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
 
 public abstract class Plant extends Idable implements Serializable {
 
@@ -9,6 +11,8 @@ public abstract class Plant extends Idable implements Serializable {
 
     private String plantRobot;
     private String compostRobot;
+
+    private List<String> fosterRobots = new LinkedList<>();
 
     /* 0 ... 100 */
     /* -1 ... angepflanzt */
@@ -48,6 +52,14 @@ public abstract class Plant extends Idable implements Serializable {
 
     public void setInfestation(float infestation) {
         this.infestation = infestation;
+    }
+
+    public List<String> getFosterRobots() {
+        return fosterRobots;
+    }
+
+    public void addFosterRobot(String id) {
+        this.fosterRobots.add(id);
     }
 
     public abstract String getTypeName();
