@@ -10,6 +10,8 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.StorageService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
 
+import java.util.Date;
+
 public class FosterRobot extends Robot {
 
     private final static int WAITING_TIME = 1000;
@@ -114,9 +116,13 @@ public class FosterRobot extends Robot {
         logger.info(String.format("fostering plant %s (%s)...", plant.getTypeName(), plant.getId()));
 
         float infestation = plant.getInfestation();
+        float infestationBefore = infestation;
         infestation = Math.max(0, infestation-0.25f);
         plant.setInfestation(infestation);
-        plant.addFosterRobot(getId());
+
+
+
+        plant.addFosterRobot(String.format("%s (%d%%, %d%%, %s)", getId(), Math.round(infestationBefore*100), Math.round(infestation*100), new Date()));
 
         waitFosterTime();
     }
