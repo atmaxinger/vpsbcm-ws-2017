@@ -103,28 +103,23 @@ public class StorageServiceImpl extends StorageService {
     public List<Notification> registerPlantAndHarvestRobot(PlantAndHarvestRobot robot) {
         try {
             Notification notificationFlowerSeedContainer = notificationManager.createNotification(flowerSeedContainer, (notification, operation, list) -> {
-                robot.tryHarvestPlant();
-                robot.tryPlant();
+                robot.doStuff();
             }, Operation.WRITE);
 
             Notification notificationVegetableSeedContainer = notificationManager.createNotification(vegetableSeedContainer, (notification, operation, list) -> {
-                robot.tryHarvestPlant();
-                robot.tryPlant();
+                robot.doStuff();
             }, Operation.WRITE);
 
             Notification notificationSoilContainer = notificationManager.createNotification(soilContainer, (notification, operation, list) -> {
-                robot.tryHarvestPlant();
-                robot.tryPlant();
+                robot.doStuff();
             }, Operation.WRITE);
 
             Notification notificationFlowerFertilizerContainer = notificationManager.createNotification(flowerFertilizerContainer, (notification, operation, list) -> {
-                robot.tryHarvestPlant();
-                robot.tryPlant();
+                robot.doStuff();
             }, Operation.WRITE);
 
             Notification notificationVegetableFertilizerContainer = notificationManager.createNotification(vegetableFertilizerContainer, (notification, operation, list) -> {
-                robot.tryHarvestPlant();
-                robot.tryPlant();
+                robot.doStuff();
             }, Operation.WRITE);
 
             notifications.add(notificationFlowerSeedContainer);

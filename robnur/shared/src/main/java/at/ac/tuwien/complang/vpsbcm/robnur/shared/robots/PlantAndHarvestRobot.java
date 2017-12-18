@@ -30,14 +30,35 @@ public class PlantAndHarvestRobot extends Robot {
         this.packingService = packingService;
         this.compostService = compostService;
 
+        doStuff();
+    }
+
+
+    public synchronized void doStuff() {
+        if (storageService.isExit()) {
+            logger.info("you can quit me now...");
+            return;
+        }
+
+        tryThrowAwayPlants();
         tryHarvestPlant();
         tryPlant();
+    }
+
+    private synchronized void tryThrowAwayPlants() {
+        if (storageService.isExit()) {
+            logger.info("you can quit me now...");
+            return;
+        }
+
+        tryThrowAwayFlowers();
+        tryThrowAwayVegetables();
     }
 
     /**
      * Try to harvest all harvestable plants
      */
-    public synchronized void tryHarvestPlant() {
+    private synchronized void tryHarvestPlant() {
         if (storageService.isExit()) {
             logger.info("you can quit me now...");
             return;
@@ -50,7 +71,7 @@ public class PlantAndHarvestRobot extends Robot {
     /**
      * try to plant either a vegetable or a flower
      */
-    public synchronized void tryPlant() {
+    private synchronized void tryPlant() {
         if (storageService.isExit()) {
             logger.info("you can quit me now...");
             return;
@@ -113,6 +134,50 @@ public class PlantAndHarvestRobot extends Robot {
         }
     }
 
+
+    private void tryThrowAwayFlowers() {
+        if (storageService.isExit()) {
+            logger.info("you can quit me now...");
+            return;
+        }
+
+        Transaction transaction = transactionService.beginTransaction(-1);
+
+        FlowerPlant plant = greenhouseService.getLimpFlowerPlant(transaction);
+        if(plant != null) {
+            logger.info(String.format("throwing away limp flower plant %s (%s)", plant.getTypeName(), plant.getId()));
+            plant.setCompostRobot(getId());
+            compostService.putFlowerPlant(plant, transaction);
+            transaction.commit();
+
+            tryThrowAwayFlowers();
+        }
+        else {
+            transaction.rollback();
+        }
+    }
+
+    private void tryThrowAwayVegetables() {
+        if (storageService.isExit()) {
+            logger.info("you can quit me now...");
+            return;
+        }
+
+        Transaction transaction = transactionService.beginTransaction(-1);
+
+        VegetablePlant plant = greenhouseService.getLimpVegetablePlant(transaction);
+        if(plant != null) {
+            logger.info(String.format("throwing away limp vegetable plant %s (%s)", plant.getTypeName(), plant.getId()));
+            plant.setCompostRobot(getId());
+            compostService.putVegetablePlant(plant, transaction);
+            transaction.commit();
+
+            tryThrowAwayVegetables();
+        }
+        else {
+            transaction.rollback();
+        }
+    }
 
     private List<Vegetable> tryHarvestVegetablePlant(Transaction transaction) {
 

@@ -85,8 +85,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         try {
             Notification notificationGreenhouseContainer = notificationManager.createNotification(greenhouseContainer, (notification, operation, list) -> {
                 logger.debug("notify plantandharvest - greenhouseContainer " + operation.name());
-                robot.tryHarvestPlant();
-                robot.tryPlant();
+                robot.doStuff();
             }, Operation.WRITE, Operation.TAKE, Operation.DELETE);
 
            notifications.add(notificationGreenhouseContainer);
