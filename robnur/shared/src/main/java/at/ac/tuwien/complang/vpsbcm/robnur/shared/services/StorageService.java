@@ -4,10 +4,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableType;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.FlowerFertilizer;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.VegetableFertilizer;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.SoilPackage;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.Water;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,6 +26,8 @@ public abstract class StorageService implements Exitable {
     private Callback<List<VegetableFertilizer>> vegetableFertilizerChanged;
     private Callback<String> waterRobotChanged;
 
+    private Callback<List<FlowerPesticide>> flowerPesticidesChanged;
+    private Callback<List<VegetablePesticide>> vegetablePesticidesChanged;
 
     protected void notifyFlowerSeedsChanged(List<FlowerPlant> list) {
         if(flowerSeedsChanged != null) {
@@ -69,6 +68,18 @@ public abstract class StorageService implements Exitable {
         }
     }
 
+    protected void notifyFlowerPesticidesChanged(List<FlowerPesticide> pesticides) {
+        if(flowerPesticidesChanged != null) {
+            flowerPesticidesChanged.handle(pesticides);
+        }
+    }
+
+    protected void notifyVegetablePesticidesChanged(List<VegetablePesticide> pesticides) {
+        if(vegetablePesticidesChanged != null) {
+            vegetablePesticidesChanged.handle(pesticides);
+        }
+    }
+
     public void onFlowerSeedChanged(Callback<List<FlowerPlant>> seedsChanged) {
         this.flowerSeedsChanged = seedsChanged;
     }
@@ -91,6 +102,14 @@ public abstract class StorageService implements Exitable {
 
     public void onWaterRobotChanged(Callback<String> waterRobotChanged) {
         this.waterRobotChanged = waterRobotChanged;
+    }
+
+    public void onFlowerPesticidesChanged(Callback<List<FlowerPesticide>> flowerPesticidesChanged) {
+        this.flowerPesticidesChanged = flowerPesticidesChanged;
+    }
+
+    public void onVegetablePesticidesChanged(Callback<List<VegetablePesticide>> vegetablePesticidesChanged) {
+        this.vegetablePesticidesChanged = vegetablePesticidesChanged;
     }
 
     /**
@@ -317,6 +336,15 @@ public abstract class StorageService implements Exitable {
      */
     public abstract List<VegetableFertilizer> readAllVegetableFertilizer(Transaction transaction);
 
+
+
+    public abstract void putFlowerPesticides(List<FlowerPesticide> pesticides, Transaction transaction);
+    public abstract FlowerPesticide getFlowerPesticide(Transaction transaction);
+    public abstract List<FlowerPesticide> readAllFlowerPesticides(Transaction transaction);
+
+    public abstract void putVegetablePesticides(List<VegetablePesticide> pesticides, Transaction transaction);
+    public abstract VegetablePesticide getVegetablePesticide(Transaction transaction);
+    public abstract List<VegetablePesticide> readAllVegetablePesticides(Transaction transaction);
 
     /**
      * Tries to get the exact amount of soil

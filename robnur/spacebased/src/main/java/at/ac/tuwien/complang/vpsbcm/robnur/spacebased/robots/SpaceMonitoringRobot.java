@@ -43,6 +43,25 @@ public class SpaceMonitoringRobot {
     }
 
     private static void doGrow(Plant plant, CultivationInformation cultivationInformation) {
+
+        if(plant.getGrowth() >= 100) {
+            return;
+        }
+
+        int random = rand.nextInt(100);
+        if(random <= cultivationInformation.getVulnerability()) {
+            float infestation = Math.min(plant.getInfestation()+0.1f, 1);
+            plant.setInfestation(infestation);
+
+            if(infestation == 1) {
+                plant.setGrowth(Plant.STATUS_LIMP);
+            }
+        }
+
+        if(plant.getGrowth() == Plant.STATUS_LIMP) {
+            return;
+        }
+
         float growthRate = cultivationInformation.getGrowthRate();
 
         float randomNumber = 0.8f + rand.nextFloat() * (1.2f - 0.8f);

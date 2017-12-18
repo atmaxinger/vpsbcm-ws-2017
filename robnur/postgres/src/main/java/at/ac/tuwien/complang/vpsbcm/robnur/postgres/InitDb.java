@@ -189,9 +189,8 @@ public class InitDb {
 
 
     public static void putInitialFlowerPlantCultivationInformation(ConfigService configService) {
-        Transaction transaction = ((new TransactionServiceImpl())).beginTransaction(-1);
 
-        if (configService.readAllFlowerPlantCultivationInformation(transaction).size() == 0) {
+        if (configService.readAllFlowerPlantCultivationInformation(null).size() == 0) {
 
             FlowerPlantCultivationInformation flowerPlantCultivationInformation = new FlowerPlantCultivationInformation();
             flowerPlantCultivationInformation.setFlowerType(FlowerType.ROSE);
@@ -201,8 +200,9 @@ public class InitDb {
             flowerPlantCultivationInformation.setGrowthRate(0.25f);
             flowerPlantCultivationInformation.setHarvest(4);
             flowerPlantCultivationInformation.setUpgradeLevel(0);
+            flowerPlantCultivationInformation.setVulnerability(25);
 
-            configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, transaction);
+            configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, null);
 
             flowerPlantCultivationInformation = new FlowerPlantCultivationInformation();
             flowerPlantCultivationInformation.setFlowerType(FlowerType.TULIP);
@@ -212,8 +212,9 @@ public class InitDb {
             flowerPlantCultivationInformation.setGrowthRate(0.5f);
             flowerPlantCultivationInformation.setHarvest(2);
             flowerPlantCultivationInformation.setUpgradeLevel(0);
+            flowerPlantCultivationInformation.setVulnerability(18);
 
-            configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, transaction);
+            configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, null);
 
             flowerPlantCultivationInformation = new FlowerPlantCultivationInformation();
             flowerPlantCultivationInformation.setFlowerType(FlowerType.DAISY);
@@ -223,8 +224,9 @@ public class InitDb {
             flowerPlantCultivationInformation.setGrowthRate(0.25f);
             flowerPlantCultivationInformation.setHarvest(4);
             flowerPlantCultivationInformation.setUpgradeLevel(0);
+            flowerPlantCultivationInformation.setVulnerability(20);
 
-            configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, transaction);
+            configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, null);
 
             flowerPlantCultivationInformation = new FlowerPlantCultivationInformation();
             flowerPlantCultivationInformation.setFlowerType(FlowerType.VIOLET);
@@ -234,17 +236,15 @@ public class InitDb {
             flowerPlantCultivationInformation.setGrowthRate(0.25f);
             flowerPlantCultivationInformation.setHarvest(4);
             flowerPlantCultivationInformation.setUpgradeLevel(0);
+            flowerPlantCultivationInformation.setVulnerability(30);
 
-            configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, transaction);
+            configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, null);
         }
-
-        transaction.commit();
     }
 
     public static void putInitialVegetablePlantCultivationInformation(ConfigService configService) {
-        Transaction transaction = ((new TransactionServiceImpl())).beginTransaction(-1);
 
-        if (configService.readAllVegetablePlantCultivationInformation(transaction).size() == 0) {
+        if (configService.readAllVegetablePlantCultivationInformation(null).size() == 0) {
 
             VegetablePlantCultivationInformation vegetablePlantCultivationInformation = new VegetablePlantCultivationInformation();
             vegetablePlantCultivationInformation.setVegetableType(VegetableType.PEPPER);
@@ -255,8 +255,9 @@ public class InitDb {
             vegetablePlantCultivationInformation.setHarvest(6);
             vegetablePlantCultivationInformation.setRemainingNumberOfHarvests(2);
             vegetablePlantCultivationInformation.setUpgradeLevel(0);
+            vegetablePlantCultivationInformation.setVulnerability(5);
 
-            configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation, transaction);
+            configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation, null);
 
             vegetablePlantCultivationInformation = new VegetablePlantCultivationInformation();
             vegetablePlantCultivationInformation.setVegetableType(VegetableType.TOMATO);
@@ -267,8 +268,9 @@ public class InitDb {
             vegetablePlantCultivationInformation.setHarvest(3);
             vegetablePlantCultivationInformation.setRemainingNumberOfHarvests(3);
             vegetablePlantCultivationInformation.setUpgradeLevel(0);
+            vegetablePlantCultivationInformation.setVulnerability(12);
 
-            configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation, transaction);
+            configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation, null);
 
             vegetablePlantCultivationInformation = new VegetablePlantCultivationInformation();
             vegetablePlantCultivationInformation.setVegetableType(VegetableType.CARROT);
@@ -279,8 +281,9 @@ public class InitDb {
             vegetablePlantCultivationInformation.setHarvest(6);
             vegetablePlantCultivationInformation.setRemainingNumberOfHarvests(2);
             vegetablePlantCultivationInformation.setUpgradeLevel(0);
+            vegetablePlantCultivationInformation.setVulnerability(20);
 
-            configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation, transaction);
+            configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation, null);
 
             vegetablePlantCultivationInformation = new VegetablePlantCultivationInformation();
             vegetablePlantCultivationInformation.setVegetableType(VegetableType.SALAD);
@@ -291,11 +294,10 @@ public class InitDb {
             vegetablePlantCultivationInformation.setHarvest(6);
             vegetablePlantCultivationInformation.setRemainingNumberOfHarvests(1);
             vegetablePlantCultivationInformation.setUpgradeLevel(0);
+            vegetablePlantCultivationInformation.setVulnerability(30);
 
-            configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation, transaction);
+            configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation, null);
         }
-
-        transaction.commit();
     }
 
     private static void insertInitialWaterToken(){

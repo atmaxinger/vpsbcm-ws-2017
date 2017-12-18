@@ -49,6 +49,7 @@ public class SpaceServer {
             flowerPlantCultivationInformation.setGrowthRate(0.25f);
             flowerPlantCultivationInformation.setHarvest(4);
             flowerPlantCultivationInformation.setUpgradeLevel(0);
+            flowerPlantCultivationInformation.setVulnerability(25);
 
             configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, null);
 
@@ -60,6 +61,7 @@ public class SpaceServer {
             flowerPlantCultivationInformation.setGrowthRate(0.5f);
             flowerPlantCultivationInformation.setHarvest(2);
             flowerPlantCultivationInformation.setUpgradeLevel(0);
+            flowerPlantCultivationInformation.setVulnerability(18);
 
             configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, null);
 
@@ -71,6 +73,7 @@ public class SpaceServer {
             flowerPlantCultivationInformation.setGrowthRate(0.25f);
             flowerPlantCultivationInformation.setHarvest(4);
             flowerPlantCultivationInformation.setUpgradeLevel(0);
+            flowerPlantCultivationInformation.setVulnerability(20);
 
             configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, null);
 
@@ -82,6 +85,7 @@ public class SpaceServer {
             flowerPlantCultivationInformation.setGrowthRate(0.25f);
             flowerPlantCultivationInformation.setHarvest(4);
             flowerPlantCultivationInformation.setUpgradeLevel(0);
+            flowerPlantCultivationInformation.setVulnerability(90);
 
             configService.putFlowerPlantCultivationInformation(flowerPlantCultivationInformation, null);
         }
@@ -100,6 +104,7 @@ public class SpaceServer {
             vegetablePlantCultivationInformation.setHarvest(6);
             vegetablePlantCultivationInformation.setRemainingNumberOfHarvests(2);
             vegetablePlantCultivationInformation.setUpgradeLevel(0);
+            vegetablePlantCultivationInformation.setVulnerability(5);
 
             configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation,null);
 
@@ -112,6 +117,7 @@ public class SpaceServer {
             vegetablePlantCultivationInformation.setHarvest(3);
             vegetablePlantCultivationInformation.setRemainingNumberOfHarvests(3);
             vegetablePlantCultivationInformation.setUpgradeLevel(0);
+            vegetablePlantCultivationInformation.setVulnerability(12);
 
             configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation,null);
 
@@ -124,6 +130,7 @@ public class SpaceServer {
             vegetablePlantCultivationInformation.setHarvest(6);
             vegetablePlantCultivationInformation.setRemainingNumberOfHarvests(2);
             vegetablePlantCultivationInformation.setUpgradeLevel(0);
+            vegetablePlantCultivationInformation.setVulnerability(20);
 
             configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation,null);
 
@@ -136,6 +143,7 @@ public class SpaceServer {
             vegetablePlantCultivationInformation.setHarvest(6);
             vegetablePlantCultivationInformation.setRemainingNumberOfHarvests(1);
             vegetablePlantCultivationInformation.setUpgradeLevel(0);
+            vegetablePlantCultivationInformation.setVulnerability(30);
 
             configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation,null);
         }

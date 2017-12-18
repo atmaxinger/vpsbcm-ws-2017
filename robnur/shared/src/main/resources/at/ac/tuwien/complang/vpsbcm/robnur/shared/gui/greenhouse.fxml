@@ -14,6 +14,7 @@
         <TableColumn fx:id="tcPlantId" text="Pflanzen Id" prefWidth="320"/>
         <TableColumn fx:id="tcPlant" text="Pflanze" prefWidth="100" />
         <TableColumn fx:id="tcGrowth" text="Entwicklung (%)" prefWidth="100"/>
+        <TableColumn fx:id="tcInfestation" text="Befall (%)" prefWidth="100" />
         <TableColumn fx:id="tcRemainingHarvets" text="Verbleibende Ernten" prefWidth="150" />
         <TableColumn fx:id="tcPlantedBy" text="Pflanz Roboter" prefWidth="100" />
     </columns>
