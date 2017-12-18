@@ -15,4 +15,10 @@ public abstract class EndProduct extends Idable implements Serializable{
     }
 
     public abstract List<Harvestable> getParts();
+
+    /**
+     *
+     * @return the price in cents
+     */
+    public abstract int getPrice();
 }

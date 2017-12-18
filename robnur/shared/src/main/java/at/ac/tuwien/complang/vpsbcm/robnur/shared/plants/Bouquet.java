@@ -23,4 +23,14 @@ public class Bouquet extends EndProduct implements Serializable {
     public List<Harvestable> getParts() {
         return new LinkedList<>(getFlowers());
     }
+
+
+    @Override
+    public int getPrice() {
+        int price = 0;
+        for(Flower flower : flowers) {
+            price += flower.getParentPlant().getCultivationInformation().getPrice();
+        }
+        return price;
+    }
 }
