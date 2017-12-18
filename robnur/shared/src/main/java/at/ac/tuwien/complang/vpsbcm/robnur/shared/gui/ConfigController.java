@@ -25,6 +25,7 @@ public class ConfigController {
     public TableColumn<CultivationInformation, Integer> tcVegetablesFertilizer;
     public TableColumn<CultivationInformation, String> tcVegetablesResearchRobots;
     public TableColumn<CultivationInformation, Integer> tcVegetablesVulnerability;
+    public TableColumn<CultivationInformation, String> tcVegetablesPrice;
 
 
     public TableView<FlowerPlantCultivationInformation> tvFlowers;
@@ -37,6 +38,7 @@ public class ConfigController {
     public TableColumn<CultivationInformation, Integer> tcFlowersFertilizer;
     public TableColumn<CultivationInformation, String> tcFlowersResearchRobots;
     public TableColumn<CultivationInformation, Integer> tcFlowersVulnerability;
+    public TableColumn<CultivationInformation, String> tcFlowersPrice;
 
 
     private ConfigService configService = RobNurGUI.configService;
@@ -51,6 +53,11 @@ public class ConfigController {
             }
         }
         return str;
+    }
+
+    private String formatPrice(int priceInCents) {
+        String s = String.format("€ %.02f", ((float)priceInCents/100.0f));
+        return s;
     }
 
     @FXML
@@ -80,6 +87,7 @@ public class ConfigController {
         tcVegetablesFertilizer.setCellValueFactory(column -> new ReadOnlyObjectWrapper<>(column.getValue().getFertilizerAmount()));
         tcVegetablesResearchRobots.setCellValueFactory(column -> new ReadOnlyStringWrapper(prettyPrintRobots(column.getValue().getResearchRobots())));
         tcVegetablesVulnerability.setCellValueFactory(column -> new ReadOnlyObjectWrapper<>(column.getValue().getVulnerability()));
+        tcVegetablesPrice.setCellValueFactory(column -> new ReadOnlyStringWrapper(formatPrice(column.getValue().getPrice())));
     }
 
 
@@ -102,5 +110,6 @@ public class ConfigController {
         tcFlowersFertilizer.setCellValueFactory(column -> new ReadOnlyObjectWrapper<>(column.getValue().getFertilizerAmount()));
         tcFlowersResearchRobots.setCellValueFactory(column -> new ReadOnlyStringWrapper(prettyPrintRobots(column.getValue().getResearchRobots())));
         tcFlowersVulnerability.setCellValueFactory(column -> new ReadOnlyObjectWrapper<>(column.getValue().getVulnerability()));
+        tcFlowersPrice.setCellValueFactory(column -> new ReadOnlyStringWrapper(formatPrice(column.getValue().getPrice())));
     }
 }

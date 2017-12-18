@@ -23,6 +23,8 @@ public abstract class CultivationInformation extends Idable implements Serializa
     /* 0...100 */
     private int vulnerability;
 
+    /* price of a single vegetable/flower in cents */
+    private int price;
 
     private List<String> robots = new LinkedList<>();
 
@@ -107,5 +109,13 @@ public abstract class CultivationInformation extends Idable implements Serializa
 
     public void setVulnerability(int vulnerability) {
         this.vulnerability = vulnerability;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
     }
 }

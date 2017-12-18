@@ -18,6 +18,7 @@
                 <TableColumn fx:id="tcVegetablesMaxHarvests" text="Anzahl der Ernten" />
                 <TableColumn fx:id="tcVegetablesHarvests" text="Ertrag" />
                 <TableColumn fx:id="tcVegetablesVulnerability" text="Anfälligkeit" />
+                <TableColumn fx:id="tcVegetablesPrice" text="Preis" />
 
                 <TableColumn text="Benötigte Resourcen">
                     <columns>
@@ -39,6 +40,7 @@
 
                 <TableColumn fx:id="tcFlowersHarvests" text="Ertrag" />
                 <TableColumn fx:id="tcFlowersVulnerability" text="Anfälligkeit" />
+                <TableColumn fx:id="tcFlowersPrice" text="Preis" />
 
                 <TableColumn text="Benötigte Resourcen">
                     <columns>
