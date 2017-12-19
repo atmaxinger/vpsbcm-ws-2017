@@ -327,7 +327,11 @@ public class StorageServiceImpl extends StorageService {
 
     @Override
     public List<FlowerPesticide> readAllFlowerPesticides(Transaction transaction) {
-        return ServiceUtil.readAllItems(STORAGE_FLOWER_PESTICIDE_TABLE,FlowerPesticide.class,transaction);
+        if(transaction != null){
+            return ServiceUtil.readAllItems(STORAGE_FLOWER_PESTICIDE_TABLE,FlowerPesticide.class,transaction);
+        } else {
+            return ServiceUtil.readAllItems(STORAGE_FLOWER_PESTICIDE_TABLE,FlowerPesticide.class);
+        }
     }
 
     @Override
@@ -344,7 +348,11 @@ public class StorageServiceImpl extends StorageService {
 
     @Override
     public List<VegetablePesticide> readAllVegetablePesticides(Transaction transaction) {
-        return ServiceUtil.readAllItems(STORAGE_VEGETABLE_PESTICIDE_TABLE,VegetablePesticide.class,transaction);
+        if(transaction != null) {
+            return ServiceUtil.readAllItems(STORAGE_VEGETABLE_PESTICIDE_TABLE, VegetablePesticide.class, transaction);
+        }else {
+            return ServiceUtil.readAllItems(STORAGE_VEGETABLE_PESTICIDE_TABLE, VegetablePesticide.class);
+        }
     }
 
     @Override

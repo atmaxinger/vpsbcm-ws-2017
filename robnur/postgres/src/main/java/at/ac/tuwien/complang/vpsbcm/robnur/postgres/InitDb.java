@@ -314,6 +314,8 @@ public class InitDb {
             vegetablePlantCultivationInformation.setPrice(80);
 
             configService.putVegetablePlantCultivationInformation(vegetablePlantCultivationInformation,transaction);
+
+            transaction.commit();
         }
     }
     private static void insertInitialWaterToken(){

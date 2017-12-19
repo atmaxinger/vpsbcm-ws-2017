@@ -102,6 +102,7 @@ public class ServiceUtil {
      * @return list of items if successful (may be of size 0), null if unsuccessful
      */
     public static <T extends Serializable> List<T> readAllItems(String table, Class<T> resultClass, Transaction transaction) {
+
         List<T> result = new ArrayList<T>();
 
         try {

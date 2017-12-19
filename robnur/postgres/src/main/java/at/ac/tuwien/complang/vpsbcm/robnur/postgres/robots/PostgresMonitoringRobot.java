@@ -35,21 +35,37 @@ public class PostgresMonitoringRobot {
                 Statement statement = ((TransactionImpl)transaction).getConnection().createStatement();
 
                 statement.execute(
-                        "UPDATE gvp g1 SET " +
-                        "    data = (SELECT jsonb (data) || " +
-                        "    jsonb_build_object('growth', " +
-                        "    ((SELECT (data->>'growth')::int from gvp g3 WHERE (g3.data->>'id')::text = (g1.data->>'id')::text) + ((random()*(1.2-0.8)+0.8) * 100))::int) " +
-                        "    FROM gvp g2 " +
-                        "    WHERE g1.id = g2.id);");
+                        "UPDATE gvp g1 SET" +
+                                "    data =" +
+                                "    (SELECT jsonb (data) || jsonb_build_object('growth', " +
+                                "                              ((SELECT (data->>'growth')::int " +
+                                "                                      FROM gvp g3 " +
+                                "                                      WHERE (g3.data->>'id')::text = (g1.data->>'id')::text) + (10))::int) " + //((random()*(1.2-0.8)+0.8) * 100))::int) " +
+                                "                          || jsonb_build_object('infestation', " +
+                                "                                (Select " +
+                                "                                       Case (Select (random() * 100 <= ((g1.data->>'cultivationInformation')::json ->>'vulnerability')::float)) " +
+                                "                                            WHEN true THEN (SELECT (g1.data->>'infestation')::float + 0.1)::float " +
+                                "                                            WHEN false THEN (SELECT (g1.data->>'infestation')::float)::float " +
+                                "                                       END)) " +
+                                "      FROM gvp g2 " +
+                                "      WHERE g1.id = g2.id);");
                 logger.info("PostgresMonitoringRobot: grew vegetables");
 
                 statement.execute(
-                        "UPDATE gfp g1 SET " +
-                                "    data = (SELECT jsonb (data) || " +
-                                "    jsonb_build_object('growth', " +
-                                "    ((SELECT (data->>'growth')::int from gfp g3 WHERE (g3.data->>'id')::text = (g1.data->>'id')::text) + ((random()*(1.2-0.8)+0.8) * 100))::int) " +
-                                "    FROM gfp g2 " +
-                                "    WHERE g1.id = g2.id);");
+                        "UPDATE gfp g1 SET" +
+                                "    data =" +
+                                "    (SELECT jsonb (data) || jsonb_build_object('growth', " +
+                                "                              ((SELECT (data->>'growth')::int " +
+                                "                                      FROM gfp g3 " +
+                                "                                      WHERE (g3.data->>'id')::text = (g1.data->>'id')::text) + (10))::int) " + //((random()*(1.2-0.8)+0.8) * 100))::int) " +
+                                "                          || jsonb_build_object('infestation', " +
+                                "                                (Select " +
+                                "                                       Case (Select (random() * 100 <= ((g1.data->>'cultivationInformation')::json ->>'vulnerability')::float)) " +
+                                "                                            WHEN true THEN (SELECT (g1.data->>'infestation')::float + 0.1)::float " +
+                                "                                            WHEN false THEN (SELECT (g1.data->>'infestation')::float)::float " +
+                                "                                       END)) " +
+                                "      FROM gfp g2 " +
+                                "      WHERE g1.id = g2.id);");
                 logger.info("PostgresMonitoringRobot: grew flowers");
 
                 transaction.commit();

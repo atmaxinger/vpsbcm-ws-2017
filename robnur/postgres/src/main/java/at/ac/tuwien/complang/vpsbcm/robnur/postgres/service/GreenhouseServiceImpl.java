@@ -251,7 +251,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         try {
-            ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE (data::json->>'growth')::numeric >= %d",GREENHOUSE_VEGETABLE_PLANT_TABLE,Plant.STATUS_LIMP));
+            ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE (data::json->>'growth')::numeric = %d LIMIT 1",GREENHOUSE_VEGETABLE_PLANT_TABLE,Plant.STATUS_LIMP));
 
             if (rs.next()) {
                 String data = rs.getString("data");
@@ -289,7 +289,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         try {
-            ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE (data::json->>'growth')::numeric >= %d",GREENHOUSE_FLOWER_PLANT_TABLE,Plant.STATUS_LIMP));
+            ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE (data::json->>'growth')::numeric = %d LIMIT 1",GREENHOUSE_FLOWER_PLANT_TABLE,Plant.STATUS_LIMP));
 
             if (rs.next()) {
                 String data = rs.getString("data");
@@ -328,7 +328,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         try {
-            ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE (data::json->>'growth')::numeric >= %d AND (data::json->>'infestation')::float >= 0.2",GREENHOUSE_FLOWER_PLANT_TABLE,Plant.STATUS_PLANTED));
+            ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE (data::json->>'growth')::numeric >= %d AND (data::json->>'infestation')::float >= 0.2 LIMIT 1",GREENHOUSE_FLOWER_PLANT_TABLE,Plant.STATUS_PLANTED));
 
             if (rs.next()) {
                 String data = rs.getString("data");
@@ -367,7 +367,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         try {
-            ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE (data::json->>'growth')::numeric >= %d AND (data::json->>'infestation')::float >= 0.2",GREENHOUSE_VEGETABLE_PLANT_TABLE,Plant.STATUS_PLANTED));
+            ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE (data::json->>'growth')::numeric >= %d AND (data::json->>'infestation')::float >= 0.2 LIMIT 1",GREENHOUSE_VEGETABLE_PLANT_TABLE,Plant.STATUS_PLANTED));
 
             if (rs.next()) {
                 String data = rs.getString("data");
