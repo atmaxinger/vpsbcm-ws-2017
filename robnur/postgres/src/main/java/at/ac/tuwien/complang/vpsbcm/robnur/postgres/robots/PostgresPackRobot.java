@@ -36,7 +36,7 @@ public class PostgresPackRobot {
         exitables.add(marketService);
         exitables.add(researchService);
 
-        PackRobot packRobot = new PackRobot(args[0], packingService,marketService,researchService,transactionService);
+        PackRobot packRobot = new PackRobot(args[0], packingService,marketService,researchService, orderService, transactionService);
         packingService.registerPackRobot(packRobot);
 
         Scanner scanner = new Scanner(System.in);

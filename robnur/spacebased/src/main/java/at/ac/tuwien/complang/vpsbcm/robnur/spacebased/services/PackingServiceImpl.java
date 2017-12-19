@@ -1,18 +1,21 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Flower;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PackRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.PackingService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
+import com.sun.tools.javac.comp.Flow;
 import org.apache.log4j.Logger;
 import org.mozartspaces.capi3.*;
 import org.mozartspaces.core.*;
 import org.mozartspaces.notifications.Notification;
 import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
+import org.mozartspaces.util.parser.sql.javacc.ParseException;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -93,6 +96,37 @@ public class PackingServiceImpl extends PackingService {
     public List<Vegetable> readAllVegetables(Transaction transaction) {
         Selector selector = FifoCoordinator.newSelector(FifoCoordinator.FifoSelector.COUNT_MAX);
         return ServiceUtil.readAllItems(vegetableContainer,selector,transaction,capi);
+    }
+
+    @Override
+    public Vegetable getVegetableByType(VegetableType type, Transaction transaction) {
+        try {
+            Query query = new Query().sql(String.format("parenVegetablePlant.TypeName = '%s'",type.name()));
+
+            Selector selector = QueryCoordinator.newSelector(query, 1);
+
+            return ServiceUtil.getItem(selector,vegetableContainer,transaction,capi);
+
+        } catch (ParseException e) {
+            logger.trace("EXCEPTION", e);
+            return null;
+        }
+    }
+
+    @Override
+    public Flower getFlowerByType(FlowerType type, Transaction transaction) {
+        try {
+            Query query = new Query().sql(String.format("parentFlowerPlant.TypeName = '%s'",type.name()));
+
+            Selector selector = QueryCoordinator.newSelector(query, 1);
+
+            return ServiceUtil.getItem(selector,flowerContainer,transaction,capi);
+
+        } catch (ParseException e) {
+            logger.trace("EXCEPTION", e);
+            return null;
+        }
+
     }
 
     public void registerPackRobot(PackRobot packRobot){

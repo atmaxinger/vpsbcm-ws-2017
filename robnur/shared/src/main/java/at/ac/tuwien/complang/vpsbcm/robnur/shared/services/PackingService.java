@@ -1,7 +1,9 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.services;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Flower;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableType;
 
 import java.util.List;
 
@@ -72,4 +74,8 @@ public abstract class PackingService implements Exitable {
      * @return all vegetables that are in the packing department, empty list if there are no vegetables in the packing department, null if unsuccessful
      */
     public abstract List<Vegetable> readAllVegetables(Transaction transaction);
+
+    public abstract Vegetable getVegetableByType(VegetableType type, Transaction transaction);
+
+    public abstract Flower getFlowerByType(FlowerType type, Transaction transaction);
 }

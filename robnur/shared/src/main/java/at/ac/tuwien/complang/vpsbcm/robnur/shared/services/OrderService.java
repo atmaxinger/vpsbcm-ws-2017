@@ -7,8 +7,8 @@ import java.util.List;
 
 public abstract class OrderService {
 
-    private StorageService.Callback<List<Order<VegetableType>>> vegetableOrdersChanged;
-    private StorageService.Callback<List<Order<FlowerType>>> flowerOrdersChanged;
+    private StorageService.Callback<List<Order<VegetableType,Vegetable>>> vegetableOrdersChanged;
+    private StorageService.Callback<List<Order<FlowerType,Flower>>> flowerOrdersChanged;
 
     protected void notifiyVegetableOrdersChanged() {
         if(vegetableOrdersChanged != null) {
@@ -22,23 +22,27 @@ public abstract class OrderService {
         }
     }
 
-    public void onVegetableOrdersChanged(StorageService.Callback<List<Order<VegetableType>>> vegetableOrdersChanged) {
+    public void onVegetableOrdersChanged(StorageService.Callback<List<Order<VegetableType,Vegetable>>> vegetableOrdersChanged) {
         this.vegetableOrdersChanged = vegetableOrdersChanged;
     }
 
-    public void onFlowerOrdersChanged(StorageService.Callback<List<Order<FlowerType>>> flowerOrdersChanged) {
+    public void onFlowerOrdersChanged(StorageService.Callback<List<Order<FlowerType,Flower>>> flowerOrdersChanged) {
         this.flowerOrdersChanged = flowerOrdersChanged;
     }
 
-    public abstract boolean placeOrderForVegetables(Order<VegetableType> order);
-    public abstract boolean placeOrderForFlowers(Order<FlowerType> order);
+    public abstract boolean placeOrderForVegetableBasket(Order<VegetableType,Vegetable> order, Transaction transaction);
 
-    public abstract boolean deliverVegetables(VegetableBasket basket, String address);
-    public abstract boolean deliverFlowers(Bouquet bouquet, String address);
+    public abstract boolean placeOrderForBouquet(Order<FlowerType,Flower> order, Transaction transaction);
 
-    public abstract Order<VegetableType> getOrderForVegetables(Order.OrderStatus status, Transaction transaction);
-    public abstract Order<FlowerType> getOrderForFlowers(Order.OrderStatus status, Transaction transaction);
+    public abstract boolean deliverVegetableBasket(VegetableBasket vegetableBasket, String address);
 
-    public abstract List<Order<VegetableType>> readAllOrdersForVegetables(Transaction transaction);
-    public abstract List<Order<FlowerType>> readAllOrdersForFlowers(Transaction transaction);
+    public abstract boolean deliverBouquet(Bouquet bouquet, String address);
+
+    public abstract Order<VegetableType,Vegetable> getNextVegetableBasketOrder(Order.OrderStatus status, Transaction transaction);
+
+    public abstract Order<FlowerType,Flower> getNextBouquetOrder(Order.OrderStatus status, Transaction transaction);
+
+    public abstract List<Order<VegetableType,Vegetable>> readAllOrdersForVegetables(Transaction transaction);
+
+    public abstract List<Order<FlowerType,Flower>> readAllOrdersForFlowers(Transaction transaction);
 }

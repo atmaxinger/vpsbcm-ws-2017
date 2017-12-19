@@ -1,5 +1,6 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.robots;
 
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.Order;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.*;
 
@@ -13,14 +14,16 @@ public class PackRobot extends Robot {
     private PackingService packingService;
     private MarketService marketService;
     private ResearchService researchService;
+    private OrderService orderService;
     private TransactionService transactionService;
 
-    public PackRobot(String id, PackingService packingService, MarketService marketService, ResearchService researchService, TransactionService transactionService) {
+    public PackRobot(String id, PackingService packingService, MarketService marketService, ResearchService researchService, OrderService orderService, TransactionService transactionService) {
         this.setId(id);
 
         this.packingService = packingService;
         this.marketService = marketService;
         this.researchService = researchService;
+        this.orderService = orderService;
         this.transactionService = transactionService;
 
         tryCreateVegetableBasket();
@@ -225,6 +228,8 @@ public class PackRobot extends Robot {
             return;
         }
 
+        tryFulfilVegetableBasketOrder();
+
         if (marketService.getAmountOfVegetableBaskets() >= 3) {
             tryPutVegetablesIntoResearch();
             return;
@@ -286,6 +291,41 @@ public class PackRobot extends Robot {
 
                 checkedVegetableTypes.add(vegetableType);
             }
+        }
+
+        transaction.commit();
+    }
+
+    private void tryFulfilVegetableBasketOrder() {
+
+        Transaction transaction = transactionService.beginTransaction(-1);
+        List<Order<VegetableType,Vegetable>> orders = new ArrayList<>();
+
+        Order<VegetableType,Vegetable> currentOrder = orderService.getNextVegetableBasketOrder(Order.OrderStatus.PLACED,transaction);
+
+        while(currentOrder != null) {
+
+            for (VegetableType type : VegetableType.values()) {
+                while (currentOrder.getMissingItems().get(type) > 0) {
+                    Vegetable vegetable = packingService.getVegetableByType(type, transaction);
+
+                    // check if there is an appropriate vegetable
+                    if (vegetable == null) {
+                        break;
+                    }
+
+                    // add vegetable to order
+                    currentOrder.setAlreadyAcquiredItem(vegetable, VegetableType.valueOf(vegetable.getParentVegetablePlant().getTypeName()));
+                }
+            }
+
+            orders.add(currentOrder);
+            currentOrder = orderService.getNextVegetableBasketOrder(Order.OrderStatus.PLACED,transaction);
+        }
+
+
+        for (Order o:orders) {
+            orderService.placeOrderForVegetableBasket(o,transaction);
         }
 
         transaction.commit();
