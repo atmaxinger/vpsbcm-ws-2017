@@ -298,16 +298,25 @@ public class PackRobot extends Robot {
 
     private void tryFulfilVegetableBasketOrder() {
 
+        logger.info("tryFulfilVegetableBasketOrder");
+
         Transaction transaction = transactionService.beginTransaction(-1);
         List<Order<VegetableType,Vegetable>> orders = new ArrayList<>();
 
         Order<VegetableType,Vegetable> currentOrder = orderService.getNextVegetableBasketOrder(Order.OrderStatus.PLACED,transaction);
 
+        logger.info("tryFulfilVegetableBasketOrder order = " + currentOrder);
+
         while(currentOrder != null) {
 
             for (VegetableType type : VegetableType.values()) {
+                logger.info("tryFulfilVegetableBasketOrder check type = " + type.name());
+
                 while (currentOrder.getMissingItems().get(type) > 0) {
+
                     Vegetable vegetable = packingService.getVegetableByType(type, transaction);
+
+                    logger.info("tryFulfilVegetableBasketOrder got vegetable = " + vegetable);
 
                     // check if there is an appropriate vegetable
                     if (vegetable == null) {
@@ -321,6 +330,8 @@ public class PackRobot extends Robot {
 
             orders.add(currentOrder);
             currentOrder = orderService.getNextVegetableBasketOrder(Order.OrderStatus.PLACED,transaction);
+
+            logger.info("tryFulfilVegetableBasketOrder order = " + currentOrder);
         }
 
 

@@ -22,6 +22,7 @@ public class RobNurGUI extends Application {
     public static StorageService storageService;
     public static ResearchService researchService;
     public static TransactionService transactionService;
+    public static OrderService orderService;
 
     public void execute(String[] args) {
         launch(args);

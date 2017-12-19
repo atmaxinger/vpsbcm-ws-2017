@@ -31,9 +31,11 @@ public class OrderServiceImpl extends OrderService {
 
         notificationManager = new NotificationManager(core);
 
+        List<Coordinator> coordinators = Arrays.asList(new QueryCoordinator(), new AnyCoordinator());
+
         try {
-            flowerOrderContainer = CapiUtil.lookupOrCreateContainer("flowerOrderContainer", serverUri, Collections.singletonList(new QueryCoordinator()), null, capi);
-            vegetableOrderContainer = CapiUtil.lookupOrCreateContainer("vegetableOrderContainer", serverUri, Collections.singletonList(new QueryCoordinator()), null, capi);
+            flowerOrderContainer = CapiUtil.lookupOrCreateContainer("flowerOrderContainer", serverUri, coordinators, null, capi);
+            vegetableOrderContainer = CapiUtil.lookupOrCreateContainer("vegetableOrderContainer", serverUri, coordinators, null, capi);
 
             notificationManager.createNotification(flowerOrderContainer, (notification, operation, list) -> notifyFlowerOrdersChanged(), Operation.WRITE, Operation.TAKE, Operation.DELETE);
             notificationManager.createNotification(vegetableOrderContainer, (notification, operation, list) -> notifiyVegetableOrdersChanged(), Operation.WRITE, Operation.TAKE, Operation.DELETE);
@@ -47,17 +49,11 @@ public class OrderServiceImpl extends OrderService {
 
     @Override
     public boolean placeOrderForVegetableBasket(Order<VegetableType,Vegetable> order, Transaction transaction) {
-        if(transaction == null){
-            return ServiceUtil.writeItem(order,vegetableOrderContainer,capi);
-        }
         return ServiceUtil.writeItem(order,vegetableOrderContainer,transaction,capi);
     }
 
     @Override
     public boolean placeOrderForBouquet(Order<FlowerType,Flower> order, Transaction transaction) {
-        if(transaction == null){
-            return ServiceUtil.writeItem(order,flowerOrderContainer,capi);
-        }
         return ServiceUtil.writeItem(order,flowerOrderContainer,transaction,capi);
     }
 
@@ -66,7 +62,7 @@ public class OrderServiceImpl extends OrderService {
         URI customerSpaceUri = URI.create(address);
         try {
             ContainerReference deliveryVegetableBasketContainer = CapiUtil.lookupOrCreateContainer("deliveryVegetableBasketContainer", customerSpaceUri, Collections.singletonList(new AnyCoordinator()), null, capi);
-            ServiceUtil.writeItem(vegetableBasket,deliveryVegetableBasketContainer,capi);
+            ServiceUtil.writeItem(vegetableBasket,deliveryVegetableBasketContainer,null, capi);
             return true;
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
@@ -79,7 +75,7 @@ public class OrderServiceImpl extends OrderService {
         URI customerSpaceUri = URI.create(address);
         try {
             ContainerReference deliveryBouquetContainer = CapiUtil.lookupOrCreateContainer("deliveryBouquetContainer", customerSpaceUri, Collections.singletonList(new AnyCoordinator()), null, capi);
-            ServiceUtil.writeItem(bouquet,deliveryBouquetContainer,capi);
+            ServiceUtil.writeItem(bouquet,deliveryBouquetContainer,null,capi);
             return true;
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
@@ -127,17 +123,11 @@ public class OrderServiceImpl extends OrderService {
 
     @Override
     public List<Order<VegetableType,Vegetable>> readAllOrdersForVegetables(Transaction transaction) {
-        if(transaction == null){
-            return ServiceUtil.readAllItems(vegetableOrderContainer,capi);
-        }
         return ServiceUtil.readAllItems(vegetableOrderContainer,transaction,capi);
     }
 
     @Override
     public List<Order<FlowerType,Flower>> readAllOrdersForFlowers(Transaction transaction) {
-        if(transaction == null){
-            return ServiceUtil.readAllItems(flowerOrderContainer,capi);
-        }
         return ServiceUtil.readAllItems(flowerOrderContainer,transaction,capi);
     }
 }

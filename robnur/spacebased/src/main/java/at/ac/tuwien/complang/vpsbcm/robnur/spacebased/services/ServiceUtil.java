@@ -57,17 +57,6 @@ public class ServiceUtil {
         return false;
     }
 
-    public synchronized static <T extends Serializable> boolean writeItem(T item, ContainerReference containerReference, Capi capi){
-        TransactionService transactionService = new TransactionServiceImpl(capi.getCore().getConfig().getSpaceUri());
-        Transaction transaction = transactionService.beginTransaction(-1);
-
-        writeItem(item,containerReference,transaction,capi);
-
-        transaction.commit();
-
-        return false;
-    }
-
     public synchronized static void writeItem(Entry entry, ContainerReference containerReference, Transaction transaction, Capi capi){
         TransactionReference transactionReference = TransactionServiceImpl.getTransactionReference(transaction);
 
@@ -95,20 +84,9 @@ public class ServiceUtil {
     }
 
     public synchronized static <T extends Serializable> List<T> readAllItems(ContainerReference containerReference, Transaction transaction,Capi capi) {
-
         return readAllItems(containerReference, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), transaction,capi);
     }
 
-    public synchronized static <T extends Serializable> List<T> readAllItems(ContainerReference containerReference, Capi capi) {
-        TransactionService transactionService = new TransactionServiceImpl(capi.getCore().getConfig().getSpaceUri());
-        Transaction transaction = transactionService.beginTransaction(-1);
-
-        List<T> result = readAllItems(containerReference, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), transaction,capi);
-
-        transaction.commit();
-
-        return result;
-    }
 
     public synchronized static void deleteItemById(String id, ContainerReference containerReference, Transaction transaction, Capi capi) {
         TransactionReference transactionReference = TransactionServiceImpl.getTransactionReference(transaction);
