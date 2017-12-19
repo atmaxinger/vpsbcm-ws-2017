@@ -64,7 +64,9 @@ public class SpaceMonitoringRobot {
 
         float growthRate = cultivationInformation.getGrowthRate();
 
+        // TODO: restore old growing method
         float randomNumber = 0.8f + rand.nextFloat() * (1.2f - 0.8f);
+        //float randomNumber = 0.1f;
 
         int add = Math.round(growthRate * randomNumber * 100f);
         plant.setGrowth(Math.min(plant.getGrowth() + add, 100));
