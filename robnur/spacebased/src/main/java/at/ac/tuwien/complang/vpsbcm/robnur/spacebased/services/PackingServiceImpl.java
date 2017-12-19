@@ -49,7 +49,7 @@ public class PackingServiceImpl extends PackingService {
         capi = new Capi(core);
         notificationManager = new NotificationManager(core);
 
-        List<Coordinator> coordinators = Arrays.asList(new AnyCoordinator(), new FifoCoordinator(), new QueryCoordinator());
+        List<Coordinator> coordinators = Arrays.asList(new AnyCoordinator(), new FifoCoordinator(), new QueryCoordinator(), new LabelCoordinator());
 
         try {
             vegetableContainer = CapiUtil.lookupOrCreateContainer("packingVegetableContainer", spaceUri, coordinators, null, capi);
@@ -68,12 +68,14 @@ public class PackingServiceImpl extends PackingService {
 
     @Override
     public void putFlower(Flower flower, Transaction transaction) {
-        ServiceUtil.writeItem(flower,flowerContainer,transaction,capi);
+        Entry entry = new Entry(flower, LabelCoordinator.newCoordinationData(flower.getParentFlowerPlant().getTypeName()));
+        ServiceUtil.writeItem(entry,flowerContainer,transaction,capi);
     }
 
     @Override
     public void putVegetable(Vegetable vegetable, Transaction transaction) {
-        ServiceUtil.writeItem(vegetable,vegetableContainer,transaction,capi);
+        Entry entry = new Entry(vegetable, LabelCoordinator.newCoordinationData(vegetable.getParentVegetablePlant().getTypeName()));
+        ServiceUtil.writeItem(entry,vegetableContainer,transaction,capi);
     }
 
     @Override
@@ -100,33 +102,12 @@ public class PackingServiceImpl extends PackingService {
 
     @Override
     public Vegetable getVegetableByType(VegetableType type, Transaction transaction) {
-        try {
-            Query query = new Query().sql(String.format("parenVegetablePlant.TypeName = '%s'",type.name()));
-
-            Selector selector = QueryCoordinator.newSelector(query, 1);
-
-            return ServiceUtil.getItem(selector,vegetableContainer,transaction,capi);
-
-        } catch (ParseException e) {
-            logger.trace("EXCEPTION", e);
-            return null;
-        }
+        return ServiceUtil.getItem(LabelCoordinator.newSelector(type.name(), 1),vegetableContainer,transaction,capi);
     }
 
     @Override
     public Flower getFlowerByType(FlowerType type, Transaction transaction) {
-        try {
-            Query query = new Query().sql(String.format("parentFlowerPlant.TypeName = '%s'",type.name()));
-
-            Selector selector = QueryCoordinator.newSelector(query, 1);
-
-            return ServiceUtil.getItem(selector,flowerContainer,transaction,capi);
-
-        } catch (ParseException e) {
-            logger.trace("EXCEPTION", e);
-            return null;
-        }
-
+        return ServiceUtil.getItem(LabelCoordinator.newSelector(type.name(), 1),flowerContainer,transaction,capi);
     }
 
     public void registerPackRobot(PackRobot packRobot){

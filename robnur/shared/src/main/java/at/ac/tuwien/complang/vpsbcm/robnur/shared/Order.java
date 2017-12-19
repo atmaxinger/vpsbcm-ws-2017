@@ -3,10 +3,7 @@ package at.ac.tuwien.complang.vpsbcm.robnur.shared;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Idable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Plant;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class Order<E extends Enum<E>,P> extends Idable {
 
@@ -43,7 +40,17 @@ public class Order<E extends Enum<E>,P> extends Idable {
     public void setAlreadyAcquiredItem(P alreadyAcquiredItem, E type) {
         alreadyAcquiredItems.add(alreadyAcquiredItem);
         int oldValue = missingItems.get(type);
-        missingItems.replace(type,oldValue-1);
+        missingItems.replace(type,oldValue - 1);
+
+        List<Integer> missingValues = new ArrayList<Integer>(missingItems.values());
+        setOrderStatus(OrderStatus.PACKED);
+        for (Integer i:missingValues) {
+            if(i > 0){
+                setOrderStatus(OrderStatus.PLACED);
+                return;
+            }
+        }
+
     }
 
     public OrderStatus getOrderStatus() {
@@ -56,5 +63,9 @@ public class Order<E extends Enum<E>,P> extends Idable {
 
     public long getTimestamp() {
         return timestamp;
+    }
+
+    public List<P> getAlreadyAcquiredItems() {
+        return alreadyAcquiredItems;
     }
 }

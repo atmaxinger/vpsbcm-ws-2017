@@ -87,7 +87,7 @@ public class OrderServiceImpl extends OrderService {
     public Order<VegetableType,Vegetable> getNextVegetableBasketOrder(Order.OrderStatus status, Transaction transaction) {
 
         Property timestampProperty = Property.forName("timestamp");
-        ComparableProperty growthProperty = ComparableProperty.forName("growth");
+        ComparableProperty growthProperty = ComparableProperty.forName("orderStatus");
 
         Query query = new Query().sortup(timestampProperty).filter(growthProperty.equalTo(status));
 
@@ -106,7 +106,7 @@ public class OrderServiceImpl extends OrderService {
     public Order<FlowerType,Flower> getNextBouquetOrder(Order.OrderStatus status, Transaction transaction) {
 
         Property timestampProperty = Property.forName("timestamp");
-        ComparableProperty growthProperty = ComparableProperty.forName("growth");
+        ComparableProperty growthProperty = ComparableProperty.forName("orderStatus");
 
         Query query = new Query().sortup(timestampProperty).filter(growthProperty.equalTo(status));
 

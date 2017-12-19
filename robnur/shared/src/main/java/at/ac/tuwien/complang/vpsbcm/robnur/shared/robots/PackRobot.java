@@ -80,6 +80,8 @@ public class PackRobot extends Robot {
             return;
         }
 
+        tryFulfilBouquetOrder();
+
         // check if there are already enough bouquets in the market
         if (marketService.getAmountOfBouquets() >= 5) {
             tryPutFlowersIntoResearch();
@@ -298,25 +300,18 @@ public class PackRobot extends Robot {
 
     private void tryFulfilVegetableBasketOrder() {
 
-        logger.info("tryFulfilVegetableBasketOrder");
-
         Transaction transaction = transactionService.beginTransaction(-1);
         List<Order<VegetableType,Vegetable>> orders = new ArrayList<>();
 
         Order<VegetableType,Vegetable> currentOrder = orderService.getNextVegetableBasketOrder(Order.OrderStatus.PLACED,transaction);
 
-        logger.info("tryFulfilVegetableBasketOrder order = " + currentOrder);
-
         while(currentOrder != null) {
 
             for (VegetableType type : VegetableType.values()) {
-                logger.info("tryFulfilVegetableBasketOrder check type = " + type.name());
 
-                while (currentOrder.getMissingItems().get(type) > 0) {
+                while (currentOrder.getMissingItems().get(type) != null && currentOrder.getMissingItems().get(type) > 0) {
 
                     Vegetable vegetable = packingService.getVegetableByType(type, transaction);
-
-                    logger.info("tryFulfilVegetableBasketOrder got vegetable = " + vegetable);
 
                     // check if there is an appropriate vegetable
                     if (vegetable == null) {
@@ -325,18 +320,71 @@ public class PackRobot extends Robot {
 
                     // add vegetable to order
                     currentOrder.setAlreadyAcquiredItem(vegetable, VegetableType.valueOf(vegetable.getParentVegetablePlant().getTypeName()));
+                    logger.info(String.format("PackRobot %s: added vegetable (%s) to order (%s)",getId(),vegetable.getId(),currentOrder.getId()));
                 }
             }
 
             orders.add(currentOrder);
             currentOrder = orderService.getNextVegetableBasketOrder(Order.OrderStatus.PLACED,transaction);
+        }
 
-            logger.info("tryFulfilVegetableBasketOrder order = " + currentOrder);
+        for (Order o:orders) {
+            orderService.placeOrderForVegetableBasket(o,transaction);
+            if(o.getOrderStatus() == Order.OrderStatus.PACKED){
+                VegetableBasket vegetableBasket = new VegetableBasket();
+                vegetableBasket.setVegetables(o.getAlreadyAcquiredItems());
+                vegetableBasket.setDeliveryRobotId(getId());
+
+                orderService.deliverVegetableBasket(vegetableBasket,o.getAddress());
+                logger.info(String.format("PackRobot %s: delivered vegetable basket (%s)",getId(),vegetableBasket.getId()));
+            }
+        }
+
+        transaction.commit();
+    }
+
+    private void tryFulfilBouquetOrder() {
+
+        Transaction transaction = transactionService.beginTransaction(-1);
+        List<Order<FlowerType,Flower>> orders = new ArrayList<>();
+
+        Order<FlowerType,Flower> currentOrder = orderService.getNextBouquetOrder(Order.OrderStatus.PLACED,transaction);
+
+        while(currentOrder != null) {
+
+            for (FlowerType type : FlowerType.values()) {
+
+                while (currentOrder.getMissingItems().get(type) != null && currentOrder.getMissingItems().get(type) > 0) {
+
+                    Flower flower = packingService.getFlowerByType(type, transaction);
+
+                    // check if there is an appropriate flower
+                    if (flower == null) {
+                        break;
+                    }
+
+                    // add flower to order
+                    currentOrder.setAlreadyAcquiredItem(flower, FlowerType.valueOf(flower.getParentFlowerPlant().getTypeName()));
+                    logger.info(String.format("PackRobot %s: added flower (%s) to order (%s)",getId(),flower.getId(),currentOrder.getId()));
+                }
+            }
+
+            orders.add(currentOrder);
+            currentOrder = orderService.getNextBouquetOrder(Order.OrderStatus.PLACED,transaction);
         }
 
 
         for (Order o:orders) {
-            orderService.placeOrderForVegetableBasket(o,transaction);
+            orderService.placeOrderForBouquet(o,transaction);
+            if(o.getOrderStatus() == Order.OrderStatus.PACKED){
+                Bouquet bouquet = new Bouquet();
+                bouquet.setFlowers(o.getAlreadyAcquiredItems());
+                bouquet.setDeliveryRobotId(getId());
+
+                orderService.deliverBouquet(bouquet,o.getAddress());
+
+                logger.info(String.format("PackRobot %s: delivered bouquet (%s)",getId(),bouquet.getId()));
+            }
         }
 
         transaction.commit();
