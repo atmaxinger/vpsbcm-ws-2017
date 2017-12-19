@@ -40,7 +40,7 @@ public abstract class DeliveryStorageService {
         this.vegetableBasketsChanged = vegetableBasketsChanged;
     }
 
-    public void onBouqetsChanged(StorageService.Callback<List<Bouquet>> bouquetsChanged) {
+    public void onBouqetsChanged(StorageService.Callback<List<Bouquet>> bouqetsChanged) {
         this.bouqetsChanged = bouqetsChanged;
     }
 
