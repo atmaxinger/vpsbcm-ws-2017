@@ -80,8 +80,12 @@ public class PlantAndHarvestRobot extends Robot {
         boolean hasPlantedSomething = false;
 
         // Step 1: get current planted plants from greenhouse
+        //         and combine them with the already composted plants
         List<VegetablePlant> vegetablePlants = greenhouseService.readAllVegetablePlants();
+        vegetablePlants.addAll(compostService.readAllVegetablePlants());
+
         List<FlowerPlant> flowerPlants = greenhouseService.readAllFlowerPlants();
+        flowerPlants.addAll(compostService.readAllFlowerPlants());
 
         // Step 2: Check whether there are more flowers or vegetables currently planted
         if (vegetablePlants.size() < flowerPlants.size()) {
