@@ -19,11 +19,13 @@ public class OrdersController {
     public TableColumn<Order<VegetableType, Vegetable>, String> tcVegetablesId;
     public TableColumn<Order<VegetableType, Vegetable>, String> tcVegetablesAddress;
     public TableColumn<Order<VegetableType, Vegetable>, String> tcVegetablesActions;
+    public TableColumn<Order<VegetableType, Vegetable>, String> tcVegetablesStatus;
 
     public TableView<Order<FlowerType, Flower>> tvFlowerOrders;
     public TableColumn<Order<FlowerType, Flower>, String> tcFlowersId;
     public TableColumn<Order<FlowerType, Flower>, String> tcFlowersAddress;
     public TableColumn<Order<FlowerType, Flower>, String> tcFlowersActions;
+    public TableColumn<Order<FlowerType, Flower>, String> tcFlowersStatus;
 
 
     private OrderService orderService = RobNurGUI.orderService;
@@ -56,6 +58,7 @@ public class OrdersController {
 
         tcVegetablesId.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getId()));
         tcVegetablesAddress.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getAddress()));
+        tcVegetablesStatus.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getOrderStatus().name()));
     }
 
     private void initFlowers() {
@@ -64,5 +67,6 @@ public class OrdersController {
 
         tcFlowersId.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getId()));
         tcFlowersAddress.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getAddress()));
+        tcFlowersStatus.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getOrderStatus().name()));
     }
 }
