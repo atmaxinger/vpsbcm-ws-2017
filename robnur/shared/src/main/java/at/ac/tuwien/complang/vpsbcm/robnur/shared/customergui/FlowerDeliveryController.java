@@ -36,7 +36,7 @@ public class FlowerDeliveryController {
         tcIndex.setCellValueFactory(column-> new ReadOnlyObjectWrapper<>(column.getTableView().getItems().indexOf(column.getValue())+1));
 
         tcBouqetId.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getId()));
-        tcBouqetId.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getPackingRobotId()));
-        tcBouqetId.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getDeliveryRobotId()));
+        tcPackRobot.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getPackingRobotId()));
+        tcDeliveryRobot.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getDeliveryRobotId()));
     }
 }

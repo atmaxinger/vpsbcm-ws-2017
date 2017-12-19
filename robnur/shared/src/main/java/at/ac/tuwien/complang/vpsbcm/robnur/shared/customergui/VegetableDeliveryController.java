@@ -15,7 +15,7 @@ import java.util.List;
 public class VegetableDeliveryController {
     public TableView<VegetableBasket> tableView;
     public TableColumn<VegetableBasket, Integer> tcIndex;
-    public TableColumn<VegetableBasket, String> tcBouqetId;
+    public TableColumn<VegetableBasket, String> tcVegetableBasketId;
     public TableColumn<VegetableBasket, String> tcPackRobot;
     public TableColumn<VegetableBasket, String> tcDeliveryRobot;
 
@@ -36,8 +36,8 @@ public class VegetableDeliveryController {
         tcIndex.setSortable(false);
         tcIndex.setCellValueFactory(column-> new ReadOnlyObjectWrapper<>(column.getTableView().getItems().indexOf(column.getValue())+1));
 
-        tcBouqetId.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getId()));
-        tcBouqetId.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getPackingRobotId()));
-        tcBouqetId.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getDeliveryRobotId()));
+        tcVegetableBasketId.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getId()));
+        tcPackRobot.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getPackingRobotId()));
+        tcDeliveryRobot.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getDeliveryRobotId()));
     }
 }
