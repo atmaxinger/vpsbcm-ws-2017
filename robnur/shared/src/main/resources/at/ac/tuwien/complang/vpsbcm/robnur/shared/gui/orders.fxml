@@ -11,18 +11,18 @@
     <items>
         <TableView fx:id="tvVegetableOrders" prefHeight="200.0" prefWidth="200.0">
             <columns>
-                <TableColumn fx:id="tcVegetablesId" prefWidth="86.0" text="Id" />
-                <TableColumn fx:id="tcVegetablesAddress" text="Addresse" />
+                <TableColumn fx:id="tcVegetablesId" prefWidth="200.0" text="Gemüse Bestellungs Id" />
+                <TableColumn fx:id="tcVegetablesAddress" text="Adresse" />
                 <TableColumn fx:id="tcVegetablesActions" prefWidth="83.0" text="Aktionen" />
             </columns>
         </TableView>
 
-        <!-- <TableView fx:id="tvResources" prefHeight="200.0" prefWidth="200.0">
+        <TableView fx:id="tvFlowerOrders" prefHeight="200.0" prefWidth="200.0">
             <columns>
-                <TableColumn fx:id="tcResourcesArt" prefWidth="150.0" text="Art" />
-                <TableColumn fx:id="tcResourcesAmountStatus" prefWidth="125.0" text="Anzahl/Status" />
-                <TableColumn fx:id="tcResourcesBuy" prefWidth="122.0" text="Kaufen" />
+                <TableColumn fx:id="tcFlowersId" prefWidth="200.0" text="Blumen Bestellungs Id" />
+                <TableColumn fx:id="tcFlowersAddress" prefWidth="125.0" text="Adresse" />
+                <TableColumn fx:id="tcFlowersActions" prefWidth="122.0" text="Aktionen" />
             </columns>
-        </TableView> -->
+        </TableView>
     </items>
 </SplitPane>
