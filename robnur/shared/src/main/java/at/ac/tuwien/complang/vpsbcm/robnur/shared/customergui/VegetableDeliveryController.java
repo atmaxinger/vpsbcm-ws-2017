@@ -1,12 +1,15 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.customergui;
 
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.gui.EndProductInformationDialog;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Bouquet;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.EndProduct;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableBasket;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.DeliveryStorageService;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
@@ -18,6 +21,7 @@ public class VegetableDeliveryController {
     public TableColumn<VegetableBasket, String> tcVegetableBasketId;
     public TableColumn<VegetableBasket, String> tcPackRobot;
     public TableColumn<VegetableBasket, String> tcDeliveryRobot;
+    public TableColumn<EndProduct, Button> tcActions;
 
     private DeliveryStorageService deliveryStorageService = CustomerGUI.deliveryStorageService;
 
@@ -39,5 +43,15 @@ public class VegetableDeliveryController {
         tcVegetableBasketId.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getId()));
         tcPackRobot.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getPackingRobotId()));
         tcDeliveryRobot.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getDeliveryRobotId()));
+        tcActions.setCellValueFactory(p -> {
+            Button btn = new Button();
+            btn.setText("Info");
+            btn.setOnAction(event -> {
+                EndProductInformationDialog dialog = new EndProductInformationDialog();
+                dialog.show(p.getValue());
+            });
+
+            return new ReadOnlyObjectWrapper<>(btn);
+        });
     }
 }

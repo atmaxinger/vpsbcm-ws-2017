@@ -10,5 +10,6 @@
         <TableColumn fx:id="tcBouqetId" text="Id" prefWidth="320" />
         <TableColumn fx:id="tcPackRobot" text="Pack Roboter" />
         <TableColumn fx:id="tcDeliveryRobot" text="Liefer Roboter" />
+        <TableColumn fx:id="tcActions" text="Aktionen" />
     </columns>
 </TableView>
