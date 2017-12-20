@@ -81,7 +81,7 @@ public class OrdersController {
         tcVegetablesAddress.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getAddress()));
         tcVegetablesStatus.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getOrderStatus().name()));
 
-        tcVegetablesPackRobots.setCellValueFactory(p -> new ReadOnlyStringWrapper(""));
+        tcVegetablesPackRobots.setCellValueFactory(p -> new ReadOnlyStringWrapper(formatList(p.getValue().getPackRobotIds())));
         tcVegetablesDeliveryRobot.setCellValueFactory(p -> new ReadOnlyStringWrapper(""));
 
         tcVegetablesActions.setCellValueFactory(p -> {
@@ -116,6 +116,9 @@ public class OrdersController {
         tcFlowersId.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getId()));
         tcFlowersAddress.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getAddress()));
         tcFlowersStatus.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getOrderStatus().name()));
+
+        tcFlowersPackRobots.setCellValueFactory(p -> new ReadOnlyStringWrapper(formatList(p.getValue().getPackRobotIds())));
+        tcFlowersDeliveryRobot.setCellValueFactory(p -> new ReadOnlyStringWrapper(""));
 
         tcFlowersActions.setCellValueFactory(p -> {
             HBox hBox = new HBox();
