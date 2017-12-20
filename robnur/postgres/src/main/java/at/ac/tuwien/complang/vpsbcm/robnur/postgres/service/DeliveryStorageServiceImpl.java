@@ -22,11 +22,39 @@ public class DeliveryStorageServiceImpl extends DeliveryStorageService {
 
     public DeliveryStorageServiceImpl(String connectionString) {
         this.connectionString = connectionString;
+
+
+        try {
+            Listener flowerListener = null;
+            flowerListener = new Listener(BOUQUET_DELIVERY_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    notifyBouqetsChanged();
+                }
+            };
+            flowerListener.start();
+
+            Listener vegetableListener = new Listener(VEGETABLE_BASKET_DELIVERY_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    notifyVegetableBasketsChanged();
+                }
+            };
+            vegetableListener.start();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public List<VegetableBasket> readAllVegetableBaskets() {
         Connection connection = PostgresHelper.getConnectionForUrl(connectionString);
+        try {
+            connection.setAutoCommit(false);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         TransactionImpl transaction = new TransactionImpl(connection);
 
         List<VegetableBasket> result = ServiceUtil.readAllItems(VEGETABLE_BASKET_DELIVERY_TABLE,VegetableBasket.class,transaction);
@@ -37,6 +65,11 @@ public class DeliveryStorageServiceImpl extends DeliveryStorageService {
     @Override
     public List<Bouquet> readAllBouquets() {
         Connection connection = PostgresHelper.getConnectionForUrl(connectionString);
+        try {
+            connection.setAutoCommit(false);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         TransactionImpl transaction = new TransactionImpl(connection);
 
         List<Bouquet> result = ServiceUtil.readAllItems(BOUQUET_DELIVERY_TABLE,Bouquet.class,transaction);

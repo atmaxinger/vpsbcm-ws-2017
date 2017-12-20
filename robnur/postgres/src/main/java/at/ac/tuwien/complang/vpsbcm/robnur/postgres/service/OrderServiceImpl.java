@@ -8,6 +8,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.log4j.Logger;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,6 +20,30 @@ public class OrderServiceImpl extends OrderService {
     private static final String VEGETABLE_ORDER_TABLE = "vot";
 
     public OrderServiceImpl() {
+
+        try {
+            Listener flowerListener = null;
+            flowerListener = new Listener(FLOWER_ORDER_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    notifyFlowerOrdersChanged();
+                    notifyCanPlaceOrderChanged(false);
+                }
+            };
+            flowerListener.start();
+
+            Listener vegetableListener = new Listener(VEGETABLE_ORDER_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    notifiyVegetableOrdersChanged();
+                    notifyCanPlaceOrderChanged(false);
+                }
+            };
+            vegetableListener.start();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -59,12 +84,17 @@ public class OrderServiceImpl extends OrderService {
 
     @Override
     public Order<VegetableType, Vegetable> getNextVegetableBasketOrder(Order.OrderStatus status, Transaction transaction) {
-        return ServiceUtil.getItemByParameter("'orderStatus'",status.name(),VEGETABLE_ORDER_TABLE,Order.class,transaction);
+        TypeReference<Order<VegetableType, Vegetable>> typeReference = new TypeReference<Order<VegetableType, Vegetable>>() {
+        };
+        return ServiceUtil.getItemByParameter("'orderStatus'",status.name(),VEGETABLE_ORDER_TABLE, typeReference,transaction);
     }
 
     @Override
     public Order<FlowerType, Flower> getNextBouquetOrder(Order.OrderStatus status, Transaction transaction) {
-        return ServiceUtil.getItemByParameter("'orderStatus'",status.name(),FLOWER_ORDER_TABLE,Order.class,transaction);
+        TypeReference<Order<FlowerType, Flower>> typeReference = new TypeReference<Order<FlowerType, Flower>>() {
+        };
+
+        return ServiceUtil.getItemByParameter("'orderStatus'",status.name(),FLOWER_ORDER_TABLE, typeReference,transaction);
     }
 
     @Override

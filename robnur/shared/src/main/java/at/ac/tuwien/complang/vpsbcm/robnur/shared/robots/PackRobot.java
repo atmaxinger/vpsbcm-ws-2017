@@ -365,6 +365,7 @@ public class PackRobot extends Robot {
                 transaction.commit();
             }
 
+            transaction = transactionService.beginTransaction(-1);
             currentOrder = orderService.getNextVegetableBasketOrder(Order.OrderStatus.PLACED,transaction);
         }
     }
@@ -435,6 +436,7 @@ public class PackRobot extends Robot {
                 transaction.commit();
             }
 
+            transaction = transactionService.beginTransaction(-1);
             currentOrder = orderService.getNextBouquetOrder(Order.OrderStatus.PLACED,transaction);
         }
     }
