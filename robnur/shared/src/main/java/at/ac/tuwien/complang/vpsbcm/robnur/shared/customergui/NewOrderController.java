@@ -9,9 +9,11 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import javafx.util.converter.IntegerStringConverter;
 
@@ -42,6 +44,9 @@ public class NewOrderController {
     private TableColumn<TableData, String> tcSinglePrice = new TableColumn<>();
     private TableColumn<TableData, HBox> tcActions = new TableColumn<>();
 
+    private VBox vbox = new VBox();
+    private Label lblPrice = new Label();
+
 
     private int getPrice(VegetableType type) {
         int p = -1;
@@ -67,8 +72,23 @@ public class NewOrderController {
         return p;
     }
 
+    private String formatPrice(int price) {
+        return String.format("%.02f €", ((float)price)/100.0f);
+    }
+
+    private void updatePriceLabel() {
+        int price = 0;
+
+        for(TableData td : tableView.getItems()) {
+            price += (td.price*td.count);
+        }
+
+        lblPrice.setText(String.format("Gesamt: %s", formatPrice(price)));
+    }
 
     private void initialize() {
+        updatePriceLabel();
+
         tcType.setText("Art");
         tcType.setCellValueFactory(column -> new ReadOnlyObjectWrapper<>(column.getValue().e));
 
@@ -78,7 +98,7 @@ public class NewOrderController {
         tcCount.setEditable(true);
 
         tcSinglePrice.setText("Einzelpreis");
-        tcSinglePrice.setCellValueFactory(p -> new ReadOnlyStringWrapper(String.format("%.02f €", ((float)p.getValue().price)/100.0f)));
+        tcSinglePrice.setCellValueFactory(p -> new ReadOnlyStringWrapper(formatPrice(p.getValue().price)));
 
         tcActions.setCellValueFactory(p -> {
             HBox box = new HBox();
@@ -88,6 +108,7 @@ public class NewOrderController {
             btnPlus.setOnAction(event -> {
                 p.getValue().count++;
                 tableView.refresh();
+                updatePriceLabel();
             });
 
             Button btnMinus = new Button();
@@ -96,6 +117,7 @@ public class NewOrderController {
                 p.getValue().count--;
                 p.getValue().count = Math.max(0, p.getValue().count);
                 tableView.refresh();
+                updatePriceLabel();
             });
 
             box.getChildren().addAll(btnPlus, btnMinus);
@@ -104,6 +126,11 @@ public class NewOrderController {
         });
 
         tableView.getColumns().addAll(tcType, tcCount, tcSinglePrice, tcActions);
+
+        lblPrice.setMaxWidth(Double.MAX_VALUE);
+        lblPrice.setMinHeight(40);
+        lblPrice.setAlignment(Pos.CENTER_RIGHT);
+        vbox.getChildren().addAll(tableView, lblPrice);
     }
 
     public void showVegetableOrderNew(List<VegetablePlantCultivationInformation> vpci) {
@@ -129,7 +156,7 @@ public class NewOrderController {
 
         dialog.setTitle("Gemüse Bestellen");
 
-        dialog.getDialogPane().setContent(tableView);
+        dialog.getDialogPane().setContent(vbox);
 
 
         dialog.setResizable(true);
@@ -179,7 +206,7 @@ public class NewOrderController {
 
         dialog.setTitle("Blumen Bestellen");
 
-        dialog.getDialogPane().setContent(tableView);
+        dialog.getDialogPane().setContent(vbox);
 
 
         dialog.setResizable(true);
