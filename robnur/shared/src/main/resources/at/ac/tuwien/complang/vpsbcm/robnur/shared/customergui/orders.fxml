@@ -14,7 +14,7 @@
       <RowConstraints maxHeight="292.0" minHeight="10.0" prefHeight="264.0" vgrow="SOMETIMES" />
    </rowConstraints>
    <children>
-      <HBox alignment="CENTER">
+      <HBox fx:id="box" alignment="CENTER">
          <children>
             <Button fx:id="btnOrderFlowers" mnemonicParsing="false" text="Blumen bestellen">
                <opaqueInsets>
