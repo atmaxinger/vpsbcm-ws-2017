@@ -128,7 +128,6 @@ public class NewOrderController {
         dialog.getDialogPane().getButtonTypes().addAll(buyButtonType, ButtonType.CANCEL);
 
         dialog.setTitle("Gemüse Bestellen");
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
 
         dialog.getDialogPane().setContent(tableView);
 
@@ -179,7 +178,6 @@ public class NewOrderController {
         dialog.getDialogPane().getButtonTypes().addAll(buyButtonType, ButtonType.CANCEL);
 
         dialog.setTitle("Blumen Bestellen");
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
 
         dialog.getDialogPane().setContent(tableView);
 
