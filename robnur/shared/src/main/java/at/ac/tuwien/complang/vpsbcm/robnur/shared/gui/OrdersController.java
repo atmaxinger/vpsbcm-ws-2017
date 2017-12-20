@@ -1,16 +1,19 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.gui;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.Order;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Flower;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerType;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableType;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.customergui.NewOrderController;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ConfigService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.OrderService;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.layout.HBox;
+import sun.security.krb5.Config;
 
 import java.util.List;
 
@@ -18,17 +21,18 @@ public class OrdersController {
     public TableView<Order<VegetableType, Vegetable>> tvVegetableOrders;
     public TableColumn<Order<VegetableType, Vegetable>, String> tcVegetablesId;
     public TableColumn<Order<VegetableType, Vegetable>, String> tcVegetablesAddress;
-    public TableColumn<Order<VegetableType, Vegetable>, String> tcVegetablesActions;
+    public TableColumn<Order<VegetableType, Vegetable>, HBox> tcVegetablesActions;
     public TableColumn<Order<VegetableType, Vegetable>, String> tcVegetablesStatus;
 
     public TableView<Order<FlowerType, Flower>> tvFlowerOrders;
     public TableColumn<Order<FlowerType, Flower>, String> tcFlowersId;
     public TableColumn<Order<FlowerType, Flower>, String> tcFlowersAddress;
-    public TableColumn<Order<FlowerType, Flower>, String> tcFlowersActions;
+    public TableColumn<Order<FlowerType, Flower>, HBox> tcFlowersActions;
     public TableColumn<Order<FlowerType, Flower>, String> tcFlowersStatus;
 
 
     private OrderService orderService = RobNurGUI.orderService;
+    private ConfigService configService = RobNurGUI.configService;
 
     @FXML
     public void initialize() {
@@ -59,6 +63,32 @@ public class OrdersController {
         tcVegetablesId.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getId()));
         tcVegetablesAddress.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getAddress()));
         tcVegetablesStatus.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getOrderStatus().name()));
+
+        tcVegetablesActions.setCellValueFactory(p -> {
+            HBox hBox = new HBox();
+
+            Button btnShowReserved = new Button();
+            btnShowReserved.setText("Reservierte");
+            btnShowReserved.setOnAction(event -> {
+                EndProductInformationDialog dialog = new EndProductInformationDialog();
+                VegetableBasket tmp = new VegetableBasket();
+                tmp.setVegetables(p.getValue().getAlreadyAcquiredItems());
+                dialog.show(tmp);
+            });
+
+            Button btnShowInfo = new Button();
+            btnShowInfo.setText("Noch fehlende");
+            btnShowInfo.setOnAction(event -> {
+                NewOrderController noc = new NewOrderController("");
+                noc.showVegetableOrder(configService.readAllVegetablePlantCultivationInformation(null), p.getValue());
+            });
+
+
+            hBox.getChildren().addAll(btnShowReserved, btnShowInfo);
+
+            return new ReadOnlyObjectWrapper<>(hBox);
+        });
+
     }
 
     private void initFlowers() {
@@ -68,5 +98,30 @@ public class OrdersController {
         tcFlowersId.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getId()));
         tcFlowersAddress.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getAddress()));
         tcFlowersStatus.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getOrderStatus().name()));
+
+        tcFlowersActions.setCellValueFactory(p -> {
+            HBox hBox = new HBox();
+
+            Button btnShowReserved = new Button();
+            btnShowReserved.setText("Reservierte");
+            btnShowReserved.setOnAction(event -> {
+                EndProductInformationDialog dialog = new EndProductInformationDialog();
+                Bouquet tmp = new Bouquet();
+                tmp.setFlowers(p.getValue().getAlreadyAcquiredItems());
+                dialog.show(tmp);
+            });
+
+            Button btnShowInfo = new Button();
+            btnShowInfo.setText("Noch fehlende");
+            btnShowInfo.setOnAction(event -> {
+                NewOrderController noc = new NewOrderController("");
+                noc.showFlowerOrder(configService.readAllFlowerPlantCultivationInformation(null), p.getValue());
+            });
+
+
+            hBox.getChildren().addAll(btnShowReserved, btnShowInfo);
+
+            return new ReadOnlyObjectWrapper<>(hBox);
+        });
     }
 }

@@ -86,7 +86,7 @@ public class NewOrderController {
         lblPrice.setText(String.format("Gesamt: %s", formatPrice(price)));
     }
 
-    private void initialize() {
+    private void initialize(boolean isNew) {
         updatePriceLabel();
 
         tcType.setText("Art");
@@ -95,69 +95,100 @@ public class NewOrderController {
         tcCount.setText("Anzahl");
         tcCount.setCellValueFactory(p -> new SimpleIntegerProperty(p.getValue().count));
 
-        tcCount.setEditable(true);
+        if(isNew) {
 
-        tcSinglePrice.setText("Einzelpreis");
-        tcSinglePrice.setCellValueFactory(p -> new ReadOnlyStringWrapper(formatPrice(p.getValue().price)));
+            tcCount.setEditable(true);
 
-        tcActions.setCellValueFactory(p -> {
-            HBox box = new HBox();
+            tcSinglePrice.setText("Einzelpreis");
+            tcSinglePrice.setCellValueFactory(p -> new ReadOnlyStringWrapper(formatPrice(p.getValue().price)));
 
-            Button btnPlus = new Button();
-            btnPlus.setText("+");
-            btnPlus.setOnAction(event -> {
-                p.getValue().count++;
-                tableView.refresh();
-                updatePriceLabel();
+            tcActions.setCellValueFactory(p -> {
+                HBox box = new HBox();
+
+                Button btnPlus = new Button();
+                btnPlus.setText("+");
+                btnPlus.setOnAction(event -> {
+                    p.getValue().count++;
+                    tableView.refresh();
+                    updatePriceLabel();
+                });
+
+                Button btnMinus = new Button();
+                btnMinus.setText("-");
+                btnMinus.setOnAction(event -> {
+                    p.getValue().count--;
+                    p.getValue().count = Math.max(0, p.getValue().count);
+                    tableView.refresh();
+                    updatePriceLabel();
+                });
+
+                box.getChildren().addAll(btnPlus, btnMinus);
+
+                return new ReadOnlyObjectWrapper<>(box);
             });
-
-            Button btnMinus = new Button();
-            btnMinus.setText("-");
-            btnMinus.setOnAction(event -> {
-                p.getValue().count--;
-                p.getValue().count = Math.max(0, p.getValue().count);
-                tableView.refresh();
-                updatePriceLabel();
-            });
-
-            box.getChildren().addAll(btnPlus, btnMinus);
-
-            return new ReadOnlyObjectWrapper<>(box);
-        });
+        }
 
         tableView.getColumns().addAll(tcType, tcCount, tcSinglePrice, tcActions);
 
-        lblPrice.setMaxWidth(Double.MAX_VALUE);
-        lblPrice.setMinHeight(40);
-        lblPrice.setAlignment(Pos.CENTER_RIGHT);
-        vbox.getChildren().addAll(tableView, lblPrice);
+        vbox.getChildren().addAll(tableView);
+
+        if(isNew) {
+            lblPrice.setMaxWidth(Double.MAX_VALUE);
+            lblPrice.setMinHeight(40);
+            lblPrice.setAlignment(Pos.CENTER_RIGHT);
+
+            vbox.getChildren().addAll(lblPrice);
+        }
     }
 
-    public void showVegetableOrderNew(List<VegetablePlantCultivationInformation> vpci) {
+
+    public void showVegetableOrder(List<VegetablePlantCultivationInformation> vpci) {
+        showVegetableOrder(vpci, null);
+    }
+
+    public void showVegetableOrder(List<VegetablePlantCultivationInformation> vpci, Order<VegetableType, Vegetable> theOrder) {
         this.vpci = vpci;
 
-        initialize();
+        initialize(theOrder == null);
 
         ObservableList<TableData> obs = tableView.getItems();
 
-        for(VegetableType type : VegetableType.values()) {
-            TableData td = new TableData();
-            td.e = type;
-            td.price = getPrice(type);
-            obs.add(td);
+        if(theOrder == null) {
+            for (VegetableType type : VegetableType.values()) {
+                TableData td = new TableData();
+                td.e = type;
+                td.price = getPrice(type);
+                obs.add(td);
+            }
         }
+        else {
+            for (VegetableType type : theOrder.getMissingItems().keySet()) {
+                TableData td = new TableData();
+                td.e = type;
+                td.price = getPrice(type);
+                td.count = theOrder.getMissingItems().get(type);
+                obs.add(td);
+            }
+        }
+
         tableView.refresh();
 
         Dialog<Order<VegetableType, Vegetable>> dialog = new Dialog<>();
 
         ButtonType buyButtonType = new ButtonType("Kaufen", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().clear();
-        dialog.getDialogPane().getButtonTypes().addAll(buyButtonType, ButtonType.CANCEL);
 
-        dialog.setTitle("Gemüse Bestellen");
+        if(theOrder == null) {
+            dialog.getDialogPane().getButtonTypes().addAll(buyButtonType, ButtonType.CANCEL);
+            dialog.setTitle("Gemüse Bestellen");
+        }
+        else {
+            dialog.setTitle("Gemüsebestellung ansehen");
+            dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL);
+        }
+
 
         dialog.getDialogPane().setContent(vbox);
-
 
         dialog.setResizable(true);
 
@@ -182,29 +213,51 @@ public class NewOrderController {
         result.ifPresent(order -> CustomerGUI.orderService.placeOrderForVegetableBasket(order, null));
     }
 
-    public void showFlowerOrderNew(List<FlowerPlantCultivationInformation> fpci) {
+    public void showFlowerOrder(List<FlowerPlantCultivationInformation> fpci) {
+        showFlowerOrder(fpci, null);
+    }
+
+    public void showFlowerOrder(List<FlowerPlantCultivationInformation> fpci, Order<FlowerType, Flower> theOrder) {
         this.fpci = fpci;
 
-        initialize();
+        initialize(theOrder == null);
 
         ObservableList<TableData> obs = tableView.getItems();
 
-        for(FlowerType type : FlowerType.values()) {
-            TableData td = new TableData();
-            td.e = type;
-            td.count = 0;
-            td.price = getPrice(type);
-            obs.add(td);
+        if(theOrder == null) {
+            for (FlowerType type : FlowerType.values()) {
+                TableData td = new TableData();
+                td.e = type;
+                td.count = 0;
+                td.price = getPrice(type);
+                obs.add(td);
+            }
         }
+        else {
+            for (FlowerType type : theOrder.getMissingItems().keySet()) {
+                TableData td = new TableData();
+                td.e = type;
+                td.price = getPrice(type);
+                td.count = theOrder.getMissingItems().get(type);
+                obs.add(td);
+            }
+        }
+
         tableView.refresh();
 
         Dialog<Order<FlowerType, Flower>> dialog = new Dialog<>();
 
         ButtonType buyButtonType = new ButtonType("Kaufen", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().clear();
-        dialog.getDialogPane().getButtonTypes().addAll(buyButtonType, ButtonType.CANCEL);
 
-        dialog.setTitle("Blumen Bestellen");
+        if(theOrder == null) {
+            dialog.getDialogPane().getButtonTypes().addAll(buyButtonType, ButtonType.CANCEL);
+            dialog.setTitle("Blumen Bestellen");
+        }
+        else {
+            dialog.setTitle("Blumenbestellung ansehen");
+            dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL);
+        }
 
         dialog.getDialogPane().setContent(vbox);
 

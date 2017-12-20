@@ -14,7 +14,7 @@
                 <TableColumn fx:id="tcVegetablesId" prefWidth="200.0" text="Gemüse Bestellungs Id" />
                 <TableColumn fx:id="tcVegetablesAddress" text="Adresse" />
                 <TableColumn fx:id="tcVegetablesStatus" text="Status" />
-                <TableColumn fx:id="tcVegetablesActions" prefWidth="83.0" text="Aktionen" />
+                <TableColumn fx:id="tcVegetablesActions" text="Aktionen" />
             </columns>
         </TableView>
 
@@ -23,7 +23,7 @@
                 <TableColumn fx:id="tcFlowersId" prefWidth="200.0" text="Blumen Bestellungs Id" />
                 <TableColumn fx:id="tcFlowersAddress" prefWidth="125.0" text="Adresse" />
                 <TableColumn fx:id="tcFlowersStatus" text="Status" />
-                <TableColumn fx:id="tcFlowersActions" prefWidth="122.0" text="Aktionen" />
+                <TableColumn fx:id="tcFlowersActions" text="Aktionen" />
             </columns>
         </TableView>
     </items>

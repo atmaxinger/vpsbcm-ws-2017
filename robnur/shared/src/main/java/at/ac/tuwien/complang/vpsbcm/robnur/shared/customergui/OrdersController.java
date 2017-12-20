@@ -35,12 +35,12 @@ public class OrdersController {
 
         btnOrderFlowers.setOnAction(event -> {
             NewOrderController no = new NewOrderController(CustomerGUI.address);
-            no.showFlowerOrderNew(fpcis);
+            no.showFlowerOrder(fpcis);
         });
 
         btnOrderVegetables.setOnAction(event -> {
             NewOrderController no = new NewOrderController(CustomerGUI.address);
-            no.showVegetableOrderNew(vpcis);
+            no.showVegetableOrder(vpcis);
         });
     }
 }
