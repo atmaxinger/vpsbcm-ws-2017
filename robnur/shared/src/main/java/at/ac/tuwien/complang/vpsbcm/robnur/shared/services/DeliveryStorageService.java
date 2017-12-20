@@ -26,13 +26,13 @@ public abstract class DeliveryStorageService {
 
     protected void notifyBouqetsChanged() {
         logger.debug(String.format("bouqets changed"));
-        List<Bouquet> bouquets = readAllBouqets();
+        List<Bouquet> bouquets = readAllBouquets();
         for(Bouquet bouquet : bouquets) {
             logger.debug(String.format("  %s", bouquet.getId()));
         }
 
         if(bouqetsChanged != null) {
-            bouqetsChanged.handle(readAllBouqets());
+            bouqetsChanged.handle(readAllBouquets());
         }
     }
 
@@ -45,5 +45,5 @@ public abstract class DeliveryStorageService {
     }
 
     public abstract List<VegetableBasket> readAllVegetableBaskets();
-    public abstract List<Bouquet> readAllBouqets();
+    public abstract List<Bouquet> readAllBouquets();
 }

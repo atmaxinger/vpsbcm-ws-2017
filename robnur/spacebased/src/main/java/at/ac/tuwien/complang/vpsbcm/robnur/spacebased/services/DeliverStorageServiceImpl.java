@@ -42,7 +42,7 @@ public class DeliverStorageServiceImpl extends DeliveryStorageService {
     }
 
     @Override
-    public List<Bouquet> readAllBouqets() {
+    public List<Bouquet> readAllBouquets() {
         return ServiceUtil.readAllItems(bouqetsContainer, null, capi);
     }
 }

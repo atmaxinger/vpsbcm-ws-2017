@@ -33,7 +33,7 @@ public class FlowerDeliveryController {
 
     @FXML
     public void initialize() {
-        initData(deliveryStorageService.readAllBouqets());
+        initData(deliveryStorageService.readAllBouquets());
         deliveryStorageService.onBouqetsChanged(this::initData);
 
         tcIndex.setSortable(false);
