@@ -1,0 +1,69 @@
+package at.ac.tuwien.complang.vpsbcm.robnur.postgres;
+
+import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.ConfigServiceImpl;
+import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.DeliveryStorageServiceImpl;
+import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.OrderServiceImpl;
+import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.PostgresHelper;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.customergui.CustomerGUI;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ConfigService;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.DeliveryStorageService;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.OrderService;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class PostgresCustomerGUI {
+
+
+    private static void createDb(Connection connection, String databasename) throws SQLException {
+        Statement statement = connection.createStatement();
+        statement.execute("DROP DATABASE IF EXISTS " +  databasename);
+        statement.execute("CREATE DATABASE " +  databasename);
+        statement.close();
+    }
+
+    private static void createTables(Connection connection) throws SQLException {
+        Statement statement = connection.createStatement();
+
+        for (String t : DeliveryStorageServiceImpl.getTables()){
+            statement.execute("CREATE TABLE " + t + "(ID BIGSERIAL PRIMARY KEY, DATA JSON NOT NULL)");
+
+        }
+        statement.close();
+    }
+
+    public static void main(String[] args) throws SQLException {
+        if(args.length == 0) {
+            System.err.println("You need to specify the id");
+            System.exit(1);
+        }
+
+
+        // TODO: CREATE TABLE
+        String server = "localhost";
+        int port = 5432;
+        String database = "customer_" + args[0];
+        String url = String.format("jdbc:postgresql://%s:%d/%s", server, port, database);
+
+        String urlForCreation = String.format("jdbc:postgresql://%s:%d/", server, port);
+
+
+        createDb(PostgresHelper.getConnectionForUrl(urlForCreation), database);
+        createTables(PostgresHelper.getConnectionForUrl(url));
+
+
+
+        ConfigService configService = new ConfigServiceImpl();
+        OrderService orderService = new OrderServiceImpl();
+        DeliveryStorageService deliveryStorageService = new DeliveryStorageServiceImpl(url);
+
+        CustomerGUI.configService = configService;
+        CustomerGUI.orderService = orderService;
+        CustomerGUI.deliveryStorageService = deliveryStorageService;
+        CustomerGUI.address = url;
+
+        CustomerGUI customerGUI = new CustomerGUI();
+        customerGUI.execute(args);
+    }
+}

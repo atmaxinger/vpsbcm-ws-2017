@@ -4,12 +4,14 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Flower;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -101,11 +103,12 @@ public class ServiceUtil {
      * @param <T> type
      * @return list of items if successful (may be of size 0), null if unsuccessful
      */
-    public static <T extends Serializable> List<T> readAllItems(String table, Class<T> resultClass, Transaction transaction) {
+    public static <T extends Serializable> List<T> readAllItems(String table, TypeReference typeReference, Transaction transaction) {
 
         List<T> result = new ArrayList<T>();
 
         try {
+
             ObjectMapper mapper = new ObjectMapper()
                     .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
@@ -116,7 +119,7 @@ public class ServiceUtil {
 
             while (rs.next()) {
                 String data = rs.getString("data");
-                T t = mapper.readValue(data, resultClass);
+                T t = mapper.readValue(data, typeReference);
                 result.add(t);
             }
 
@@ -127,6 +130,24 @@ public class ServiceUtil {
         }
 
         return result;
+    }
+
+
+    /**
+     * read all items from table
+     * @param table the name of the table
+     * @param resultClass the expected class of the result
+     * @param transaction the transaction
+     * @param <T> type
+     * @return list of items if successful (may be of size 0), null if unsuccessful
+     */
+    public static <T extends Serializable> List<T> readAllItems(String table, Class<T> resultClass, Transaction transaction) {
+        return readAllItems(table, new TypeReference<T>() {
+            @Override
+            public Type getType() {
+                return resultClass;
+            }
+        }, transaction);
     }
 
     /**
@@ -141,6 +162,20 @@ public class ServiceUtil {
         List<T> l = readAllItems(table, resultClass, t);
         t.commit();
 
+        return l;
+    }
+
+    /**
+     * read all items from table
+     * @param table the name of the table
+     * @param resultClass the expected class of the result
+     * @param <T> type
+     * @return list of items if successful (may be of size 0), null if unsuccessful
+     */
+    public static <T extends Serializable> List<T> readAllItems(String table, TypeReference typeReference) {
+        Transaction t = transactionService.beginTransaction(-1,"READ ALL ITEMS " + table);
+        List<T> l = readAllItems(table, typeReference, t);
+        t.commit();
         return l;
     }
 
@@ -181,59 +216,6 @@ public class ServiceUtil {
         return result;
     }
 
-    /**
-     * get all items of a table (read + delete)
-     * @param table the name of the table
-     * @param resultClass the expected class of the result
-     * @param <T> type
-     * @return list of items if successful (may be of size 0), null if unsuccessful
-     */
-    public static <T extends Serializable> List<T> getAllItems(String table, Class<T> resultClass) {
-        Transaction t = transactionService.beginTransaction(-1,"READ ALL ITEMS " + table);
-        List<T> l = getAllItems(table, resultClass, t);
-        t.commit();
-
-        return l;
-    }
-
-    /**
-     * read one item by parameter of the JSON
-     * @param parameterName the name of the JSON parameter
-     * @param parameterValue the value of the JSON parameter
-     * @param table the name of the table
-     * @param resultClass the expected class of the result
-     * @param transaction the transaction
-     * @param <T> type
-     * @return The item if successful, null if unsuccessful
-     */
-    public static <T extends Serializable> T readItemByParameter(String parameterName, String parameterValue, String table, Class<T> resultClass, Transaction transaction) {
-
-        T result = null;
-
-        try {
-
-            ObjectMapper mapper = new ObjectMapper()
-                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-            Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
-
-            String query = String.format("SELECT * FROM %s WHERE (data " + prepareArrow(parameterName) + " %s)::text = '%s'", table, parameterName, parameterValue);
-            ResultSet rs = statement.executeQuery(query);
-
-            if(rs.next()) {
-                String data = rs.getString("data");
-                result = mapper.readValue(data, resultClass);
-            }
-
-            statement.close();
-
-        } catch (SQLException | IOException e) {
-            logger.trace("EXCEPTION", e);
-        }
-
-        return result;
-
-    }
 
     /**
      * get one item by parameter of the JSON (read + delete)
@@ -245,7 +227,7 @@ public class ServiceUtil {
      * @param <T> type
      * @return The item if successful, null if unsuccessful
      */
-    public static <T extends Serializable> T getItemByParameter(String parameterName, String parameterValue, String table, Class<T> resultClass, Transaction transaction) {
+    public static <T extends Serializable> T getItemByParameter(String parameterName, String parameterValue, String table, TypeReference typeReference, Transaction transaction) {
 
         T result = null;
 
@@ -266,7 +248,7 @@ public class ServiceUtil {
 
             rs.next();
             String data = rs.getString("data");
-            result = mapper.readValue(data, resultClass);
+            result = mapper.readValue(data, typeReference);
             long databaseId = rs.getLong("id");
 
             deleteItemByDatabaseId(databaseId, table, transaction);
@@ -285,6 +267,26 @@ public class ServiceUtil {
     }
 
     /**
+     * get one item by parameter of the JSON (read + delete)
+     * @param parameterName the name of the JSON parameter
+     * @param parameterValue the value of the JSON parameter
+     * @param table the name of the table
+     * @param resultClass the expected class of the result
+     * @param transaction the transaction
+     * @param <T> type
+     * @return The item if successful, null if unsuccessful
+     */
+    public static <T extends Serializable> T getItemByParameter(String parameterName, String parameterValue, String table, Class<T> resultClass, Transaction transaction) {
+
+        return getItemByParameter(parameterName, parameterValue, table,  new TypeReference<T>() {
+            @Override
+            public Type getType() {
+                return resultClass;
+            }
+        }, transaction);
+    }
+
+    /**
      * get one item arbitrary item (read + delete)
      * @param table the name of the table
      * @param resultClass the expected class of the result
@@ -292,7 +294,7 @@ public class ServiceUtil {
      * @param <T> type
      * @return The item if successful, null if unsuccessful
      */
-    public static <T extends Serializable> T getItem(String table, Class<T> resultClass, Transaction transaction) {
+    public static <T extends Serializable> T getItem(String table, TypeReference typeReference, Transaction transaction) {
 
         T result = null;
 
@@ -313,7 +315,7 @@ public class ServiceUtil {
 
             rs.next();
             String data = rs.getString("data");
-            result = mapper.readValue(data, resultClass);
+            result = mapper.readValue(data, typeReference);
             long databaseId = rs.getLong("id");
 
             deleteItemByDatabaseId(databaseId, table, transaction);
@@ -331,58 +333,24 @@ public class ServiceUtil {
         return result;
     }
 
+
     /**
-     * get all items matching a parameter of the JSON (read + delete)
-     * @param parameterName the name of the JSON parameter
-     * @param parameterValue the value of the JSON parameter
+     * get one item arbitrary item (read + delete)
      * @param table the name of the table
      * @param resultClass the expected class of the result
      * @param transaction the transaction
      * @param <T> type
-     * @return The list of items if successful (may be of size 0), null if unsuccessful
+     * @return The item if successful, null if unsuccessful
      */
-    public static <T extends Serializable> List<T> getItemsByParameter(String parameterName, String parameterValue, String table, Class<T> resultClass, Transaction transaction) {
-        logger.debug(String.format("getItemsByParameter(\"%s\",\"%s\",\"%s\",%s,%s)", parameterName, parameterValue, table, resultClass, transaction));
-
-        List<T> result = new ArrayList<>();
-
-
-        ObjectMapper mapper = new ObjectMapper()
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-        Statement statement = null;
-        try {
-            statement = ((TransactionImpl) transaction).getConnection().createStatement();
-        } catch (SQLException e) {
-            logger.trace("EXCEPTION", e);
-            return null;
-        }
-
-        ResultSet rs = null;
-        try {
-            String query = String.format("SELECT * FROM %s WHERE (data " + prepareArrow(parameterName) + " %s)::text = '%s'", table, parameterName, parameterValue);
-            rs = statement.executeQuery(query);
-
-
-            while (rs.next()) {
-                String data = rs.getString("data");
-                result.add(mapper.readValue(data, resultClass));
-
-                deleteItemByParameter(parameterName, parameterValue, table, transaction);
+    public static <T extends Serializable> T getItem(String table, Class<T> resultClass, Transaction transaction) {
+        return getItem(table, new TypeReference<T>() {
+            @Override
+            public Type getType() {
+                return resultClass;
             }
-        } catch (SQLException | IOException e) {
-            result = null;
-            logger.trace("EXCEPTION", e);
-        }
-
-        try {
-            statement.close();
-        } catch (SQLException e) {
-            logger.trace("EXCEPTION", e);
-        }
-
-        return result;
+        }, transaction);
     }
+
 
     /**
      * get one items by the id of the JSON (read + delete)
@@ -394,8 +362,29 @@ public class ServiceUtil {
      * @return The list of items if successful (may be of size 0), null if unsuccessful
      */
     public static <T extends Serializable> T getItemById(String id, String table, Class<T> resultClass, Transaction transaction) {
-        return getItemByParameter("'id'", id, table, resultClass, transaction);
+        return getItemByParameter("'id'", id, table, new TypeReference<T>() {
+            @Override
+            public Type getType() {
+                return resultClass;
+            }
+        }, transaction);
     }
+
+
+    /**
+     * get one items by the id of the JSON (read + delete)
+     * @param id the id of the JSON
+     * @param table the name of the table
+     * @param resultClass the expected class of the result
+     * @param transaction the transaction
+     * @param <T> type
+     * @return The list of items if successful (may be of size 0), null if unsuccessful
+     */
+    public static <T extends Serializable> T getItemById(String id, String table, TypeReference typeReference, Transaction transaction) {
+        return getItemByParameter("'id'", id, table, typeReference, transaction);
+    }
+
+
 
 
     /**

@@ -1,13 +1,11 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.postgres.robots;
 
-import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.PackingServiceImpl;
-import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.ResearchServiceImpl;
-import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.TransactionServiceImpl;
+import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.*;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PackRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Exitable;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.OrderService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ResearchService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
-import at.ac.tuwien.complang.vpsbcm.robnur.postgres.service.MarketServiceImpl;
 import org.apache.log4j.Logger;
 
 import java.net.URISyntaxException;
@@ -31,6 +29,7 @@ public class PostgresPackRobot {
         MarketServiceImpl marketService = new MarketServiceImpl();
         ResearchService researchService = new ResearchServiceImpl();
         TransactionService transactionService = new TransactionServiceImpl();
+        OrderService orderService = new OrderServiceImpl();
 
         exitables.add(packingService);
         exitables.add(marketService);
