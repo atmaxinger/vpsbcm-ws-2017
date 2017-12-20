@@ -59,7 +59,7 @@ public class MarketController {
         tcBasketId.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getId()));
         tcType.setCellValueFactory(column -> new ReadOnlyStringWrapper(getType(column.getValue())));
 
-        tcPackRobot.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getPackingRobotId()));
+        tcPackRobot.setCellValueFactory(column -> new ReadOnlyStringWrapper(column.getValue().getPackingRobotIdsAsString()));
 
         tcInfo.setCellValueFactory(column -> {
             Button btn = new Button("Infos");

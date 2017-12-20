@@ -58,4 +58,8 @@ public abstract class OrderService {
     public abstract List<Order<VegetableType,Vegetable>> readAllOrdersForVegetables(Transaction transaction);
 
     public abstract List<Order<FlowerType,Flower>> readAllOrdersForFlowers(Transaction transaction);
+
+    public abstract void updateVegetableBasketOrderStatus(String id, Order.OrderStatus orderStatus);
+
+    public abstract void updateBouquetOrderStatus(String id, Order.OrderStatus orderStatus);
 }

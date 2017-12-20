@@ -301,11 +301,13 @@ public class PackRobot extends Robot {
     private void tryFulfilVegetableBasketOrder() {
 
         Transaction transaction = transactionService.beginTransaction(-1);
-        List<Order<VegetableType,Vegetable>> orders = new ArrayList<>();
+        List<String> alreadyCheckedOrderIds = new ArrayList<>();
 
         Order<VegetableType,Vegetable> currentOrder = orderService.getNextVegetableBasketOrder(Order.OrderStatus.PLACED,transaction);
 
-        while(currentOrder != null) {
+        while(currentOrder != null && !alreadyCheckedOrderIds.contains(currentOrder.getId())) {
+
+            alreadyCheckedOrderIds.add(currentOrder.getId());
 
             for (VegetableType type : VegetableType.values()) {
 
@@ -320,37 +322,63 @@ public class PackRobot extends Robot {
 
                     // add vegetable to order
                     currentOrder.setAlreadyAcquiredItem(vegetable, VegetableType.valueOf(vegetable.getParentVegetablePlant().getTypeName()));
-                    logger.info(String.format("PackRobot %s: added vegetable (%s) to order (%s)",getId(),vegetable.getId(),currentOrder.getId()));
+                    currentOrder.addPackRobotId(this.getId());
+                    logger.info(String.format("PackRobot %s: added vegetable (%s) to order (%s)", getId(), vegetable.getId(), currentOrder.getId()));
                 }
             }
 
-            orders.add(currentOrder);
+            if (currentOrder.getOrderStatus() == Order.OrderStatus.PACKED) {
+                // create vegetable basket
+                VegetableBasket vegetableBasket = new VegetableBasket();
+                vegetableBasket.setVegetables(currentOrder.getAlreadyAcquiredItems());
+                vegetableBasket.setDeliveryRobotId(getId());
+                vegetableBasket.setPackingRobotIds(currentOrder.getPackRobotIds());
+
+
+                waitPackingTime();
+
+                orderService.placeOrderForVegetableBasket(currentOrder, transaction);
+
+                transaction.commit();
+
+                // deliver order
+                logger.info(String.format("PackRobot %s: start delivering vegetable basket (%s)", getId(), vegetableBasket.getId()));
+
+                waitOneWayToDeliveryTime();
+
+                // deliver order and check if delivery was successful
+                if(orderService.deliverVegetableBasket(vegetableBasket, currentOrder.getAddress())){
+                    orderService.updateVegetableBasketOrderStatus(currentOrder.getId(), Order.OrderStatus.PAID);
+                    logger.info(String.format("PackRobot %s: delivered vegetable basket (%s)", getId(), vegetableBasket.getId()));
+
+                }else {
+                    orderService.updateVegetableBasketOrderStatus(currentOrder.getId(), Order.OrderStatus.UNABLE_TO_DELIVER);
+                    logger.info(String.format("PackRobot %s: unable to deliver vegetable basket (%s)", getId(), vegetableBasket.getId()));
+                }
+
+                waitOneWayToDeliveryTime();
+
+                logger.info(String.format("PackRobot %s: returned from delivery", getId()));
+            }
+            else {
+                orderService.placeOrderForVegetableBasket(currentOrder, transaction);
+                transaction.commit();
+            }
+
             currentOrder = orderService.getNextVegetableBasketOrder(Order.OrderStatus.PLACED,transaction);
         }
-
-        for (Order o:orders) {
-            orderService.placeOrderForVegetableBasket(o,transaction);
-            if(o.getOrderStatus() == Order.OrderStatus.PACKED){
-                VegetableBasket vegetableBasket = new VegetableBasket();
-                vegetableBasket.setVegetables(o.getAlreadyAcquiredItems());
-                vegetableBasket.setDeliveryRobotId(getId());
-
-                orderService.deliverVegetableBasket(vegetableBasket,o.getAddress());
-                logger.info(String.format("PackRobot %s: delivered vegetable basket (%s)",getId(),vegetableBasket.getId()));
-            }
-        }
-
-        transaction.commit();
     }
 
     private void tryFulfilBouquetOrder() {
 
         Transaction transaction = transactionService.beginTransaction(-1);
-        List<Order<FlowerType,Flower>> orders = new ArrayList<>();
+        List<String> alreadyCheckedOrderIds = new ArrayList<>();
 
         Order<FlowerType,Flower> currentOrder = orderService.getNextBouquetOrder(Order.OrderStatus.PLACED,transaction);
 
-        while(currentOrder != null) {
+        while(currentOrder != null && !alreadyCheckedOrderIds.contains(currentOrder.getId())) {
+
+            alreadyCheckedOrderIds.add(currentOrder.getId());
 
             for (FlowerType type : FlowerType.values()) {
 
@@ -365,29 +393,50 @@ public class PackRobot extends Robot {
 
                     // add flower to order
                     currentOrder.setAlreadyAcquiredItem(flower, FlowerType.valueOf(flower.getParentFlowerPlant().getTypeName()));
-                    logger.info(String.format("PackRobot %s: added flower (%s) to order (%s)",getId(),flower.getId(),currentOrder.getId()));
+                    currentOrder.addPackRobotId(this.getId());
+                    logger.info(String.format("PackRobot %s: added flower (%s) to order (%s)", getId(), flower.getId(), currentOrder.getId()));
                 }
             }
 
-            orders.add(currentOrder);
+            if (currentOrder.getOrderStatus() == Order.OrderStatus.PACKED) {
+                // create bouquet basket
+                Bouquet bouquet = new Bouquet();
+                bouquet.setFlowers(currentOrder.getAlreadyAcquiredItems());
+                bouquet.setDeliveryRobotId(getId());
+                bouquet.setPackingRobotIds(currentOrder.getPackRobotIds());
+
+                waitPackingTime();
+
+                orderService.placeOrderForBouquet(currentOrder, transaction);
+
+                transaction.commit();
+
+                // deliver order
+                logger.info(String.format("PackRobot %s: start delivering bouquet (%s)", getId(), bouquet.getId()));
+
+                waitOneWayToDeliveryTime();
+
+                // deliver order and check if delivery was successful
+                if(orderService.deliverBouquet(bouquet, currentOrder.getAddress())){
+                    orderService.updateBouquetOrderStatus(currentOrder.getId(), Order.OrderStatus.PAID);
+                    logger.info(String.format("PackRobot %s: delivered bouquet (%s)", getId(), bouquet.getId()));
+
+                }else {
+                    orderService.updateBouquetOrderStatus(currentOrder.getId(), Order.OrderStatus.UNABLE_TO_DELIVER);
+                    logger.info(String.format("PackRobot %s: unable to deliver bouquet (%s)", getId(), bouquet.getId()));
+                }
+
+                waitOneWayToDeliveryTime();
+
+                logger.info(String.format("PackRobot %s: returned from delivery", getId()));
+            }
+            else {
+                orderService.placeOrderForBouquet(currentOrder, transaction);
+                transaction.commit();
+            }
+
             currentOrder = orderService.getNextBouquetOrder(Order.OrderStatus.PLACED,transaction);
         }
-
-
-        for (Order o:orders) {
-            orderService.placeOrderForBouquet(o,transaction);
-            if(o.getOrderStatus() == Order.OrderStatus.PACKED){
-                Bouquet bouquet = new Bouquet();
-                bouquet.setFlowers(o.getAlreadyAcquiredItems());
-                bouquet.setDeliveryRobotId(getId());
-
-                orderService.deliverBouquet(bouquet,o.getAddress());
-
-                logger.info(String.format("PackRobot %s: delivered bouquet (%s)",getId(),bouquet.getId()));
-            }
-        }
-
-        transaction.commit();
     }
 
     List<Vegetable> getVegetablesOfSameType(VegetableType vegetableType, List<Vegetable> vegetables) {
@@ -438,6 +487,14 @@ public class PackRobot extends Robot {
             Thread.sleep(waitTime);
         } catch (InterruptedException e) {
             logger.trace("EXCEPTION", e);
+        }
+    }
+
+    private void waitOneWayToDeliveryTime(){
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

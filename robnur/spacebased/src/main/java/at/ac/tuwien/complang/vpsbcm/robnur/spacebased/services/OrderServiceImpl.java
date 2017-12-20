@@ -40,11 +40,33 @@ public class OrderServiceImpl extends OrderService {
             notificationManager.createNotification(flowerOrderContainer, (notification, operation, list) -> notifyFlowerOrdersChanged(), Operation.WRITE, Operation.TAKE, Operation.DELETE);
             notificationManager.createNotification(vegetableOrderContainer, (notification, operation, list) -> notifiyVegetableOrdersChanged(), Operation.WRITE, Operation.TAKE, Operation.DELETE);
 
+            notificationManager.createNotification(flowerOrderContainer, (notification, operation, list) -> notifyCanPlaceOrderChanged(false), Operation.WRITE, Operation.TAKE, Operation.DELETE);
+            notificationManager.createNotification(vegetableOrderContainer, (notification, operation, list) -> notifyCanPlaceOrderChanged(false), Operation.WRITE, Operation.TAKE, Operation.DELETE);
         } catch (MzsCoreException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public boolean canPlaceOrder(String address) {
+        ComparableProperty addressProperty = ComparableProperty.forName("address");
+        ComparableProperty orderStatusProperty = ComparableProperty.forName("orderStatus");
+
+        Matchmaker matchmaker = Matchmakers.and(addressProperty.equalTo(addressProperty),Matchmakers.or(orderStatusProperty.equalTo(Order.OrderStatus.PLACED), orderStatusProperty.equalTo(Order.OrderStatus.PACKED)));
+        Query query = new Query().filter(addressProperty.equalTo(address)).filter(matchmaker);
+        Selector selector = QueryCoordinator.newSelector(query, 1);
+
+        List<Order<FlowerType,Flower>> result = ServiceUtil.readAllItems(flowerOrderContainer,selector,null,capi);
+        if (result == null || result.isEmpty()){
+            result = ServiceUtil.readAllItems(vegetableOrderContainer,selector,null,capi);
+            if (result == null || result.isEmpty()){
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
@@ -129,5 +151,19 @@ public class OrderServiceImpl extends OrderService {
     @Override
     public List<Order<FlowerType,Flower>> readAllOrdersForFlowers(Transaction transaction) {
         return ServiceUtil.readAllItems(flowerOrderContainer,transaction,capi);
+    }
+
+    @Override
+    public void updateVegetableBasketOrderStatus(String id, Order.OrderStatus orderStatus) {
+        Order order = ServiceUtil.getItemById(id,vegetableOrderContainer,null,capi);
+        order.setOrderStatus(orderStatus);
+        ServiceUtil.writeItem(order,vegetableOrderContainer,null,capi);
+    }
+
+    @Override
+    public void updateBouquetOrderStatus(String id, Order.OrderStatus orderStatus) {
+        Order order = ServiceUtil.getItemById(id,flowerOrderContainer,null,capi);
+        order.setOrderStatus(orderStatus);
+        ServiceUtil.writeItem(order,flowerOrderContainer,null,capi);
     }
 }

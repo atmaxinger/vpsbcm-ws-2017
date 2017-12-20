@@ -41,7 +41,7 @@ public class VegetableDeliveryController {
         tcIndex.setCellValueFactory(column-> new ReadOnlyObjectWrapper<>(column.getTableView().getItems().indexOf(column.getValue())+1));
 
         tcVegetableBasketId.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getId()));
-        tcPackRobot.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getPackingRobotId()));
+        tcPackRobot.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getPackingRobotIdsAsString()));
         tcDeliveryRobot.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getDeliveryRobotId()));
         tcActions.setCellValueFactory(p -> {
             Button btn = new Button();

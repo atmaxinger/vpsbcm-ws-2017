@@ -2,13 +2,14 @@ package at.ac.tuwien.complang.vpsbcm.robnur.shared;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Idable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Plant;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PackRobot;
 
 import java.util.*;
 
 public class Order<E extends Enum<E>,P> extends Idable {
 
     public enum OrderStatus {
-        PLACED, PACKED, PAID
+        PLACED, PACKED, UNABLE_TO_DELIVER, PAID
     }
 
     private OrderStatus orderStatus = OrderStatus.PLACED;
@@ -16,6 +17,7 @@ public class Order<E extends Enum<E>,P> extends Idable {
     private String address;
     private HashMap<E, Integer> missingItems = new HashMap<>();
     private List<P> alreadyAcquiredItems = new LinkedList<>();
+    private List<String> packRobotIds = new ArrayList<>();
 
     public Order() {
         timestamp = (new Date()).getTime();
@@ -67,5 +69,13 @@ public class Order<E extends Enum<E>,P> extends Idable {
 
     public List<P> getAlreadyAcquiredItems() {
         return alreadyAcquiredItems;
+    }
+
+    public List<String> getPackRobotIds() {
+        return packRobotIds;
+    }
+
+    public void addPackRobotId(String packRobotId) {
+        this.packRobotIds.add(packRobotId);
     }
 }

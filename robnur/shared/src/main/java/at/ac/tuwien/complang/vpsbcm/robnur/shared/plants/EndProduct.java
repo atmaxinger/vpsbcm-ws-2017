@@ -1,18 +1,40 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.plants;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class EndProduct extends Idable implements Serializable{
-    private String packingRobotId;
+    private List<String> packingRobotIds = new ArrayList<>();
     private String deliveryRobotId;
 
-    public String getPackingRobotId() {
-        return packingRobotId;
+    private String formatList(List<String> list) {
+        String s="";
+
+        for(int i=0; i<list.size(); i++) {
+            s += list.get(i);
+            if(i < list.size()-1) {
+                s += ", ";
+            }
+        }
+
+        return s;
+    }
+
+    public String getPackingRobotIdsAsString() {
+        return formatList(packingRobotIds);
+    }
+
+    public List<String> getPackingRobotIds() {
+        return packingRobotIds;
     }
 
     public void setPackingRobotId(String packingRobotId) {
-        this.packingRobotId = packingRobotId;
+        packingRobotIds.add(packingRobotId);
+    }
+
+    public void setPackingRobotIds(List<String> packingRobotIds) {
+        this.packingRobotIds.addAll(packingRobotIds);
     }
 
     public String getDeliveryRobotId() {
