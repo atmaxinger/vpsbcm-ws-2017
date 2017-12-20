@@ -9,6 +9,7 @@ public abstract class OrderService {
 
     private StorageService.Callback<List<Order<VegetableType,Vegetable>>> vegetableOrdersChanged;
     private StorageService.Callback<List<Order<FlowerType,Flower>>> flowerOrdersChanged;
+    private StorageService.Callback<Boolean> canPlaceOrderChanged;
 
     protected void notifiyVegetableOrdersChanged() {
         if(vegetableOrdersChanged != null) {
@@ -22,6 +23,12 @@ public abstract class OrderService {
         }
     }
 
+    protected void notifyCanPlaceOrderChanged(boolean canPlaceOrder) {
+        if(canPlaceOrderChanged != null) {
+            canPlaceOrderChanged.handle(canPlaceOrder);
+        }
+    }
+
     public void onVegetableOrdersChanged(StorageService.Callback<List<Order<VegetableType,Vegetable>>> vegetableOrdersChanged) {
         this.vegetableOrdersChanged = vegetableOrdersChanged;
     }
@@ -29,6 +36,12 @@ public abstract class OrderService {
     public void onFlowerOrdersChanged(StorageService.Callback<List<Order<FlowerType,Flower>>> flowerOrdersChanged) {
         this.flowerOrdersChanged = flowerOrdersChanged;
     }
+
+    public void onCanPlaceOrderChanged(StorageService.Callback<Boolean> canPlaceOrderChanged) {
+        this.canPlaceOrderChanged = canPlaceOrderChanged;
+    }
+
+    public abstract boolean canPlaceOrder(String address);
 
     public abstract boolean placeOrderForVegetableBasket(Order<VegetableType,Vegetable> order, Transaction transaction);
 
