@@ -42,6 +42,8 @@ public class InitDb {
 
         createTables(StorageServiceImpl.getTables());
         createNotifyFunction(StorageServiceImpl.getTables());
+
+        createTables(OrderServiceImpl.getTables());
         
         createWaterTrigger("sw");
 

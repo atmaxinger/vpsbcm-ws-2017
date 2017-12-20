@@ -1,7 +1,6 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.postgres.service;
 
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Flower;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PackRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.PackingService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
@@ -91,6 +90,16 @@ public class PackingServiceImpl extends PackingService {
             return ServiceUtil.readAllItems(PACKING_VEGETABLE_TABLE,Vegetable.class);
         }
         return ServiceUtil.readAllItems(PACKING_VEGETABLE_TABLE,Vegetable.class,transaction);
+    }
+
+    @Override
+    public Vegetable getVegetableByType(VegetableType type, Transaction transaction) {
+        return ServiceUtil.getItemByParameter("'cultivationInformation'->>'vegetableType'",type.name(),PACKING_VEGETABLE_TABLE,Vegetable.class,transaction);
+    }
+
+    @Override
+    public Flower getFlowerByType(FlowerType type, Transaction transaction) {
+        return ServiceUtil.getItemByParameter("'cultivationInformation'->>'flowerType'",type.name(),PACKING_FLOWER_TABLE,Flower.class,transaction);
     }
 
     public static List<String> getTables() {
