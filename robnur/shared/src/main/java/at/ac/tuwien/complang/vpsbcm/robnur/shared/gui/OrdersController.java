@@ -23,16 +23,33 @@ public class OrdersController {
     public TableColumn<Order<VegetableType, Vegetable>, String> tcVegetablesAddress;
     public TableColumn<Order<VegetableType, Vegetable>, HBox> tcVegetablesActions;
     public TableColumn<Order<VegetableType, Vegetable>, String> tcVegetablesStatus;
+    public TableColumn<Order<VegetableType, Vegetable>, String> tcVegetablesPackRobots;
+    public TableColumn<Order<VegetableType, Vegetable>, String> tcVegetablesDeliveryRobot;
 
     public TableView<Order<FlowerType, Flower>> tvFlowerOrders;
     public TableColumn<Order<FlowerType, Flower>, String> tcFlowersId;
     public TableColumn<Order<FlowerType, Flower>, String> tcFlowersAddress;
     public TableColumn<Order<FlowerType, Flower>, HBox> tcFlowersActions;
     public TableColumn<Order<FlowerType, Flower>, String> tcFlowersStatus;
+    public TableColumn<Order<FlowerType, Flower>, String> tcFlowersPackRobots;
+    public TableColumn<Order<FlowerType, Flower>, String> tcFlowersDeliveryRobot;
 
 
     private OrderService orderService = RobNurGUI.orderService;
     private ConfigService configService = RobNurGUI.configService;
+
+    private String formatList(List<String> list) {
+        String s="";
+
+        for(int i=0; i<list.size(); i++) {
+            s += list.get(i);
+            if(i < list.size()-1) {
+                s += ", ";
+            }
+        }
+
+        return s;
+    }
 
     @FXML
     public void initialize() {
@@ -64,6 +81,9 @@ public class OrdersController {
         tcVegetablesAddress.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getAddress()));
         tcVegetablesStatus.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getOrderStatus().name()));
 
+        tcVegetablesPackRobots.setCellValueFactory(p -> new ReadOnlyStringWrapper(""));
+        tcVegetablesDeliveryRobot.setCellValueFactory(p -> new ReadOnlyStringWrapper(""));
+
         tcVegetablesActions.setCellValueFactory(p -> {
             HBox hBox = new HBox();
 
@@ -83,12 +103,10 @@ public class OrdersController {
                 noc.showVegetableOrder(configService.readAllVegetablePlantCultivationInformation(null), p.getValue());
             });
 
-
             hBox.getChildren().addAll(btnShowReserved, btnShowInfo);
 
             return new ReadOnlyObjectWrapper<>(hBox);
         });
-
     }
 
     private void initFlowers() {
