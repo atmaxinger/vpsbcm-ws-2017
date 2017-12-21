@@ -11,6 +11,7 @@ import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -25,6 +26,7 @@ public class OrderServiceImpl extends OrderService {
     private ContainerReference newVegetableOrderContainer;
     private ContainerReference flowerOrderContainer;
     private ContainerReference vegetableOrderContainer;
+    private ContainerReference addressContainer;
     private NotificationManager notificationManager;
 
     public OrderServiceImpl(URI serverUri) {
@@ -40,6 +42,7 @@ public class OrderServiceImpl extends OrderService {
             newVegetableOrderContainer = CapiUtil.lookupOrCreateContainer("newVegetableOrderContainer", serverUri, coordinators, null, capi);
             flowerOrderContainer = CapiUtil.lookupOrCreateContainer("flowerOrderContainer", serverUri, coordinators, null, capi);
             vegetableOrderContainer = CapiUtil.lookupOrCreateContainer("vegetableOrderContainer", serverUri, coordinators, null, capi);
+            addressContainer = CapiUtil.lookupOrCreateContainer("addressContainer", serverUri, Arrays.asList(new LabelCoordinator(),new AnyCoordinator()), null, capi);
 
             notificationManager.createNotification(flowerOrderContainer, (notification, operation, list) -> notifyFlowerOrdersChanged(), Operation.WRITE, Operation.TAKE, Operation.DELETE);
             notificationManager.createNotification(vegetableOrderContainer, (notification, operation, list) -> notifiyVegetableOrdersChanged(), Operation.WRITE, Operation.TAKE, Operation.DELETE);
@@ -47,12 +50,8 @@ public class OrderServiceImpl extends OrderService {
             notificationManager.createNotification(newFlowerOrderContainer, (notification, operation, list) -> notifyNewFlowerOrdersChanged(), Operation.WRITE, Operation.TAKE, Operation.DELETE);
             notificationManager.createNotification(newVegetableOrderContainer, (notification, operation, list) -> notifiyNewVegetableOrdersChanged(), Operation.WRITE, Operation.TAKE, Operation.DELETE);
 
-            notificationManager.createNotification(flowerOrderContainer, (notification, operation, list) -> notifyCanPlaceOrderChanged(false), Operation.WRITE, Operation.TAKE, Operation.DELETE);
-            notificationManager.createNotification(vegetableOrderContainer, (notification, operation, list) -> notifyCanPlaceOrderChanged(false), Operation.WRITE, Operation.TAKE, Operation.DELETE);
 
-            notificationManager.createNotification(newFlowerOrderContainer, (notification, operation, list) -> notifyCanPlaceOrderChanged(false), Operation.WRITE, Operation.TAKE, Operation.DELETE);
-            notificationManager.createNotification(newVegetableOrderContainer, (notification, operation, list) -> notifyCanPlaceOrderChanged(false), Operation.WRITE, Operation.TAKE, Operation.DELETE);
-
+            notificationManager.createNotification(addressContainer, (notification, operation, list) -> notifyCanPlaceOrderChanged(false), Operation.WRITE, Operation.TAKE, Operation.DELETE);
         } catch (MzsCoreException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -62,7 +61,7 @@ public class OrderServiceImpl extends OrderService {
 
     @Override
     public boolean canPlaceOrder(String address) {
-        ComparableProperty addressProperty = ComparableProperty.forName("address");
+        /*ComparableProperty addressProperty = ComparableProperty.forName("address");
         ComparableProperty orderStatusProperty = ComparableProperty.forName("orderStatus");
 
         Matchmaker matchmaker = Matchmakers.and(addressProperty.equalTo(addressProperty),Matchmakers.or(orderStatusProperty.equalTo(Order.OrderStatus.PLACED), orderStatusProperty.equalTo(Order.OrderStatus.PACKED)));
@@ -81,16 +80,31 @@ public class OrderServiceImpl extends OrderService {
 
         logger.debug("--- canPlaceOrder result is " + result);
 
-        return false;
+        return false;*/
+
+       List<String> allAddresses = ServiceUtil.readAllItems(addressContainer,null,capi);
+       if(allAddresses != null){
+           for(String a : allAddresses) {
+               if(a.equals(address)) {
+                   return false;
+               }
+           }
+       }
+
+       return true;
     }
 
     @Override
     public boolean placeOrderForVegetableBasket(Order<VegetableType, Vegetable> order) {
+        ServiceUtil.writeItem(new Entry(order.getAddress(), LabelCoordinator.newCoordinationData(order.getAddress())), addressContainer, null, capi);
+
         return ServiceUtil.writeItem(order,newVegetableOrderContainer,null,capi);
     }
 
     @Override
     public boolean placeOrderForBouquet(Order<FlowerType, Flower> order) {
+        ServiceUtil.writeItem(new Entry(order.getAddress(), LabelCoordinator.newCoordinationData(order.getAddress())), addressContainer, null, capi);
+
         return ServiceUtil.writeItem(order,flowerOrderContainer,null,capi);
     }
 
@@ -108,6 +122,7 @@ public class OrderServiceImpl extends OrderService {
     public boolean deliverVegetableBasket(VegetableBasket vegetableBasket, String address) {
         URI customerSpaceUri = URI.create(address);
         try {
+            ServiceUtil.getItem(LabelCoordinator.newSelector(address), addressContainer, null, capi);
             ContainerReference deliveryVegetableBasketContainer = CapiUtil.lookupOrCreateContainer("deliveryVegetableBasketContainer", customerSpaceUri, Collections.singletonList(new AnyCoordinator()), null, capi);
             ServiceUtil.writeItem(vegetableBasket,deliveryVegetableBasketContainer,null, capi);
             return true;
@@ -121,6 +136,7 @@ public class OrderServiceImpl extends OrderService {
     public boolean deliverBouquet(Bouquet bouquet, String address) {
         URI customerSpaceUri = URI.create(address);
         try {
+            ServiceUtil.getItem(LabelCoordinator.newSelector(address), addressContainer, null, capi);
             ContainerReference deliveryBouquetContainer = CapiUtil.lookupOrCreateContainer("deliveryBouquetContainer", customerSpaceUri, Collections.singletonList(new AnyCoordinator()), null, capi);
             ServiceUtil.writeItem(bouquet,deliveryBouquetContainer,null,capi);
             return true;
