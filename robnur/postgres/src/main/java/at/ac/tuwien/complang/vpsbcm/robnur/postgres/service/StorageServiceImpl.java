@@ -123,12 +123,32 @@ public class StorageServiceImpl extends StorageService {
             };
             accessWaterListener.start();
 
+
+            Listener flowerPesticideListener = new Listener(STORAGE_FLOWER_PESTICIDE_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    notifyFlowerPesticidesChanged(readAllFlowerPesticides(null));
+                }
+            };
+            flowerPesticideListener.start();
+
+            Listener vegetablePesticideListener = new Listener(STORAGE_VEGETABLE_PESTICIDE_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    notifyVegetablePesticidesChanged(readAllVegetablePesticides(null));
+                }
+            };
+            vegetablePesticideListener.start();
+
+
             listeners.add(flowerSeedListener);
             listeners.add(vegetableSeedListener);
             listeners.add(flowerFertilizerListener);
             listeners.add(vegetableSeedListener);
             listeners.add(soilListener);
             listeners.add(accessWaterListener);
+            listeners.add(flowerPesticideListener);
+            listeners.add(vegetablePesticideListener);
 
         } catch (SQLException e) {
             logger.trace("EXCEPTION", e);
