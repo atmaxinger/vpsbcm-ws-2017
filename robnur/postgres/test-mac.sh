@@ -1,6 +1,6 @@
 #!/bin/bash
 
-numberOfRobots=5
+numberOfRobots=3
 
 sh run-script-mac.sh "pwsh pg-gui.ps1"
 sh run-script-mac.sh "pwsh pg-monitoring.ps1"
@@ -21,4 +21,16 @@ done
 for i in $(seq 1 $numberOfRobots);
 do
     sh run-script-mac.sh "pwsh pg-research.ps1 -id $i"
+done
+
+# start foster robots
+for i in $(seq 1 $numberOfRobots);
+do
+sh run-script-mac.sh "pwsh pg-foster.ps1 -id $i"
+done
+
+# start customers
+for i in $(seq 1 $numberOfRobots);
+do
+sh run-script-mac.sh "pwsh pg-customer.ps1 -id $i"
 done
