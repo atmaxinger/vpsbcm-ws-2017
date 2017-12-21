@@ -15,8 +15,8 @@ import java.util.Properties;
 public class DeliveryStorageServiceImpl extends DeliveryStorageService {
     final static Logger logger = Logger.getLogger(MarketServiceImpl.class);
 
-    private static final String BOUQUET_DELIVERY_TABLE = "bd";
-    private static final String VEGETABLE_BASKET_DELIVERY_TABLE = "vbd";
+    public static final String BOUQUET_DELIVERY_TABLE = "bd";
+    public static final String VEGETABLE_BASKET_DELIVERY_TABLE = "vbd";
 
     private String connectionString;
 
@@ -26,7 +26,7 @@ public class DeliveryStorageServiceImpl extends DeliveryStorageService {
 
         try {
             Listener flowerListener = null;
-            flowerListener = new Listener(BOUQUET_DELIVERY_TABLE) {
+            flowerListener = new Listener(BOUQUET_DELIVERY_TABLE, connectionString) {
                 @Override
                 public void onNotify(int pid, DBMETHOD method) {
                     notifyBouqetsChanged();
@@ -34,7 +34,7 @@ public class DeliveryStorageServiceImpl extends DeliveryStorageService {
             };
             flowerListener.start();
 
-            Listener vegetableListener = new Listener(VEGETABLE_BASKET_DELIVERY_TABLE) {
+            Listener vegetableListener = new Listener(VEGETABLE_BASKET_DELIVERY_TABLE, connectionString) {
                 @Override
                 public void onNotify(int pid, DBMETHOD method) {
                     notifyVegetableBasketsChanged();
@@ -55,7 +55,7 @@ public class DeliveryStorageServiceImpl extends DeliveryStorageService {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        TransactionImpl transaction = new TransactionImpl(connection);
+        TransactionImpl transaction = new TransactionImpl(connection, "READ ALL DELIVERED VEGETABLE BASKETS");
 
         List<VegetableBasket> result = ServiceUtil.readAllItems(VEGETABLE_BASKET_DELIVERY_TABLE,VegetableBasket.class,transaction);
         transaction.commit();
@@ -70,7 +70,7 @@ public class DeliveryStorageServiceImpl extends DeliveryStorageService {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        TransactionImpl transaction = new TransactionImpl(connection);
+        TransactionImpl transaction = new TransactionImpl(connection, "READ ALL DELIVERED BOUQETS");
 
         List<Bouquet> result = ServiceUtil.readAllItems(BOUQUET_DELIVERY_TABLE,Bouquet.class,transaction);
         transaction.commit();

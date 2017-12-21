@@ -12,6 +12,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.OrderService;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 public class PostgresCustomerGUI {
 
@@ -33,6 +34,33 @@ public class PostgresCustomerGUI {
         statement.close();
     }
 
+    private static void createNotifyFunction(Connection connection) throws SQLException {
+        for (String table : DeliveryStorageServiceImpl.getTables()) {
+            Statement statement = connection.createStatement();
+
+            statement.execute(
+                    String.format(
+                            "CREATE OR REPLACE FUNCTION %s_function() RETURNS TRIGGER AS $$" +
+                                    "        BEGIN" +
+                                    "        PERFORM pg_notify('%s_notify', TG_OP);" +
+                                    "        RETURN NULL;" +
+                                    "        END; " +
+                                    "$$ LANGUAGE plpgsql;"
+                            , table, table)
+            );
+
+            statement.execute(
+                    String.format(
+                            "CREATE TRIGGER %s_trigger " +
+                                    "AFTER INSERT OR DELETE ON %s " +
+                                    "FOR EACH ROW EXECUTE PROCEDURE %s_function();"
+                            , table, table, table));
+
+            statement.close();
+
+        }
+    }
+
     public static void main(String[] args) throws SQLException {
         if(args.length == 0) {
             System.err.println("You need to specify the id");
@@ -51,7 +79,7 @@ public class PostgresCustomerGUI {
 
         createDb(PostgresHelper.getConnectionForUrl(urlForCreation), database);
         createTables(PostgresHelper.getConnectionForUrl(url));
-
+        createNotifyFunction(PostgresHelper.getConnectionForUrl(url));
 
 
         ConfigService configService = new ConfigServiceImpl();

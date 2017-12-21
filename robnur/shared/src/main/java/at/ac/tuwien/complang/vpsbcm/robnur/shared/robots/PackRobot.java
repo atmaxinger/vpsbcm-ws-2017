@@ -299,24 +299,28 @@ public class PackRobot extends Robot {
     }
 
     private void tryFulfilVegetableBasketOrder() {
+        logger.debug("tryFulfilVegetableBasketOrder()");
 
-        Transaction transaction = transactionService.beginTransaction(-1);
+        Transaction transaction = transactionService.beginTransaction(-1, "tryFulfillVegetableBasketOrder");
         List<String> alreadyCheckedOrderIds = new ArrayList<>();
 
         Order<VegetableType,Vegetable> currentOrder = orderService.getNextVegetableBasketOrder(Order.OrderStatus.PLACED,transaction);
 
         while(currentOrder != null && !alreadyCheckedOrderIds.contains(currentOrder.getId())) {
+            logger.debug("tryFulfilVegetableBasketOrder - got order to work on (Status: " + currentOrder.getOrderStatus() + ") - " + currentOrder.getId());
 
             alreadyCheckedOrderIds.add(currentOrder.getId());
 
             for (VegetableType type : VegetableType.values()) {
 
                 while (currentOrder.getMissingItems().get(type) != null && currentOrder.getMissingItems().get(type) > 0) {
+                    logger.debug("tryFulfilVegetableBasketOrder - working on missing item " + type);
 
                     Vegetable vegetable = packingService.getVegetableByType(type, transaction);
 
                     // check if there is an appropriate vegetable
                     if (vegetable == null) {
+                        logger.debug("tryFulfilVegetableBasketOrder - no appropriate vegetable");
                         break;
                     }
 
@@ -361,16 +365,23 @@ public class PackRobot extends Robot {
                 logger.info(String.format("PackRobot %s: returned from delivery", getId()));
             }
             else {
+                logger.debug("tryFulfilVegetableBasketOrder - writing back order");
                 orderService.placeOrderForVegetableBasket(currentOrder, transaction);
                 transaction.commit();
             }
 
-            transaction = transactionService.beginTransaction(-1);
+            transaction = transactionService.beginTransaction(-1, "tryFulfillVegetableBasketOrder in loop");
             currentOrder = orderService.getNextVegetableBasketOrder(Order.OrderStatus.PLACED,transaction);
         }
+
+        // if we are here we either did not get any order or we got an order we already worked on --> rollback
+        transaction.rollback();
+
+        logger.debug("tryFulfilVegetableBasketOrder - fin");
     }
 
     private void tryFulfilBouquetOrder() {
+        logger.debug("tryFulfilBouquetOrder()");
 
         Transaction transaction = transactionService.beginTransaction(-1);
         List<String> alreadyCheckedOrderIds = new ArrayList<>();
@@ -378,12 +389,14 @@ public class PackRobot extends Robot {
         Order<FlowerType,Flower> currentOrder = orderService.getNextBouquetOrder(Order.OrderStatus.PLACED,transaction);
 
         while(currentOrder != null && !alreadyCheckedOrderIds.contains(currentOrder.getId())) {
+            logger.debug("tryFulfilBouquetOrder - got order to work on (Status: " + currentOrder.getOrderStatus() + ") - " + currentOrder.getId());
 
             alreadyCheckedOrderIds.add(currentOrder.getId());
 
             for (FlowerType type : FlowerType.values()) {
 
                 while (currentOrder.getMissingItems().get(type) != null && currentOrder.getMissingItems().get(type) > 0) {
+                    logger.debug("tryFulfilBouqetOrder - working on missing item " + type);
 
                     Flower flower = packingService.getFlowerByType(type, transaction);
 
@@ -439,6 +452,10 @@ public class PackRobot extends Robot {
             transaction = transactionService.beginTransaction(-1);
             currentOrder = orderService.getNextBouquetOrder(Order.OrderStatus.PLACED,transaction);
         }
+
+        // if we are here we either did not get any order or we got an order we already worked on --> rollback
+        transaction.rollback();
+        logger.debug("tryFulfilBouquetOrder - fin");
     }
 
     List<Vegetable> getVegetablesOfSameType(VegetableType vegetableType, List<Vegetable> vegetables) {

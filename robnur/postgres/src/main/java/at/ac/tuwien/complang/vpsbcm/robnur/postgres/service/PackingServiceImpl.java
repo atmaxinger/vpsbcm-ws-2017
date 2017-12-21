@@ -94,12 +94,12 @@ public class PackingServiceImpl extends PackingService {
 
     @Override
     public Vegetable getVegetableByType(VegetableType type, Transaction transaction) {
-        return ServiceUtil.getItemByParameter("'cultivationInformation'->>'vegetableType'",type.name(),PACKING_VEGETABLE_TABLE,Vegetable.class,transaction);
+        return ServiceUtil.getItemByParameter("'parentPlant'->'cultivationInformation'->>'vegetableType'",type.name(),PACKING_VEGETABLE_TABLE,Vegetable.class,transaction);
     }
 
     @Override
     public Flower getFlowerByType(FlowerType type, Transaction transaction) {
-        return ServiceUtil.getItemByParameter("'cultivationInformation'->>'flowerType'",type.name(),PACKING_FLOWER_TABLE,Flower.class,transaction);
+        return ServiceUtil.getItemByParameter("'parentPlant'->'cultivationInformation'->>'flowerType'",type.name(),PACKING_FLOWER_TABLE,Flower.class,transaction);
     }
 
     public static List<String> getTables() {

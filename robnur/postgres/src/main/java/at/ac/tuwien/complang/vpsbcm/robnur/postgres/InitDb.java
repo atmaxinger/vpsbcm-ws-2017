@@ -44,6 +44,7 @@ public class InitDb {
         createNotifyFunction(StorageServiceImpl.getTables());
 
         createTables(OrderServiceImpl.getTables());
+        createNotifyFunction(OrderServiceImpl.getTables());
         
         createWaterTrigger("sw");
 
@@ -104,7 +105,7 @@ public class InitDb {
                 statement.execute(
                         String.format(
                         "CREATE TRIGGER %s_trigger " +
-                                "AFTER INSERT OR DELETE ON %s " +
+                                "AFTER INSERT OR DELETE OR UPDATE ON %s " +
                                 "FOR EACH ROW EXECUTE PROCEDURE %s_function();"
                         , table, table, table));
 

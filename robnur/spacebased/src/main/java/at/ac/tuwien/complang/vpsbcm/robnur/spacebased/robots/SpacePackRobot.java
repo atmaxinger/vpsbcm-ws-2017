@@ -39,6 +39,14 @@ public class SpacePackRobot {
         PackRobot packRobot = new PackRobot(args[0], packingService,marketService,researchService,orderService,transactionService);
         packingService.registerPackRobot(packRobot);
 
+        orderService.onFlowerOrdersChanged(p -> {
+            packRobot.tryCreateBouquet();
+        });
+
+        orderService.onVegetableOrdersChanged(p -> {
+            packRobot.tryCreateVegetableBasket();
+        });
+
         exitables.add(packingService);
         exitables.add(marketService);
         exitables.add(researchService);

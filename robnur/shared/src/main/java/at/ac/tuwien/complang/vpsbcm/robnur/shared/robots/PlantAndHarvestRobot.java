@@ -9,7 +9,6 @@ import java.util.*;
 public class PlantAndHarvestRobot extends Robot {
 
     final static Logger logger = Logger.getLogger(PlantAndHarvestRobot.class);
-    private HashMap<String, Integer> plantCount = new HashMap<>();
     private StorageService storageService;
     private GreenhouseService greenhouseService;
     private TransactionService transactionService;
@@ -51,6 +50,8 @@ public class PlantAndHarvestRobot extends Robot {
             return;
         }
 
+        logger.debug("tryThrowAwayPlants()");
+
         tryThrowAwayFlowers();
         tryThrowAwayVegetables();
     }
@@ -64,6 +65,9 @@ public class PlantAndHarvestRobot extends Robot {
             return;
         }
 
+        logger.debug("tryHarvestPlant()");
+
+
         tryHarvestFlower();
         tryHarvestVegetable();
     }
@@ -76,6 +80,8 @@ public class PlantAndHarvestRobot extends Robot {
             logger.info("you can quit me now...");
             return;
         }
+
+        logger.debug("tryPlant()");
 
         boolean hasPlantedSomething = false;
 

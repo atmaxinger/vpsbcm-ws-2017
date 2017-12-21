@@ -5,10 +5,14 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.OrderService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
 
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
 
@@ -48,11 +52,25 @@ public class OrderServiceImpl extends OrderService {
 
     @Override
     public boolean canPlaceOrder(String address) {
-        if(readAllOrdersForFlowers(null).size() >= 1){
-            return false;
-        } else if(readAllOrdersForVegetables(null).size() >= 1) {
-            return false;
+        List<Order<FlowerType, Flower>> allFlowerOrders = readAllOrdersForFlowers(null);
+        List<Order<VegetableType, Vegetable>> allVegetableOrders = readAllOrdersForVegetables(null);
+
+        for(Order o : allFlowerOrders) {
+            if(o.getOrderStatus() == Order.OrderStatus.PLACED || o.getOrderStatus() == Order.OrderStatus.PACKED) {
+                if(o.getAddress().equals(address)) {
+                    return false;
+                }
+            }
         }
+
+        for(Order o : allVegetableOrders) {
+            if(o.getOrderStatus() == Order.OrderStatus.PLACED || o.getOrderStatus() == Order.OrderStatus.PACKED) {
+                if(o.getAddress().equals(address)) {
+                    return false;
+                }
+            }
+        }
+
         return true;
     }
 
@@ -74,16 +92,20 @@ public class OrderServiceImpl extends OrderService {
 
     @Override
     public boolean deliverVegetableBasket(VegetableBasket vegetableBasket, String address) {
-        return ServiceUtil.writeItem(vegetableBasket,address);
+        return ServiceUtil.writeItemIntoForeignDb(vegetableBasket, address, DeliveryStorageServiceImpl.VEGETABLE_BASKET_DELIVERY_TABLE);
+
+
     }
 
     @Override
     public boolean deliverBouquet(Bouquet bouquet, String address) {
-        return ServiceUtil.writeItem(bouquet,address);
+        return ServiceUtil.writeItemIntoForeignDb(bouquet, address, DeliveryStorageServiceImpl.BOUQUET_DELIVERY_TABLE);
     }
 
     @Override
     public Order<VegetableType, Vegetable> getNextVegetableBasketOrder(Order.OrderStatus status, Transaction transaction) {
+        logger.debug("getNextVegetableBasketOrder()");
+
         TypeReference<Order<VegetableType, Vegetable>> typeReference = new TypeReference<Order<VegetableType, Vegetable>>() {
         };
         return ServiceUtil.getItemByParameter("'orderStatus'",status.name(),VEGETABLE_ORDER_TABLE, typeReference,transaction);
