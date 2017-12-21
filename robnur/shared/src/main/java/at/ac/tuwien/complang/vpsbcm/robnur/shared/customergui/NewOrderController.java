@@ -210,7 +210,7 @@ public class NewOrderController {
         });
 
         Optional<Order<VegetableType, Vegetable>> result = dialog.showAndWait();
-        result.ifPresent(order -> CustomerGUI.orderService.placeOrderForVegetableBasket(order, null));
+        result.ifPresent(order -> CustomerGUI.orderService.placeOrderForVegetableBasket(order));
     }
 
     public void showFlowerOrder(List<FlowerPlantCultivationInformation> fpci) {
@@ -282,7 +282,7 @@ public class NewOrderController {
         });
 
         Optional<Order<FlowerType, Flower>> result = dialog.showAndWait();
-        result.ifPresent(order -> CustomerGUI.orderService.placeOrderForBouquet(order, null));
+        result.ifPresent(order -> CustomerGUI.orderService.placeOrderForBouquet(order));
     }
 }
 

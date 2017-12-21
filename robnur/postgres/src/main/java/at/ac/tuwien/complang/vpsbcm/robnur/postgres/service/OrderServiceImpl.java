@@ -20,8 +20,11 @@ public class OrderServiceImpl extends OrderService {
 
     final static Logger logger = Logger.getLogger(MarketServiceImpl.class);
 
+    private static final String NEW_FLOWER_ORDER_TABLE = "nfot";
+    private static final String NEW_VEGETABLE_ORDER_TABLE = "nvot";
     private static final String FLOWER_ORDER_TABLE = "fot";
     private static final String VEGETABLE_ORDER_TABLE = "vot";
+
 
     public OrderServiceImpl() {
 
@@ -44,6 +47,27 @@ public class OrderServiceImpl extends OrderService {
                 }
             };
             vegetableListener.start();
+
+
+            Listener newFlowerListener = null;
+            newFlowerListener = new Listener(NEW_FLOWER_ORDER_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    notifyNewFlowerOrdersChanged();
+                    notifyCanPlaceOrderChanged(false);
+                }
+            };
+            newFlowerListener.start();
+
+            Listener newVegetableListener = new Listener(NEW_VEGETABLE_ORDER_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    notifiyNewVegetableOrdersChanged();
+                    notifyCanPlaceOrderChanged(false);
+                }
+            };
+            newVegetableListener.start();
+
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -75,7 +99,17 @@ public class OrderServiceImpl extends OrderService {
     }
 
     @Override
-    public boolean placeOrderForVegetableBasket(Order<VegetableType, Vegetable> order, Transaction transaction) {
+    public boolean placeOrderForVegetableBasket(Order<VegetableType, Vegetable> order) {
+        return ServiceUtil.writeItem(order,NEW_VEGETABLE_ORDER_TABLE);
+    }
+
+    @Override
+    public boolean placeOrderForBouquet(Order<FlowerType, Flower> order) {
+        return ServiceUtil.writeItem(order,NEW_FLOWER_ORDER_TABLE);
+    }
+
+    @Override
+    public boolean putVegetableBasketOrder(Order<VegetableType, Vegetable> order, Transaction transaction) {
         if(transaction == null) {
             return ServiceUtil.writeItem(order, VEGETABLE_ORDER_TABLE);
         }
@@ -83,7 +117,7 @@ public class OrderServiceImpl extends OrderService {
     }
 
     @Override
-    public boolean placeOrderForBouquet(Order<FlowerType, Flower> order, Transaction transaction) {
+    public boolean putBouquetOrder(Order<FlowerType, Flower> order, Transaction transaction) {
         if(transaction == null) {
             return ServiceUtil.writeItem(order, FLOWER_ORDER_TABLE);
         }
@@ -93,8 +127,6 @@ public class OrderServiceImpl extends OrderService {
     @Override
     public boolean deliverVegetableBasket(VegetableBasket vegetableBasket, String address) {
         return ServiceUtil.writeItemIntoForeignDb(vegetableBasket, address, DeliveryStorageServiceImpl.VEGETABLE_BASKET_DELIVERY_TABLE);
-
-
     }
 
     @Override
@@ -108,7 +140,13 @@ public class OrderServiceImpl extends OrderService {
 
         TypeReference<Order<VegetableType, Vegetable>> typeReference = new TypeReference<Order<VegetableType, Vegetable>>() {
         };
-        return ServiceUtil.getItemByParameter("'orderStatus'",status.name(),VEGETABLE_ORDER_TABLE, typeReference,transaction);
+        Order<VegetableType, Vegetable> result = ServiceUtil.getItemByParameter("'orderStatus'",status.name(),VEGETABLE_ORDER_TABLE, typeReference,transaction);
+
+        if(result == null){
+            result = ServiceUtil.getItemByParameter("'orderStatus'",status.name(),NEW_VEGETABLE_ORDER_TABLE, typeReference,transaction);
+        }
+
+        return result;
     }
 
     @Override
@@ -116,29 +154,50 @@ public class OrderServiceImpl extends OrderService {
         TypeReference<Order<FlowerType, Flower>> typeReference = new TypeReference<Order<FlowerType, Flower>>() {
         };
 
-        return ServiceUtil.getItemByParameter("'orderStatus'",status.name(),FLOWER_ORDER_TABLE, typeReference,transaction);
+        Order<FlowerType, Flower> result =  ServiceUtil.getItemByParameter("'orderStatus'",status.name(),FLOWER_ORDER_TABLE, typeReference,transaction);
+
+        if (result == null){
+            result = ServiceUtil.getItemByParameter("'orderStatus'",status.name(),NEW_FLOWER_ORDER_TABLE, typeReference,transaction);
+        }
+
+        return result;
     }
 
     @Override
     public List readAllOrdersForVegetables(Transaction transaction) {
+        List result;
         TypeReference<Order<VegetableType, Vegetable>> typeReference = new TypeReference<Order<VegetableType, Vegetable>>() {
         };
 
         if(transaction == null) {
-            return ServiceUtil.readAllItems(VEGETABLE_ORDER_TABLE,typeReference);
+            result = ServiceUtil.readAllItems(VEGETABLE_ORDER_TABLE,typeReference);
+            result.addAll(ServiceUtil.readAllItems(NEW_VEGETABLE_ORDER_TABLE,typeReference));
+
+            return result;
         }
-        return ServiceUtil.readAllItems(VEGETABLE_ORDER_TABLE, typeReference, transaction);
+
+        result = ServiceUtil.readAllItems(VEGETABLE_ORDER_TABLE,typeReference,transaction);
+        result.addAll(ServiceUtil.readAllItems(NEW_VEGETABLE_ORDER_TABLE,typeReference,transaction));
+
+        return result;
     }
 
     @Override
     public List readAllOrdersForFlowers(Transaction transaction) {
+        List result;
         TypeReference<Order<FlowerType, Flower>> typeReference = new TypeReference<Order<FlowerType, Flower>>() {
         };
 
         if(transaction == null) {
-            return ServiceUtil.readAllItems(FLOWER_ORDER_TABLE, typeReference);
+            result = ServiceUtil.readAllItems(FLOWER_ORDER_TABLE, typeReference);
+            result.addAll(ServiceUtil.readAllItems(NEW_FLOWER_ORDER_TABLE, typeReference));
+
+            return result;
         }
-        return ServiceUtil.readAllItems(FLOWER_ORDER_TABLE, typeReference, transaction);
+        result = ServiceUtil.readAllItems(FLOWER_ORDER_TABLE, typeReference,transaction);
+        result.addAll(ServiceUtil.readAllItems(NEW_FLOWER_ORDER_TABLE, typeReference,transaction));
+
+        return result;
     }
 
     @Override
@@ -173,6 +232,6 @@ public class OrderServiceImpl extends OrderService {
     }
 
     public static List<String> getTables() {
-        return Arrays.asList(FLOWER_ORDER_TABLE,VEGETABLE_ORDER_TABLE);
+        return Arrays.asList(NEW_FLOWER_ORDER_TABLE,NEW_VEGETABLE_ORDER_TABLE,FLOWER_ORDER_TABLE,VEGETABLE_ORDER_TABLE);
     }
 }

@@ -57,7 +57,7 @@ public class OrdersController {
         initFlowers();
     }
 
-    private void updateFlowersData(List<Order<FlowerType, Flower>> orders) {
+    private synchronized void updateFlowersData(List<Order<FlowerType, Flower>> orders) {
         ObservableList<Order<FlowerType, Flower>> obs = tvFlowerOrders.getItems();
         obs.clear();
         obs.addAll(orders);
@@ -65,7 +65,7 @@ public class OrdersController {
         tvFlowerOrders.refresh();
     }
 
-    private void updateVegetablesData(List<Order<VegetableType, Vegetable>> orders) {
+    private synchronized void updateVegetablesData(List<Order<VegetableType, Vegetable>> orders) {
         ObservableList<Order<VegetableType, Vegetable>> obs = tvVegetableOrders.getItems();
         obs.clear();
         obs.addAll(orders);
@@ -76,6 +76,7 @@ public class OrdersController {
     private void initVegetables() {
         updateVegetablesData(orderService.readAllOrdersForVegetables(null));
         orderService.onVegetableOrdersChanged(this::updateVegetablesData);
+        orderService.onNewVegetableOrdersChanged(this::updateVegetablesData);
 
         tcVegetablesId.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getId()));
         tcVegetablesAddress.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getAddress()));
@@ -112,6 +113,7 @@ public class OrdersController {
     private void initFlowers() {
         updateFlowersData(orderService.readAllOrdersForFlowers(null));
         orderService.onFlowerOrdersChanged(this::updateFlowersData);
+        orderService.onNewFlowerOrdersChanged(this::updateFlowersData);
 
         tcFlowersId.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getId()));
         tcFlowersAddress.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getAddress()));

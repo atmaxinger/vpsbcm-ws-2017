@@ -9,6 +9,8 @@ public abstract class OrderService {
 
     private StorageService.Callback<List<Order<VegetableType,Vegetable>>> vegetableOrdersChanged;
     private StorageService.Callback<List<Order<FlowerType,Flower>>> flowerOrdersChanged;
+    private StorageService.Callback<List<Order<VegetableType,Vegetable>>> newVegetableOrdersChanged;
+    private StorageService.Callback<List<Order<FlowerType,Flower>>> newFlowerOrdersChanged;
     private StorageService.Callback<Boolean> canPlaceOrderChanged;
 
     protected void notifiyVegetableOrdersChanged() {
@@ -22,6 +24,19 @@ public abstract class OrderService {
             flowerOrdersChanged.handle(readAllOrdersForFlowers(null));
         }
     }
+
+    protected void notifiyNewVegetableOrdersChanged() {
+        if(newVegetableOrdersChanged != null) {
+            newVegetableOrdersChanged.handle(readAllOrdersForVegetables(null));
+        }
+    }
+
+    protected void notifyNewFlowerOrdersChanged() {
+        if(newFlowerOrdersChanged != null) {
+            newFlowerOrdersChanged.handle(readAllOrdersForFlowers(null));
+        }
+    }
+
 
     protected void notifyCanPlaceOrderChanged(boolean canPlaceOrder) {
         if(canPlaceOrderChanged != null) {
@@ -37,15 +52,27 @@ public abstract class OrderService {
         this.flowerOrdersChanged = flowerOrdersChanged;
     }
 
+    public void onNewVegetableOrdersChanged(StorageService.Callback<List<Order<VegetableType,Vegetable>>> newVegetableOrdersChanged) {
+        this.newVegetableOrdersChanged = newVegetableOrdersChanged;
+    }
+
+    public void onNewFlowerOrdersChanged(StorageService.Callback<List<Order<FlowerType,Flower>>> newFlowerOrdersChanged) {
+        this.newFlowerOrdersChanged = newFlowerOrdersChanged;
+    }
+
     public void onCanPlaceOrderChanged(StorageService.Callback<Boolean> canPlaceOrderChanged) {
         this.canPlaceOrderChanged = canPlaceOrderChanged;
     }
 
     public abstract boolean canPlaceOrder(String address);
 
-    public abstract boolean placeOrderForVegetableBasket(Order<VegetableType,Vegetable> order, Transaction transaction);
+    public abstract boolean placeOrderForVegetableBasket(Order<VegetableType, Vegetable> order);
 
-    public abstract boolean placeOrderForBouquet(Order<FlowerType,Flower> order, Transaction transaction);
+    public abstract boolean placeOrderForBouquet(Order<FlowerType, Flower> order);
+
+    public abstract boolean putVegetableBasketOrder(Order<VegetableType, Vegetable> order, Transaction transaction);
+
+    public abstract boolean putBouquetOrder(Order<FlowerType, Flower> order, Transaction transaction);
 
     public abstract boolean deliverVegetableBasket(VegetableBasket vegetableBasket, String address);
 

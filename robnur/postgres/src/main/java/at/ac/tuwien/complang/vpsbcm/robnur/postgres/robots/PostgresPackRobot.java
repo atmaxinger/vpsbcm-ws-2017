@@ -38,11 +38,11 @@ public class PostgresPackRobot {
         PackRobot packRobot = new PackRobot(args[0], packingService,marketService,researchService, orderService, transactionService);
         packingService.registerPackRobot(packRobot);
 
-        orderService.onVegetableOrdersChanged(p -> {
+        orderService.onNewVegetableOrdersChanged(p -> {
             packRobot.tryCreateVegetableBasket();
         });
 
-        orderService.onFlowerOrdersChanged(p -> {
+        orderService.onNewFlowerOrdersChanged(p -> {
             packRobot.tryCreateBouquet();
         });
 

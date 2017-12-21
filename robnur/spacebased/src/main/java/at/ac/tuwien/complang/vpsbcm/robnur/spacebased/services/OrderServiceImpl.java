@@ -21,6 +21,8 @@ public class OrderServiceImpl extends OrderService {
 
     private MzsCore core;
     private Capi capi;
+    private ContainerReference newFlowerOrderContainer;
+    private ContainerReference newVegetableOrderContainer;
     private ContainerReference flowerOrderContainer;
     private ContainerReference vegetableOrderContainer;
     private NotificationManager notificationManager;
@@ -34,14 +36,23 @@ public class OrderServiceImpl extends OrderService {
         List<Coordinator> coordinators = Arrays.asList(new QueryCoordinator(), new AnyCoordinator());
 
         try {
+            newFlowerOrderContainer = CapiUtil.lookupOrCreateContainer("newFlowerOrderContainer", serverUri, coordinators, null, capi);
+            newVegetableOrderContainer = CapiUtil.lookupOrCreateContainer("newVegetableOrderContainer", serverUri, coordinators, null, capi);
             flowerOrderContainer = CapiUtil.lookupOrCreateContainer("flowerOrderContainer", serverUri, coordinators, null, capi);
             vegetableOrderContainer = CapiUtil.lookupOrCreateContainer("vegetableOrderContainer", serverUri, coordinators, null, capi);
 
             notificationManager.createNotification(flowerOrderContainer, (notification, operation, list) -> notifyFlowerOrdersChanged(), Operation.WRITE, Operation.TAKE, Operation.DELETE);
             notificationManager.createNotification(vegetableOrderContainer, (notification, operation, list) -> notifiyVegetableOrdersChanged(), Operation.WRITE, Operation.TAKE, Operation.DELETE);
 
+            notificationManager.createNotification(newFlowerOrderContainer, (notification, operation, list) -> notifyNewFlowerOrdersChanged(), Operation.WRITE, Operation.TAKE, Operation.DELETE);
+            notificationManager.createNotification(newVegetableOrderContainer, (notification, operation, list) -> notifiyNewVegetableOrdersChanged(), Operation.WRITE, Operation.TAKE, Operation.DELETE);
+
             notificationManager.createNotification(flowerOrderContainer, (notification, operation, list) -> notifyCanPlaceOrderChanged(false), Operation.WRITE, Operation.TAKE, Operation.DELETE);
             notificationManager.createNotification(vegetableOrderContainer, (notification, operation, list) -> notifyCanPlaceOrderChanged(false), Operation.WRITE, Operation.TAKE, Operation.DELETE);
+
+            notificationManager.createNotification(newFlowerOrderContainer, (notification, operation, list) -> notifyCanPlaceOrderChanged(false), Operation.WRITE, Operation.TAKE, Operation.DELETE);
+            notificationManager.createNotification(newVegetableOrderContainer, (notification, operation, list) -> notifyCanPlaceOrderChanged(false), Operation.WRITE, Operation.TAKE, Operation.DELETE);
+
         } catch (MzsCoreException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -60,22 +71,36 @@ public class OrderServiceImpl extends OrderService {
 
         List<Order<FlowerType,Flower>> result = ServiceUtil.readAllItems(flowerOrderContainer,selector,null,capi);
         if (result == null || result.isEmpty()){
+            logger.debug("canPlaceOrder result is " + result);
             result = ServiceUtil.readAllItems(vegetableOrderContainer,selector,null,capi);
             if (result == null || result.isEmpty()){
+                logger.debug("canPlaceOrder result is " + result);
                 return true;
             }
         }
+
+        logger.debug("--- canPlaceOrder result is " + result);
 
         return false;
     }
 
     @Override
-    public boolean placeOrderForVegetableBasket(Order<VegetableType,Vegetable> order, Transaction transaction) {
+    public boolean placeOrderForVegetableBasket(Order<VegetableType, Vegetable> order) {
+        return ServiceUtil.writeItem(order,newVegetableOrderContainer,null,capi);
+    }
+
+    @Override
+    public boolean placeOrderForBouquet(Order<FlowerType, Flower> order) {
+        return ServiceUtil.writeItem(order,flowerOrderContainer,null,capi);
+    }
+
+    @Override
+    public boolean putVegetableBasketOrder(Order<VegetableType, Vegetable> order, Transaction transaction) {
         return ServiceUtil.writeItem(order,vegetableOrderContainer,transaction,capi);
     }
 
     @Override
-    public boolean placeOrderForBouquet(Order<FlowerType,Flower> order, Transaction transaction) {
+    public boolean putBouquetOrder(Order<FlowerType, Flower> order, Transaction transaction) {
         return ServiceUtil.writeItem(order,flowerOrderContainer,transaction,capi);
     }
 
@@ -118,7 +143,10 @@ public class OrderServiceImpl extends OrderService {
         List<Order<VegetableType,Vegetable>> result = ServiceUtil.getAllItems(vegetableOrderContainer,selector,transaction,capi);
 
         if (result == null || result.isEmpty()){
-            return null;
+            result = ServiceUtil.getAllItems(newVegetableOrderContainer,selector,transaction,capi);
+            if (result == null || result.isEmpty()) {
+                return null;
+            }
         }
 
         return result.get(0);
@@ -137,7 +165,10 @@ public class OrderServiceImpl extends OrderService {
         List<Order<FlowerType,Flower>> result = ServiceUtil.getAllItems(flowerOrderContainer,selector,transaction,capi);
 
         if (result == null || result.isEmpty()){
-            return null;
+            result = ServiceUtil.getAllItems(flowerOrderContainer,selector,transaction,capi);
+            if (result == null || result.isEmpty()) {
+                return null;
+            }
         }
 
         return result.get(0);
@@ -145,12 +176,18 @@ public class OrderServiceImpl extends OrderService {
 
     @Override
     public List<Order<VegetableType,Vegetable>> readAllOrdersForVegetables(Transaction transaction) {
-        return ServiceUtil.readAllItems(vegetableOrderContainer,transaction,capi);
+        List result;
+        result = ServiceUtil.readAllItems(newVegetableOrderContainer,transaction,capi);
+        result.addAll(ServiceUtil.readAllItems(vegetableOrderContainer,transaction,capi));
+        return result;
     }
 
     @Override
     public List<Order<FlowerType,Flower>> readAllOrdersForFlowers(Transaction transaction) {
-        return ServiceUtil.readAllItems(flowerOrderContainer,transaction,capi);
+        List result;
+        result = ServiceUtil.readAllItems(newFlowerOrderContainer,transaction,capi);
+        result.addAll(ServiceUtil.readAllItems(flowerOrderContainer,transaction,capi));
+        return result;
     }
 
     @Override

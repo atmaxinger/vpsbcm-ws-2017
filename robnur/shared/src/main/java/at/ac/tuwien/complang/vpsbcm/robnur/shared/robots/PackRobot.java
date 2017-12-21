@@ -338,10 +338,9 @@ public class PackRobot extends Robot {
                 vegetableBasket.setDeliveryRobotId(getId());
                 vegetableBasket.setPackingRobotIds(currentOrder.getPackRobotIds());
 
-
                 waitPackingTime();
 
-                orderService.placeOrderForVegetableBasket(currentOrder, transaction);
+                orderService.putVegetableBasketOrder(currentOrder, transaction);
 
                 transaction.commit();
 
@@ -366,7 +365,7 @@ public class PackRobot extends Robot {
             }
             else {
                 logger.debug("tryFulfilVegetableBasketOrder - writing back order");
-                orderService.placeOrderForVegetableBasket(currentOrder, transaction);
+                orderService.putVegetableBasketOrder(currentOrder, transaction);
                 transaction.commit();
             }
 
@@ -421,7 +420,7 @@ public class PackRobot extends Robot {
 
                 waitPackingTime();
 
-                orderService.placeOrderForBouquet(currentOrder, transaction);
+                orderService.putBouquetOrder(currentOrder, transaction);
 
                 transaction.commit();
 
@@ -445,7 +444,7 @@ public class PackRobot extends Robot {
                 logger.info(String.format("PackRobot %s: returned from delivery", getId()));
             }
             else {
-                orderService.placeOrderForBouquet(currentOrder, transaction);
+                orderService.putBouquetOrder(currentOrder, transaction);
                 transaction.commit();
             }
 
