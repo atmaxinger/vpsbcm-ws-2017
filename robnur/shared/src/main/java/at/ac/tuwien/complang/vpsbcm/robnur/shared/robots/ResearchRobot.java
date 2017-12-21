@@ -44,7 +44,7 @@ public class ResearchRobot extends Robot {
             }
 
             // check if upgrade level of flower-type is already at a maximum
-            if (cultivationInformation.getUpgradeLevel() >= 5) {
+            if (cultivationInformation.getUpgradeLevel() >= 6) {
                 transaction.rollback();
                 continue;
             }
@@ -101,7 +101,7 @@ public class ResearchRobot extends Robot {
             }
 
             // check if upgrade level of vegetable-type is already at a maximum
-            if (cultivationInformation.getUpgradeLevel() >= 5) {
+            if (cultivationInformation.getUpgradeLevel() >= 6) {
                 transaction.rollback();
                 continue;
             }
@@ -180,6 +180,9 @@ public class ResearchRobot extends Robot {
                 cultivationInformation.setHarvest(cultivationInformation.getHarvest() + 4);
                 cultivationInformation.setGrowthRate(0.5f);
                 break;
+            case 5:
+                cultivationInformation.setVulnerability(cultivationInformation.getVulnerability() / 2);
+                break;
         }
 
         cultivationInformation.setUpgradeLevel(cultivationInformation.getUpgradeLevel() + 1);
@@ -195,7 +198,7 @@ public class ResearchRobot extends Robot {
 
         for (Flower f : flowers) {
             if (f.getParentFlowerPlant().getCultivationInformation().getFlowerType().equals(flowerType) &&
-                    f.getParentFlowerPlant().getCultivationInformation().getUpgradeLevel() < 5) {
+                    f.getParentFlowerPlant().getCultivationInformation().getUpgradeLevel() < 6) {
 
                 flowersOfSameType.add(f);
 
@@ -220,7 +223,7 @@ public class ResearchRobot extends Robot {
 
         for (Vegetable v : vegetables) {
             if (v.getParentVegetablePlant().getCultivationInformation().getVegetableType().equals(vegetableType) &&
-                    v.getParentVegetablePlant().getCultivationInformation().getUpgradeLevel() < 5) {
+                    v.getParentVegetablePlant().getCultivationInformation().getUpgradeLevel() < 6) {
 
                 vegetablesOfSameType.add(v);
 
