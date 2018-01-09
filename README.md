@@ -8,7 +8,7 @@ Dies ist eine Implementierung einer Roboter Gärtnerei
 
 ## Ausführen
  - Ins ```robnur``` Verzeichnis wechseln
- - ```mvn install``` ausführen
+ - ```mvn install -DskipTests=true``` ausführen
  ### Space basierende Implementierung
  - Ins ```spacebased``` Verzeichnis wechseln
     - Hier finden sich 9 Powershell Skripte
