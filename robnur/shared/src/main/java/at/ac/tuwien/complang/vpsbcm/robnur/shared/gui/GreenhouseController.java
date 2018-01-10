@@ -21,6 +21,8 @@ public class GreenhouseController {
     public TableColumn<Plant, String> tcRemainingHarvets;
     public TableColumn<Plant, String> tcPlantId;
     public TableColumn<Plant, String> tcPlantedBy;
+    public TableColumn<Plant, String> tcInfestation;
+    public TableColumn<Plant, String> tcFosterRobots;
 
     private GreenhouseService greenhouseService = RobNurGUI.greenhouseService;
 
@@ -46,9 +48,12 @@ public class GreenhouseController {
             String s = "";
 
             int growth = param.getValue().getGrowth();
-            if(growth <= 0) {
+            if(growth == Plant.STATUS_PLANTED) {
                 s = "Angepflanzt";
-            } else if(growth >= 100) {
+            } else if(growth == Plant.STATUS_LIMP) {
+                s = "Welk";
+            }
+            else if(growth >= 100) {
                 s = "Erntebereit";
             }
             else {
@@ -68,6 +73,25 @@ public class GreenhouseController {
             }
 
             return new ReadOnlyStringWrapper(rem);
+        });
+
+        tcInfestation.setCellValueFactory(column -> {
+            String s = String.format("%d%%", Math.round(column.getValue().getInfestation() * 100));
+            return new ReadOnlyStringWrapper(s);
+        });
+
+        tcFosterRobots.setCellValueFactory(column -> {
+            StringBuilder s = new StringBuilder();
+            List<String> robots = column.getValue().getFosterRobots();
+
+            for(int i=0; i<robots.size(); i++) {
+                s.append(robots.get(i));
+                if(i < robots.size() - 1) {
+                    s.append(", ");
+                }
+            }
+
+            return new ReadOnlyStringWrapper(s.toString());
         });
 
 

@@ -2,12 +2,10 @@ package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.robots;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PackRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Exitable;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.OrderService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ResearchService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
-import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.MarketServiceImpl;
-import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.PackingServiceImpl;
-import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.ResearchServiceImpl;
-import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.TransactionServiceImpl;
+import at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services.*;
 import org.apache.log4j.Logger;
 import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.notifications.Notification;
@@ -35,10 +33,19 @@ public class SpacePackRobot {
         PackingServiceImpl packingService = new PackingServiceImpl(uri);
         MarketServiceImpl marketService = new MarketServiceImpl(uri);
         ResearchService researchService = new ResearchServiceImpl(uri);
+        OrderService orderService = new OrderServiceImpl(uri);
         TransactionService transactionService = new TransactionServiceImpl(uri);
 
-        PackRobot packRobot = new PackRobot(args[0], packingService,marketService,researchService,transactionService);
+        PackRobot packRobot = new PackRobot(args[0], packingService,marketService,researchService,orderService,transactionService);
         packingService.registerPackRobot(packRobot);
+
+        orderService.onNewFlowerOrdersChanged(p -> {
+            packRobot.tryCreateBouquet();
+        });
+
+        orderService.onNewVegetableOrdersChanged(p -> {
+            packRobot.tryCreateVegetableBasket();
+        });
 
         exitables.add(packingService);
         exitables.add(marketService);

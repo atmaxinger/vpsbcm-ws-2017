@@ -20,7 +20,14 @@ public abstract class CultivationInformation extends Idable implements Serializa
 
     private int soilAmount;
 
+    /* 0...100 */
+    private int vulnerability;
+
+    /* price of a single vegetable/flower in cents */
+    private int price;
+
     private List<String> robots = new LinkedList<>();
+
 
     public CultivationInformation() {
     }
@@ -33,6 +40,7 @@ public abstract class CultivationInformation extends Idable implements Serializa
         waterAmount = cultivationInformation.waterAmount;
         soilAmount = cultivationInformation.soilAmount;
         robots = cultivationInformation.robots;
+        vulnerability = cultivationInformation.vulnerability;
     }
 
     public float getGrowthRate() {
@@ -93,5 +101,21 @@ public abstract class CultivationInformation extends Idable implements Serializa
 
     public List<String> getResearchRobots() {
         return robots;
+    }
+
+    public int getVulnerability() {
+        return vulnerability;
+    }
+
+    public void setVulnerability(int vulnerability) {
+        this.vulnerability = vulnerability;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
     }
 }

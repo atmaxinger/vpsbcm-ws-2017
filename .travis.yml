@@ -1,0 +1,12 @@
+language: java
+jdk: oraclejdk8
+services:
+  - postgresql: '9.6'
+before_install:
+  - mkdir ~/robnur
+  - chmod +x create_postgres_config.sh
+  - sh ./create_postgres_config.sh
+  - cd robnur
+  - psql -c 'create database robnur;' -U postgres
+
+    

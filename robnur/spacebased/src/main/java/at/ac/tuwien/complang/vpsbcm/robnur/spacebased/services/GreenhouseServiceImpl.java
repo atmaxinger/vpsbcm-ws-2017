@@ -3,6 +3,7 @@ package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Plant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.FosterRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PlantAndHarvestRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.GreenhouseService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
@@ -12,6 +13,7 @@ import org.mozartspaces.core.*;
 import org.mozartspaces.notifications.Notification;
 import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
+import org.mozartspaces.util.parser.sql.javacc.ParseException;
 
 import java.net.URI;
 import java.util.*;
@@ -66,16 +68,6 @@ public class GreenhouseServiceImpl extends GreenhouseService {
 
         greenhouseContainer = CapiUtil.lookupOrCreateContainer(greenhouseContainerName, spaceUri, coordinators, null, capi);
 
-        /*try {
-            greenhouseContainer = capi.lookupContainer(greenhouseContainerName, spaceUri, MzsConstants.RequestTimeout.DEFAULT, null);
-        } catch (ContainerNotFoundException var9) {
-            try {
-                greenhouseContainer = capi.createContainer(greenhouseContainerName, spaceUri, 20, coordinators, null, null); // create bounded container
-            } catch (ContainerNameNotAvailableException var8) {
-                greenhouseContainer = capi.lookupContainer(greenhouseContainerName, spaceUri, MzsConstants.RequestTimeout.DEFAULT, null);
-            }
-        }*/
-
         notifications.add(notificationManager.createNotification(greenhouseContainer, (notification, operation, list) -> raiseChangedEvent(), Operation.DELETE, Operation.TAKE, Operation.WRITE));
     }
 
@@ -83,11 +75,26 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         try {
             Notification notificationGreenhouseContainer = notificationManager.createNotification(greenhouseContainer, (notification, operation, list) -> {
                 logger.debug("notify plantandharvest - greenhouseContainer " + operation.name());
-                robot.tryHarvestPlant();
-                robot.tryPlant();
+                robot.doStuff();
             }, Operation.WRITE, Operation.TAKE, Operation.DELETE);
 
            notifications.add(notificationGreenhouseContainer);
+        } catch (MzsCoreException e) {
+            logger.trace("EXCEPTION", e);
+        } catch (InterruptedException e) {
+            logger.trace("EXCEPTION", e);
+        }
+    }
+
+
+    public void registerFosterRobot(FosterRobot robot) {
+        try {
+            Notification notificationGreenhouseContainer = notificationManager.createNotification(greenhouseContainer, (notification, operation, list) -> {
+                logger.debug("notify foster robot - greenhouseContainer " + operation.name());
+                robot.foster();
+            }, Operation.WRITE, Operation.TAKE, Operation.DELETE);
+
+            notifications.add(notificationGreenhouseContainer);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
         } catch (InterruptedException e) {
@@ -271,6 +278,124 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             if (ps.size() > 0) {
                 return ps.get(0);
 
+            }
+        } catch (MzsTimeoutException | TransactionException e) {
+            TransactionServiceImpl.setTransactionInvalid(transaction);
+        } catch (MzsCoreException e) {
+            logger.trace("EXCEPTION", e);
+        }
+
+        return null;
+    }
+
+    @Override
+    public VegetablePlant getLimpVegetablePlant(Transaction transaction) {
+        TransactionReference transactionReference = TransactionServiceImpl.getTransactionReference(transaction);
+
+        try {
+            ComparableProperty growthProperty = ComparableProperty.forName("growth");
+            Query query = new Query();
+
+            List<Selector> selectors = Arrays.asList(
+                    LabelCoordinator.newSelector(VEGETABLE_LABEL, MzsConstants.Selecting.COUNT_MAX),
+                    QueryCoordinator.newSelector(query.filter(growthProperty.equalTo(Plant.STATUS_LIMP)).cnt(0, 1), MzsConstants.Selecting.COUNT_MAX)
+            );
+
+            ArrayList<VegetablePlant> vegetablePlants = capi.take(greenhouseContainer, selectors, MzsConstants.RequestTimeout.DEFAULT, transactionReference);
+
+            if (vegetablePlants.size() > 0) {
+                return vegetablePlants.get(0);
+            }
+        } catch (MzsTimeoutException | TransactionException e) {
+            TransactionServiceImpl.setTransactionInvalid(transaction);
+        } catch (MzsCoreException e) {
+            logger.trace("EXCEPTION", e);
+        }
+
+        return null;
+    }
+
+    @Override
+    public FlowerPlant getLimpFlowerPlant(Transaction transaction) {
+        TransactionReference tref = TransactionServiceImpl.getTransactionReference(transaction);
+
+        try {
+            ComparableProperty growthProperty = ComparableProperty.forName("growth");
+            Query query = new Query();
+
+            List<Selector> selectors = Arrays.asList(
+                    LabelCoordinator.newSelector(FLOWER_LABEL, MzsConstants.Selecting.COUNT_MAX),
+                    QueryCoordinator.newSelector(query.filter(growthProperty.equalTo(Plant.STATUS_LIMP)).cnt(0, 1), MzsConstants.Selecting.COUNT_MAX)
+            );
+
+            ArrayList<FlowerPlant> ps = capi.take(greenhouseContainer, selectors, MzsConstants.RequestTimeout.DEFAULT, tref);
+            if (ps.size() > 0) {
+                return ps.get(0);
+
+            }
+        } catch (MzsTimeoutException | TransactionException e) {
+            TransactionServiceImpl.setTransactionInvalid(transaction);
+        } catch (MzsCoreException e) {
+            logger.trace("EXCEPTION", e);
+        }
+
+        return null;
+    }
+
+    @Override
+    public FlowerPlant getInfestedFlowerPlant(Transaction transaction) {
+        TransactionReference tref = TransactionServiceImpl.getTransactionReference(transaction);
+
+        try {
+            ComparableProperty infestationProperty = ComparableProperty.forName("infestation");
+
+            Query query = new Query();
+            try {
+                query = query.sql("(growth >= -1) AND (infestation >= 0.2f)").sortdown(infestationProperty);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            List<Selector> selectors = Arrays.asList(
+                    LabelCoordinator.newSelector(FLOWER_LABEL, MzsConstants.Selecting.COUNT_MAX),
+                    QueryCoordinator.newSelector(query.cnt(0, 1), MzsConstants.Selecting.COUNT_MAX)
+            );
+
+            ArrayList<FlowerPlant> ps = capi.take(greenhouseContainer, selectors, MzsConstants.RequestTimeout.DEFAULT, tref);
+            if (ps.size() > 0) {
+                return ps.get(0);
+            }
+        } catch (MzsTimeoutException | TransactionException e) {
+            TransactionServiceImpl.setTransactionInvalid(transaction);
+        } catch (MzsCoreException e) {
+            logger.trace("EXCEPTION", e);
+        }
+
+        return null;
+    }
+
+    @Override
+    public VegetablePlant getInfestedVegetablePlant(Transaction transaction) {
+        TransactionReference tref = TransactionServiceImpl.getTransactionReference(transaction);
+
+        try {
+            ComparableProperty infestationProperty = ComparableProperty.forName("infestation");
+
+            Query query = new Query();
+            try {
+                query = query.sql("(growth >= -1) AND (infestation >= 0.2f)").sortdown(infestationProperty);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            List<Selector> selectors = Arrays.asList(
+                    LabelCoordinator.newSelector(VEGETABLE_LABEL, MzsConstants.Selecting.COUNT_MAX),
+                    QueryCoordinator.newSelector(query.cnt(0, 1), MzsConstants.Selecting.COUNT_MAX)
+            );
+
+            ArrayList<VegetablePlant> ps = capi.take(greenhouseContainer, selectors, MzsConstants.RequestTimeout.DEFAULT, tref);
+            if (ps.size() > 0) {
+                return ps.get(0);
             }
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionInvalid(transaction);

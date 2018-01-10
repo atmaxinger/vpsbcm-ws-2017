@@ -14,6 +14,7 @@ public class PGUI {
         CompostService compostService = new CompostServiceImpl();
         ConfigService configService = new ConfigServiceImpl();
         TransactionService transactionService = new TransactionServiceImpl();
+        OrderService orderService = new OrderServiceImpl();
 
         RobNurGUI.storageService = storageService;
         RobNurGUI.greenhouseService = greenhouseService;
@@ -23,6 +24,7 @@ public class PGUI {
         RobNurGUI.compostService = compostService;
         RobNurGUI.configService = configService;
         RobNurGUI.transactionService = transactionService;
+        RobNurGUI.orderService = orderService;
 
         RobNurGUI robNurGUI = new RobNurGUI();
         robNurGUI.execute(args);

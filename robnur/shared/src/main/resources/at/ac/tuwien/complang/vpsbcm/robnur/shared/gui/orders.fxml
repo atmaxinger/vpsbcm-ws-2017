@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<SplitPane prefHeight="369.0" prefWidth="504.0" dividerPositions="0.66" orientation="VERTICAL"
+           xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.complang.vpsbcm.robnur.shared.gui.OrdersController">
+    <items>
+        <TableView fx:id="tvVegetableOrders" prefHeight="200.0" prefWidth="200.0">
+            <columns>
+                <TableColumn fx:id="tcVegetablesId" prefWidth="200.0" text="Gemüse Bestellungs Id" />
+                <TableColumn fx:id="tcVegetablesAddress" text="Adresse" />
+                <TableColumn fx:id="tcVegetablesStatus" text="Status" />
+                <TableColumn fx:id="tcVegetablesActions" text="Aktionen" />
+                <TableColumn fx:id="tcVegetablesPackRobots" text="Pack Roboter" />
+                <TableColumn fx:id="tcVegetablesDeliveryRobot" text="Liefer Roboter" />
+            </columns>
+        </TableView>
+
+        <TableView fx:id="tvFlowerOrders" prefHeight="200.0" prefWidth="200.0">
+            <columns>
+                <TableColumn fx:id="tcFlowersId" prefWidth="200.0" text="Blumen Bestellungs Id" />
+                <TableColumn fx:id="tcFlowersAddress" prefWidth="125.0" text="Adresse" />
+                <TableColumn fx:id="tcFlowersStatus" text="Status" />
+                <TableColumn fx:id="tcFlowersActions" text="Aktionen" />
+                <TableColumn fx:id="tcFlowersPackRobots" text="Pack Roboter" />
+                <TableColumn fx:id="tcFlowersDeliveryRobot" text="Liefer Roboter" />
+            </columns>
+        </TableView>
+    </items>
+</SplitPane>

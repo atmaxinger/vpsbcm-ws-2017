@@ -1,10 +1,8 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.FlowerFertilizer;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.VegetableFertilizer;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.SoilPackage;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.Water;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.*;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.FosterRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PlantAndHarvestRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.StorageService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
@@ -32,8 +30,12 @@ public class StorageServiceImpl extends StorageService {
     private ContainerReference soilContainer;
     private ContainerReference flowerFertilizerContainer;
     private ContainerReference vegetableFertilizerContainer;
+    private ContainerReference vegetablePesticidesContainer;
+    private ContainerReference flowerPesticidesContainer;
+
     private ContainerReference waterTokenContainer;
     private ContainerReference waterAccessContainer;
+
     private URI spaceUri;
 
     List<Notification> notifications = new LinkedList<>();
@@ -70,6 +72,9 @@ public class StorageServiceImpl extends StorageService {
         waterTokenContainer = CapiUtil.lookupOrCreateContainer("waterTokenContainer", spaceUri, Arrays.asList(new AnyCoordinator()), null, capi);
         waterAccessContainer = CapiUtil.lookupOrCreateContainer("waterAccessContainer", spaceUri, Arrays.asList(new AnyCoordinator()), null, capi);
 
+        flowerPesticidesContainer = CapiUtil.lookupOrCreateContainer("storageFlowerPesticidesContainer", spaceUri, coords, null, capi);
+        vegetablePesticidesContainer = CapiUtil.lookupOrCreateContainer("storageVegetablePesticidesContainer", spaceUri, coords, null, capi);
+
         try {
             notifications.add(notificationManager.createNotification(flowerSeedContainer, (notification, operation, list) -> notifyFlowerSeedsChanged(readAllFlowerSeeds()), Operation.DELETE, Operation.TAKE, Operation.WRITE));
             notifications.add(notificationManager.createNotification(vegetableSeedContainer, (notification, operation, list) -> notifyVegetableSeedsChanged(readAllVegetableSeeds()), Operation.DELETE, Operation.TAKE, Operation.WRITE));
@@ -77,6 +82,10 @@ public class StorageServiceImpl extends StorageService {
             notifications.add(notificationManager.createNotification(soilContainer, (notification, operation, list) -> notifySoilPackagesChanged(readAllSoilPackage()), Operation.DELETE, Operation.TAKE, Operation.WRITE));
             notifications.add(notificationManager.createNotification(flowerFertilizerContainer, (notification, operation, list) -> notifyFlowerFertilizerChanged(readAllFlowerFertilizer()), Operation.DELETE, Operation.TAKE, Operation.WRITE));
             notifications.add(notificationManager.createNotification(vegetableFertilizerContainer, (notification, operation, list) -> notifyVegetableFertilizerChanged(readAllVegetableFertilizer()), Operation.DELETE, Operation.TAKE, Operation.WRITE));
+
+            notifications.add(notificationManager.createNotification(flowerPesticidesContainer, (notification, operation, list) -> notifyFlowerPesticidesChanged(readAllFlowerPesticides(null)), Operation.DELETE, Operation.TAKE, Operation.WRITE));
+            notifications.add(notificationManager.createNotification(vegetablePesticidesContainer, (notification, operation, list) -> notifyVegetablePesticidesChanged(readAllVegetablePesticides(null)), Operation.DELETE, Operation.TAKE, Operation.WRITE));
+
 
             notifications.add(notificationManager.createNotification(waterAccessContainer, (notification, operation, list) -> {
                 if(operation == Operation.WRITE) {
@@ -94,28 +103,23 @@ public class StorageServiceImpl extends StorageService {
     public List<Notification> registerPlantAndHarvestRobot(PlantAndHarvestRobot robot) {
         try {
             Notification notificationFlowerSeedContainer = notificationManager.createNotification(flowerSeedContainer, (notification, operation, list) -> {
-                robot.tryHarvestPlant();
-                robot.tryPlant();
+                robot.doStuff();
             }, Operation.WRITE);
 
             Notification notificationVegetableSeedContainer = notificationManager.createNotification(vegetableSeedContainer, (notification, operation, list) -> {
-                robot.tryHarvestPlant();
-                robot.tryPlant();
+                robot.doStuff();
             }, Operation.WRITE);
 
             Notification notificationSoilContainer = notificationManager.createNotification(soilContainer, (notification, operation, list) -> {
-                robot.tryHarvestPlant();
-                robot.tryPlant();
+                robot.doStuff();
             }, Operation.WRITE);
 
             Notification notificationFlowerFertilizerContainer = notificationManager.createNotification(flowerFertilizerContainer, (notification, operation, list) -> {
-                robot.tryHarvestPlant();
-                robot.tryPlant();
+                robot.doStuff();
             }, Operation.WRITE);
 
             Notification notificationVegetableFertilizerContainer = notificationManager.createNotification(vegetableFertilizerContainer, (notification, operation, list) -> {
-                robot.tryHarvestPlant();
-                robot.tryPlant();
+                robot.doStuff();
             }, Operation.WRITE);
 
             notifications.add(notificationFlowerSeedContainer);
@@ -123,6 +127,30 @@ public class StorageServiceImpl extends StorageService {
             notifications.add(notificationSoilContainer);
             notifications.add(notificationFlowerFertilizerContainer);
             notifications.add(notificationVegetableFertilizerContainer);
+
+            return notifications;
+        } catch (MzsCoreException e) {
+            logger.trace("EXCEPTION", e);
+        } catch (InterruptedException e) {
+            logger.trace("EXCEPTION", e);
+        }
+
+        return null;
+    }
+
+    public List<Notification> registerFosterRobot(FosterRobot robot) {
+        try {
+
+            Notification notificationFlowerPesticidesContainer = notificationManager.createNotification(flowerPesticidesContainer, (notification, operation, list) -> {
+                robot.foster();
+            }, Operation.WRITE);
+
+            Notification notificationVegetablePesticidesContainer = notificationManager.createNotification(vegetablePesticidesContainer, (notification, operation, list) -> {
+                robot.foster();
+            }, Operation.WRITE);
+
+            notifications.add(notificationFlowerPesticidesContainer);
+            notifications.add(notificationVegetablePesticidesContainer);
 
             return notifications;
         } catch (MzsCoreException e) {
@@ -444,13 +472,125 @@ public class StorageServiceImpl extends StorageService {
     }
 
     @Override
+    public void putFlowerPesticides(List<FlowerPesticide> pesticides, Transaction transaction) {
+        TransactionReference tref = TransactionServiceImpl.getTransactionReference(transaction);
+
+        try {
+            List<Entry> entries = new LinkedList<>();
+            for(FlowerPesticide flowerPesticide : pesticides) {
+                entries.add(new Entry(flowerPesticide));
+            }
+
+            capi.write(entries, flowerPesticidesContainer, MzsConstants.RequestTimeout.INFINITE, tref);
+        } catch (MzsTimeoutException | TransactionException e) {
+            TransactionServiceImpl.setTransactionInvalid(transaction);
+            logger.trace("EXCEPTION", e);
+        } catch (MzsCoreException e) {
+            logger.trace("EXCEPTION", e);
+        }
+    }
+
+    @Override
+    public FlowerPesticide getFlowerPesticide(Transaction transaction) {
+        TransactionReference tref = TransactionServiceImpl.getTransactionReference(transaction);
+        ArrayList<FlowerPesticide> flowerPesticides = null;
+
+        try {
+            flowerPesticides = capi.take(flowerPesticidesContainer, AnyCoordinator.newSelector(1), MzsConstants.RequestTimeout.DEFAULT, tref);
+            if(flowerPesticides != null && flowerPesticides.size() > 0) {
+                return flowerPesticides.get(0);
+            }
+        } catch (MzsTimeoutException | TransactionException e) {
+            TransactionServiceImpl.setTransactionInvalid(transaction);
+            logger.trace("EXCEPTION", e);
+        } catch (MzsCoreException e) {
+            logger.trace("EXCEPTION", e);
+        }
+
+        return null;
+    }
+
+    @Override
+    public List<FlowerPesticide> readAllFlowerPesticides(Transaction transaction) {
+        TransactionReference tref = TransactionServiceImpl.getTransactionReference(transaction);
+        List<FlowerPesticide> flowerPesticides = null;
+
+        try {
+            flowerPesticides = capi.read(flowerPesticidesContainer, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), MzsConstants.RequestTimeout.ZERO, tref);
+        } catch (MzsTimeoutException | TransactionException e) {
+            TransactionServiceImpl.setTransactionInvalid(transaction);
+            logger.trace("EXCEPTION", e);
+        } catch (MzsCoreException e) {
+            logger.trace("EXCEPTION", e);
+        }
+
+        return flowerPesticides;
+    }
+
+    @Override
+    public void putVegetablePesticides(List<VegetablePesticide> pesticides, Transaction transaction) {
+        TransactionReference tref = TransactionServiceImpl.getTransactionReference(transaction);
+
+        try {
+            List<Entry> entries = new LinkedList<>();
+            for(VegetablePesticide vegetablePesticide : pesticides) {
+                entries.add(new Entry(vegetablePesticide));
+            }
+
+            capi.write(entries, vegetablePesticidesContainer, MzsConstants.RequestTimeout.INFINITE, tref);
+        } catch (MzsTimeoutException | TransactionException e) {
+            TransactionServiceImpl.setTransactionInvalid(transaction);
+            logger.trace("EXCEPTION", e);
+        } catch (MzsCoreException e) {
+            logger.trace("EXCEPTION", e);
+        }
+    }
+
+    @Override
+    public VegetablePesticide getVegetablePesticide(Transaction transaction) {
+        TransactionReference tref = TransactionServiceImpl.getTransactionReference(transaction);
+        ArrayList<VegetablePesticide> vegetablePesticides = null;
+
+        try {
+            vegetablePesticides = capi.take(vegetablePesticidesContainer, AnyCoordinator.newSelector(1), MzsConstants.RequestTimeout.DEFAULT, tref);
+            if(vegetablePesticides != null && vegetablePesticides.size() > 0) {
+                return vegetablePesticides.get(0);
+            }
+        } catch (MzsTimeoutException | TransactionException e) {
+            TransactionServiceImpl.setTransactionInvalid(transaction);
+            logger.trace("EXCEPTION", e);
+        } catch (MzsCoreException e) {
+            logger.trace("EXCEPTION", e);
+        }
+
+        return null;
+    }
+
+    @Override
+    public List<VegetablePesticide> readAllVegetablePesticides(Transaction transaction) {
+        TransactionReference tref = TransactionServiceImpl.getTransactionReference(transaction);
+        List<VegetablePesticide> vegetablePesticides = null;
+
+        try {
+            vegetablePesticides = capi.read(vegetablePesticidesContainer, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), MzsConstants.RequestTimeout.ZERO, tref);
+        } catch (MzsTimeoutException | TransactionException e) {
+            TransactionServiceImpl.setTransactionInvalid(transaction);
+            logger.trace("EXCEPTION", e);
+        } catch (MzsCoreException e) {
+            logger.trace("EXCEPTION", e);
+        }
+
+        return vegetablePesticides;
+    }
+
+    @Override
     public Water accessTap(String robotId) {
         try {
             List<String> tokens = capi.take(waterTokenContainer,AnyCoordinator.newSelector(),MzsConstants.RequestTimeout.INFINITE,null);
 
             if(tokens == null || tokens.isEmpty()){
                 return null;
-            }else if(tokens.size() > 1){
+            } else if(tokens.size() > 1){
                 return null;
             }
 

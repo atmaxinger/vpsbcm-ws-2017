@@ -53,7 +53,23 @@ public class PostgresHelper {
         }
         try {
             Connection connection = DriverManager.getConnection(url, props);
-            //logger.debug("NEW CONNECTION: " + connection + " reason: " + reason);
+            return connection;
+        } catch (SQLException e) {
+            logger.trace("EXCEPTION", e);
+        }
+        return null;
+    }
+
+    public synchronized static Connection getConnectionForUrl(String connectionString) {
+        String user = PostgresHelper.readProperty("db.user");
+        String password = PostgresHelper.readProperty("db.password");
+
+        Properties props = new Properties();
+        props.setProperty("user", user);
+        props.setProperty("password", password);
+
+        try {
+            Connection connection = DriverManager.getConnection(connectionString, props);
             return connection;
         } catch (SQLException e) {
             logger.trace("EXCEPTION", e);

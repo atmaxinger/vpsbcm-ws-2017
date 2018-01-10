@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane prefHeight="306.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.complang.vpsbcm.robnur.shared.customergui.OrdersController">
+   <columnConstraints>
+      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints maxHeight="42.0" minHeight="42.0" prefHeight="42.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="292.0" minHeight="10.0" prefHeight="264.0" vgrow="SOMETIMES" />
+   </rowConstraints>
+   <children>
+      <HBox fx:id="box" alignment="CENTER">
+         <children>
+            <Button fx:id="btnOrderFlowers" mnemonicParsing="false" text="Blumen bestellen">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <HBox.margin>
+                  <Insets right="5.0" />
+               </HBox.margin>
+            </Button>
+            <Button fx:id="btnOrderVegetables" mnemonicParsing="false" text="Gemüse bestellen" />
+         </children>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+      </HBox>
+      <!--<TableView prefHeight="468.0" prefWidth="600.0" GridPane.rowIndex="1">
+        <columns>
+          <TableColumn prefWidth="75.0" text="Bestell Id" />
+          <TableColumn prefWidth="75.0" text="C2" />
+        </columns>
+      </TableView>-->
+   </children>
+</GridPane>

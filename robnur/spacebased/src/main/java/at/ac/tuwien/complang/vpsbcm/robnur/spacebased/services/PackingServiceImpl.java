@@ -1,7 +1,9 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Flower;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableType;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PackRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.PackingService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
@@ -12,7 +14,6 @@ import org.mozartspaces.notifications.Notification;
 import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,7 +47,7 @@ public class PackingServiceImpl extends PackingService {
         capi = new Capi(core);
         notificationManager = new NotificationManager(core);
 
-        List<Coordinator> coordinators = Arrays.asList(new AnyCoordinator(), new FifoCoordinator(), new QueryCoordinator());
+        List<Coordinator> coordinators = Arrays.asList(new AnyCoordinator(), new FifoCoordinator(), new QueryCoordinator(), new LabelCoordinator());
 
         try {
             vegetableContainer = CapiUtil.lookupOrCreateContainer("packingVegetableContainer", spaceUri, coordinators, null, capi);
@@ -65,12 +66,14 @@ public class PackingServiceImpl extends PackingService {
 
     @Override
     public void putFlower(Flower flower, Transaction transaction) {
-        ServiceUtil.writeItem(flower,flowerContainer,transaction,capi);
+        Entry entry = new Entry(flower, LabelCoordinator.newCoordinationData(flower.getParentFlowerPlant().getTypeName()));
+        ServiceUtil.writeItem(entry,flowerContainer,transaction,capi);
     }
 
     @Override
     public void putVegetable(Vegetable vegetable, Transaction transaction) {
-        ServiceUtil.writeItem(vegetable,vegetableContainer,transaction,capi);
+        Entry entry = new Entry(vegetable, LabelCoordinator.newCoordinationData(vegetable.getParentVegetablePlant().getTypeName()));
+        ServiceUtil.writeItem(entry,vegetableContainer,transaction,capi);
     }
 
     @Override
@@ -93,6 +96,16 @@ public class PackingServiceImpl extends PackingService {
     public List<Vegetable> readAllVegetables(Transaction transaction) {
         Selector selector = FifoCoordinator.newSelector(FifoCoordinator.FifoSelector.COUNT_MAX);
         return ServiceUtil.readAllItems(vegetableContainer,selector,transaction,capi);
+    }
+
+    @Override
+    public Vegetable getVegetableByType(VegetableType type, Transaction transaction) {
+        return ServiceUtil.getItem(LabelCoordinator.newSelector(type.name(), 1),vegetableContainer,transaction,capi);
+    }
+
+    @Override
+    public Flower getFlowerByType(FlowerType type, Transaction transaction) {
+        return ServiceUtil.getItem(LabelCoordinator.newSelector(type.name(), 1),flowerContainer,transaction,capi);
     }
 
     public void registerPackRobot(PackRobot packRobot){

@@ -1,9 +1,7 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.gui;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.FlowerFertilizer;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.SoilPackage;
-import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.VegetableFertilizer;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.resouces.*;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ConfigService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.StorageService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
@@ -151,7 +149,7 @@ public class StorageController {
                     for(int i=0;i<amount; i++) {
                         FlowerPlant fp = new FlowerPlant();
                         fp.setCultivationInformation(fcpi);
-                        fp.setGrowth(-1);
+                        fp.setGrowth(Plant.STATUS_PLANTED);
 
                         flowerSeeds.add(fp);
                     }
@@ -179,7 +177,7 @@ public class StorageController {
                     for(int i=0; i<amount; i++) {
                         VegetablePlant vp = new VegetablePlant();
                         vp.setCultivationInformation(vpci);
-                        vp.setGrowth(-1);
+                        vp.setGrowth(Plant.STATUS_PLANTED);
 
                         vegetableSeeds.add(vp);
                     }
@@ -329,8 +327,54 @@ public class StorageController {
             vegFert.amount = "0";
         }
 
+        ResourceTableDataModel flowerPesticide = new ResourceTableDataModel() {
+            @Override
+            void buyAction(int amount) {
+                Transaction t = transactionService.beginTransaction(-1);
 
-        obs.addAll(soil, flowerFertilizer, vegFert, waterModel);
+                List<FlowerPesticide> flowerPesticides = new LinkedList<>();
+                for(int i=0; i<amount; i++) {
+                    FlowerPesticide ff = new FlowerPesticide();
+                    flowerPesticides.add(ff);
+                }
+
+                storageService.putFlowerPesticides(flowerPesticides, t);
+                t.commit();
+            }
+        };
+        flowerPesticide.resource = "Blumen Schutzmittel";
+        tmp = storageService.readAllFlowerPesticides(null);
+        if(tmp != null) {
+            flowerPesticide.amount = "" + tmp.size();
+        } else {
+            flowerPesticide.amount = "0";
+        }
+
+        ResourceTableDataModel vegetablePesticide = new ResourceTableDataModel() {
+            @Override
+            void buyAction(int amount) {
+                Transaction t = transactionService.beginTransaction(-1);
+
+                List<VegetablePesticide> vegetablePesticides = new LinkedList<>();
+                for(int i=0; i<amount; i++) {
+                    VegetablePesticide pesticide = new VegetablePesticide();
+                    vegetablePesticides.add(pesticide);
+                }
+
+                storageService.putVegetablePesticides(vegetablePesticides, t);
+                t.commit();
+            }
+        };
+        vegetablePesticide.resource = "Gemüse Schutzmittel";
+        tmp = storageService.readAllVegetablePesticides(null);
+        if(tmp != null) {
+            vegetablePesticide.amount = "" + tmp.size();
+        } else {
+            vegetablePesticide.amount = "0";
+        }
+
+
+        obs.addAll(soil, flowerFertilizer, vegFert, flowerPesticide, vegetablePesticide, waterModel);
     }
 
 
@@ -360,6 +404,8 @@ public class StorageController {
             }
             tvResources.refresh();
         });
+        storageService.onFlowerPesticidesChanged(data -> initResourcesData());
+        storageService.onVegetablePesticidesChanged(data -> initResourcesData());
 
         tcResourcesArt.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().resource));
         tcResourcesAmountStatus.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().amount));

@@ -38,6 +38,11 @@
         <fx:include source="config.fxml" />
       </content>
     </Tab>
+    <Tab text="Bestellungen">
+      <content>
+        <fx:include source="orders.fxml" />
+      </content>
+    </Tab>
     <Tab text="Shop">
       <content>
         <fx:include source="market.fxml" />

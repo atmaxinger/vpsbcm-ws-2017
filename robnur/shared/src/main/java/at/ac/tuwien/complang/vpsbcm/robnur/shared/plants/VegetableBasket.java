@@ -23,4 +23,13 @@ public class VegetableBasket extends EndProduct implements Serializable {
     public List<Harvestable> getParts() {
         return new LinkedList<>(getVegetables());
     }
+
+    @Override
+    public int getPrice() {
+        int price = 0;
+        for(Vegetable vegetable : vegetables) {
+            price += vegetable.getParentPlant().getCultivationInformation().getPrice();
+        }
+        return price;
+    }
 }

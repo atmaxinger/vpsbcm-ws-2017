@@ -1,6 +1,7 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.spacebased.services;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
 import org.apache.log4j.Logger;
 import org.mozartspaces.capi3.*;
 import org.mozartspaces.core.*;
@@ -42,16 +43,18 @@ public class ServiceUtil {
         return null;
     }
 
-    public synchronized static <T extends Serializable> void writeItem(T item, ContainerReference containerReference, Transaction transaction, Capi capi){
+    public synchronized static <T extends Serializable> boolean writeItem(T item, ContainerReference containerReference, Transaction transaction, Capi capi){
         TransactionReference transactionReference = TransactionServiceImpl.getTransactionReference(transaction);
 
         try {
             capi.write(new Entry(item),containerReference,MzsConstants.RequestTimeout.DEFAULT,transactionReference);
+            return true;
         } catch (MzsTimeoutException | TransactionException e) {
             TransactionServiceImpl.setTransactionInvalid(transaction);
         } catch (MzsCoreException e) {
             logger.trace("EXCEPTION", e);
         }
+        return false;
     }
 
     public synchronized static void writeItem(Entry entry, ContainerReference containerReference, Transaction transaction, Capi capi){
@@ -81,9 +84,9 @@ public class ServiceUtil {
     }
 
     public synchronized static <T extends Serializable> List<T> readAllItems(ContainerReference containerReference, Transaction transaction,Capi capi) {
-
         return readAllItems(containerReference, AnyCoordinator.newSelector(AnyCoordinator.AnySelector.COUNT_MAX), transaction,capi);
     }
+
 
     public synchronized static void deleteItemById(String id, ContainerReference containerReference, Transaction transaction, Capi capi) {
         TransactionReference transactionReference = TransactionServiceImpl.getTransactionReference(transaction);

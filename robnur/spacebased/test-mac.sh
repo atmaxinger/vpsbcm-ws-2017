@@ -22,3 +22,16 @@ for i in $(seq 1 $numberOfRobots);
 do
     sh run-script-mac.sh "pwsh space-research.ps1 -id $i"
 done
+
+# start foster robots
+for i in $(seq 1 $numberOfRobots);
+do
+sh run-script-mac.sh "pwsh space-foster.ps1 -id $i"
+done
+
+# start customers
+for i in $(seq 1 $numberOfRobots);
+do
+sh run-script-mac.sh "pwsh space-customer.ps1"
+done
+

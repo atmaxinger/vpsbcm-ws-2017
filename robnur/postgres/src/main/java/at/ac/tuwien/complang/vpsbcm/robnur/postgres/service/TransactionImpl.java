@@ -18,6 +18,11 @@ public class TransactionImpl implements Transaction {
         this.reason = reason;
     }
 
+    public TransactionImpl(Connection connection) {
+        this.connection = connection;
+        this.reason = "";
+    }
+
     public boolean commit() {
         try {
             logger.debug(String.format("COMMIT TRANSACTION (%s)", reason));

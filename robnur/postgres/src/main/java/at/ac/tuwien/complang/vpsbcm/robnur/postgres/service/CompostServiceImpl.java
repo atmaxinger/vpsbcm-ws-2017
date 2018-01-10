@@ -85,34 +85,42 @@ public class CompostServiceImpl extends CompostService {
         }
     }
 
+    @Override
     public void putFlowerPlant(FlowerPlant flowerPlant, Transaction transaction) {
         ServiceUtil.writeItem(flowerPlant, COMPOST_FLOWER_PLANT_TABLE, transaction);
     }
 
+    @Override
     public void putVegetablePlant(VegetablePlant vegetablePlant, Transaction transaction) {
         ServiceUtil.writeItem(vegetablePlant, COMPOST_VEGETABLE_PLANT_TABLE, transaction);
     }
 
+    @Override
     public void putFlower(Flower flower, Transaction transaction) {
         ServiceUtil.writeItem(flower, COMPOST_FLOWER_TABLE, transaction);
     }
 
+    @Override
     public void putVegetable(Vegetable vegetable, Transaction transaction) {
         ServiceUtil.writeItem(vegetable, COMPOST_VEGETABLE_TABLE, transaction);
     }
 
+    @Override
     public List<FlowerPlant> readAllFlowerPlants() {
         return ServiceUtil.readAllItems(COMPOST_FLOWER_PLANT_TABLE,FlowerPlant.class);
     }
 
+    @Override
     public List<VegetablePlant> readAllVegetablePlants() {
         return ServiceUtil.readAllItems(COMPOST_VEGETABLE_PLANT_TABLE,VegetablePlant.class);
     }
 
+    @Override
     public List<Flower> readAllFlowers() {
         return ServiceUtil.readAllItems(COMPOST_FLOWER_TABLE,Flower.class);
     }
 
+    @Override
     public List<Vegetable> readAllVegetables() {
         return ServiceUtil.readAllItems(COMPOST_VEGETABLE_TABLE,Vegetable.class);
     }

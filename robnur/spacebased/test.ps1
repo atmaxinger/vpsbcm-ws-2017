@@ -17,3 +17,7 @@ for($i=1; $i -le $count; $i++) {
 for($i=1; $i -le $count; $i++) {
     start powershell ".\space-research.ps1 -id $i"
 }
+
+for($i=1; $i -le $count; $i++) {
+    start powershell ".\space-foster.ps1 -id $i"
+}

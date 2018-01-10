@@ -1,19 +1,16 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.postgres.service;
 
-import at.ac.tuwien.complang.vpsbcm.robnur.postgres.robots.PostgresMonitoringRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Plant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.FosterRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.robots.PlantAndHarvestRobot;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.GreenhouseService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.xml.stream.FactoryConfigurationError;
 import java.io.IOException;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -21,7 +18,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class GreenhouseServiceImpl extends GreenhouseService {
 
@@ -127,7 +123,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
 
         try {
             Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
-            int cnt = statement.executeUpdate("DELETE FROM " + GREENHOUSE_VEGETABLE_PLANT_TABLE);
+            statement.executeUpdate("DELETE FROM " + GREENHOUSE_VEGETABLE_PLANT_TABLE);
         } catch (SQLException e) {
             logger.trace("EXCEPTION", e);
             return null;
@@ -141,7 +137,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
 
         try {
             Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
-            int cnt = statement.executeUpdate("DELETE FROM " + GREENHOUSE_FLOWER_PLANT_TABLE);
+            statement.executeUpdate("DELETE FROM " + GREENHOUSE_FLOWER_PLANT_TABLE);
         } catch (SQLException e) {
             logger.trace("EXCEPTION", e);
             return null;
@@ -239,13 +235,166 @@ public class GreenhouseServiceImpl extends GreenhouseService {
         return result;
     }
 
+    @Override
+    public VegetablePlant getLimpVegetablePlant(Transaction transaction) {
+        VegetablePlant result = null;
+
+        Statement statement = null;
+        try {
+            statement = ((TransactionImpl) transaction).getConnection().createStatement();
+        } catch (SQLException e) {
+            logger.trace("EXCEPTION", e);
+            return null;
+        }
+
+        ObjectMapper mapper = new ObjectMapper()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        try {
+            ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE (data::json->>'growth')::numeric = %d LIMIT 1",GREENHOUSE_VEGETABLE_PLANT_TABLE,Plant.STATUS_LIMP));
+
+            if (rs.next()) {
+                String data = rs.getString("data");
+                result = mapper.readValue(data, VegetablePlant.class);
+
+                ServiceUtil.deleteItemById(result.getId(), GREENHOUSE_VEGETABLE_PLANT_TABLE, transaction);
+            }
+        } catch (SQLException | IOException e) {
+            result = null;
+            logger.trace("EXCEPTION", e);
+        }
+
+        try {
+            statement.close();
+        } catch (SQLException e) {
+            logger.trace("EXCEPTION", e);
+        }
+
+        return result;
+    }
+
+    @Override
+    public FlowerPlant getLimpFlowerPlant(Transaction transaction) {
+        FlowerPlant result = null;
+
+        Statement statement = null;
+        try {
+            statement = ((TransactionImpl) transaction).getConnection().createStatement();
+        } catch (SQLException e) {
+            logger.trace("EXCEPTION", e);
+            return null;
+        }
+
+        ObjectMapper mapper = new ObjectMapper()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        try {
+            ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE (data::json->>'growth')::numeric = %d LIMIT 1",GREENHOUSE_FLOWER_PLANT_TABLE,Plant.STATUS_LIMP));
+
+            if (rs.next()) {
+                String data = rs.getString("data");
+                result = mapper.readValue(data, FlowerPlant.class);
+
+                ServiceUtil.deleteItemById(result.getId(), GREENHOUSE_FLOWER_PLANT_TABLE, transaction);
+            }
+        } catch (SQLException | IOException e) {
+            result = null;
+            logger.trace("EXCEPTION", e);
+        }
+
+        try {
+            statement.close();
+        } catch (SQLException e) {
+            logger.trace("EXCEPTION", e);
+        }
+
+        return result;
+    }
+
+    @Override
+    public FlowerPlant getInfestedFlowerPlant(Transaction transaction) {
+
+        FlowerPlant result = null;
+
+        Statement statement = null;
+        try {
+            statement = ((TransactionImpl) transaction).getConnection().createStatement();
+        } catch (SQLException e) {
+            logger.trace("EXCEPTION", e);
+            return null;
+        }
+
+        ObjectMapper mapper = new ObjectMapper()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        try {
+            ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE (data::json->>'growth')::numeric >= %d AND (data::json->>'infestation')::float >= 0.2 LIMIT 1",GREENHOUSE_FLOWER_PLANT_TABLE,Plant.STATUS_PLANTED));
+
+            if (rs.next()) {
+                String data = rs.getString("data");
+                result = mapper.readValue(data, FlowerPlant.class);
+
+                ServiceUtil.deleteItemById(result.getId(), GREENHOUSE_FLOWER_PLANT_TABLE, transaction);
+            }
+        } catch (SQLException | IOException e) {
+            result = null;
+            logger.trace("EXCEPTION", e);
+        }
+
+        try {
+            statement.close();
+        } catch (SQLException e) {
+            logger.trace("EXCEPTION", e);
+        }
+
+        return result;
+    }
+
+    @Override
+    public VegetablePlant getInfestedVegetablePlant(Transaction transaction) {
+
+        VegetablePlant result = null;
+
+        Statement statement = null;
+        try {
+            statement = ((TransactionImpl) transaction).getConnection().createStatement();
+        } catch (SQLException e) {
+            logger.trace("EXCEPTION", e);
+            return null;
+        }
+
+        ObjectMapper mapper = new ObjectMapper()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        try {
+            ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s WHERE (data::json->>'growth')::numeric >= %d AND (data::json->>'infestation')::float >= 0.2 LIMIT 1",GREENHOUSE_VEGETABLE_PLANT_TABLE,Plant.STATUS_PLANTED));
+
+            if (rs.next()) {
+                String data = rs.getString("data");
+                result = mapper.readValue(data, VegetablePlant.class);
+
+                ServiceUtil.deleteItemById(result.getId(), GREENHOUSE_VEGETABLE_PLANT_TABLE, transaction);
+            }
+        } catch (SQLException | IOException e) {
+            result = null;
+            logger.trace("EXCEPTION", e);
+        }
+
+        try {
+            statement.close();
+        } catch (SQLException e) {
+            logger.trace("EXCEPTION", e);
+        }
+
+        return result;
+    }
+
     public void registerPlantAndHarvestRobot(PlantAndHarvestRobot robot) {
         try {
             Listener flowerListener = new Listener(GREENHOUSE_FLOWER_PLANT_TABLE) {
                 @Override
                 public void onNotify(int pid, DBMETHOD method) {
-                    robot.tryHarvestPlant();
-                    robot.tryPlant();
+                    robot.doStuff();
                 }
             };
             flowerListener.start();
@@ -254,14 +403,40 @@ public class GreenhouseServiceImpl extends GreenhouseService {
             Listener vegetableListener = new Listener(GREENHOUSE_VEGETABLE_PLANT_TABLE) {
                 @Override
                 public void onNotify(int pid, DBMETHOD method) {
-                    robot.tryHarvestPlant();
-                    robot.tryPlant();
+                    robot.doStuff();
                 }
             };
             vegetableListener.start();
 
             listeners.add(flowerListener);
             listeners.add(vegetableListener);
+        } catch (SQLException e) {
+            logger.trace("EXCEPTION", e);
+        }
+    }
+
+    public void registerFosterRobot(FosterRobot robot) {
+
+        try {
+            Listener flowerListener = new Listener(GREENHOUSE_FLOWER_PLANT_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    if(method == DBMETHOD.INSERT) {
+                        robot.foster();
+                    }
+                }
+            };
+            flowerListener.start();
+
+            Listener vegetableListener = new Listener(GREENHOUSE_VEGETABLE_PLANT_TABLE) {
+                @Override
+                public void onNotify(int pid, DBMETHOD method) {
+                    if(method == DBMETHOD.INSERT) {
+                        robot.foster();
+                    }
+                }
+            };
+            vegetableListener.start();
         } catch (SQLException e) {
             logger.trace("EXCEPTION", e);
         }

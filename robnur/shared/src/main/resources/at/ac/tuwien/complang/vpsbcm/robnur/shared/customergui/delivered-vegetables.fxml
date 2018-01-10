@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<TableView fx:id="tableView" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.complang.vpsbcm.robnur.shared.customergui.VegetableDeliveryController">
+  <columns>
+    <TableColumn fx:id="tcIndex" prefWidth="86.0" text="#" />
+    <TableColumn fx:id="tcVegetableBasketId" text="Id" prefWidth="320" />
+    <TableColumn fx:id="tcPackRobot" text="Pack Roboter" />
+    <TableColumn fx:id="tcDeliveryRobot" text="Liefer Roboter" />
+    <TableColumn fx:id="tcActions" text="Aktionen" />
+  </columns>
+</TableView>

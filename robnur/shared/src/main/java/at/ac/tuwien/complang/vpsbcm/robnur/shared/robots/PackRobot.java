@@ -1,5 +1,6 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.robots;
 
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.Order;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.*;
 
@@ -13,14 +14,16 @@ public class PackRobot extends Robot {
     private PackingService packingService;
     private MarketService marketService;
     private ResearchService researchService;
+    private OrderService orderService;
     private TransactionService transactionService;
 
-    public PackRobot(String id, PackingService packingService, MarketService marketService, ResearchService researchService, TransactionService transactionService) {
+    public PackRobot(String id, PackingService packingService, MarketService marketService, ResearchService researchService, OrderService orderService, TransactionService transactionService) {
         this.setId(id);
 
         this.packingService = packingService;
         this.marketService = marketService;
         this.researchService = researchService;
+        this.orderService = orderService;
         this.transactionService = transactionService;
 
         tryCreateVegetableBasket();
@@ -76,6 +79,8 @@ public class PackRobot extends Robot {
             logger.info("you can quit me now...");
             return;
         }
+
+        tryFulfilBouquetOrder();
 
         // check if there are already enough bouquets in the market
         if (marketService.getAmountOfBouquets() >= 5) {
@@ -179,17 +184,13 @@ public class PackRobot extends Robot {
         }
     }
 
-    private void tryPutVegetablesIntoResearch() {
+    private void tryPutVegetablesIntoResearch(List<Vegetable> vegetables, Transaction transaction) {
         if (researchService.isExit()) {
             logger.info("you can quit me now...");
             return;
         }
 
-        Transaction transaction = transactionService.beginTransaction(TRANSACTION_TIMEOUT);
-        List<Vegetable> vegetables = packingService.readAllVegetables(transaction);
-
-        if (vegetables == null) {
-            transaction.rollback();
+        if (vegetables == null || vegetables.isEmpty()) {
             return;
         }
 
@@ -197,25 +198,21 @@ public class PackRobot extends Robot {
         for (int i = 0; i < Math.min(vegetables.size(), 10); i++) {
             Vegetable vegetable = packingService.getVegetable(vegetables.get(i).getId(), transaction);
             if (vegetable == null) {
-                transaction.rollback();
-
-                tryPutVegetablesIntoResearch();
-                return;
+                logger.fatal("should never happen");
             }
 
             vegetable.addPutResearchRobot(getId());
             researchService.putVegetable(vegetable, transaction);
+            vegetables.remove(i);
 
             logger.info(String.format("PackRobot %s: forward vegetable(%s) to research department.", this.getId(), vegetable.getId()));
 
             put++;
         }
 
-        transaction.commit();
-
         // If we have packed 10 into research, chances are good there are more...
         if (put == 10) {
-            tryPutVegetablesIntoResearch();
+            tryPutVegetablesIntoResearch(vegetables, transaction);
         }
     }
 
@@ -225,17 +222,12 @@ public class PackRobot extends Robot {
             return;
         }
 
-        if (marketService.getAmountOfVegetableBaskets() >= 3) {
-            tryPutVegetablesIntoResearch();
-            return;
-        }
+        tryFulfilVegetableBasketOrder();
 
         Transaction transaction = transactionService.beginTransaction(TRANSACTION_TIMEOUT);
         List<Vegetable> vegetables = packingService.readAllVegetables(transaction);
 
-        if (vegetables.size() <= 5) {
-            // not enough vegetables available
-            logger.info(String.format("PackRobot %s: not enough vegetable to create vegetable basket", this.getId()));
+        if (vegetables.isEmpty()) {
             transaction.commit();
             return;
         }
@@ -248,9 +240,17 @@ public class PackRobot extends Robot {
 
             if (!checkedVegetableTypes.contains(vegetableType)) {
 
+                checkedVegetableTypes.add(vegetableType);
+
                 List<Vegetable> vegetablesOfSameType = getVegetablesOfSameType(vegetableType, vegetables);
 
-                if (vegetablesOfSameType.size() >= 5) {
+                if (marketService.getAmountOfVegetableBaskets(vegetableType) >= 3) { // check if there are already 3 vegetable baskets filled  with the current vegetable type in the market
+                    logger.info("to many vegetable baskets");
+                    tryPutVegetablesIntoResearch(vegetablesOfSameType,transaction);
+                    continue;
+                }
+
+                if (vegetablesOfSameType.size() >= 5) { // check if there are enough vegetables of the same type to create a basket
 
                     // create vegetable basket
 
@@ -283,12 +283,169 @@ public class PackRobot extends Robot {
 
                     return;
                 }
-
-                checkedVegetableTypes.add(vegetableType);
             }
         }
 
         transaction.commit();
+    }
+
+    private void tryFulfilVegetableBasketOrder() {
+        logger.debug("tryFulfilVegetableBasketOrder()");
+
+        Transaction transaction = transactionService.beginTransaction(-1, "tryFulfillVegetableBasketOrder");
+        List<String> alreadyCheckedOrderIds = new ArrayList<>();
+
+        Order<VegetableType,Vegetable> currentOrder = orderService.getNextVegetableBasketOrder(Order.OrderStatus.PLACED,transaction);
+
+        while(currentOrder != null && !alreadyCheckedOrderIds.contains(currentOrder.getId())) {
+            logger.debug("tryFulfilVegetableBasketOrder - got order to work on (Status: " + currentOrder.getOrderStatus() + ") - " + currentOrder.getId());
+
+            alreadyCheckedOrderIds.add(currentOrder.getId());
+
+            for (VegetableType type : VegetableType.values()) {
+
+                while (currentOrder.getMissingItems().get(type) != null && currentOrder.getMissingItems().get(type) > 0) {
+                    logger.debug("tryFulfilVegetableBasketOrder - working on missing item " + type);
+
+                    Vegetable vegetable = packingService.getVegetableByType(type, transaction);
+
+                    // check if there is an appropriate vegetable
+                    if (vegetable == null) {
+                        logger.debug("tryFulfilVegetableBasketOrder - no appropriate vegetable");
+                        break;
+                    }
+
+                    // add vegetable to order
+                    currentOrder.setAlreadyAcquiredItem(vegetable, VegetableType.valueOf(vegetable.getParentVegetablePlant().getTypeName()));
+                    currentOrder.addPackRobotId(this.getId());
+                    logger.info(String.format("PackRobot %s: added vegetable (%s) to order (%s)", getId(), vegetable.getId(), currentOrder.getId()));
+                }
+            }
+
+            if (currentOrder.getOrderStatus() == Order.OrderStatus.PACKED) {
+                // create vegetable basket
+                VegetableBasket vegetableBasket = new VegetableBasket();
+                vegetableBasket.setVegetables(currentOrder.getAlreadyAcquiredItems());
+                vegetableBasket.setDeliveryRobotId(getId());
+                vegetableBasket.setPackingRobotIds(currentOrder.getPackRobotIds());
+
+                waitPackingTime();
+
+                orderService.putVegetableBasketOrder(currentOrder, transaction);
+
+                transaction.commit();
+
+                // deliver order
+                logger.info(String.format("PackRobot %s: start delivering vegetable basket (%s)", getId(), vegetableBasket.getId()));
+
+                waitOneWayToDeliveryTime();
+
+                // deliver order and check if delivery was successful
+                if(orderService.deliverVegetableBasket(vegetableBasket, currentOrder.getAddress())){
+                    orderService.updateVegetableBasketOrderStatus(currentOrder.getId(), Order.OrderStatus.PAID);
+                    logger.info(String.format("PackRobot %s: delivered vegetable basket (%s)", getId(), vegetableBasket.getId()));
+
+                }else {
+                    orderService.updateVegetableBasketOrderStatus(currentOrder.getId(), Order.OrderStatus.UNABLE_TO_DELIVER);
+                    logger.info(String.format("PackRobot %s: unable to deliver vegetable basket (%s)", getId(), vegetableBasket.getId()));
+                }
+
+                waitOneWayToDeliveryTime();
+
+                logger.info(String.format("PackRobot %s: returned from delivery", getId()));
+            }
+            else {
+                logger.debug("tryFulfilVegetableBasketOrder - writing back order");
+                orderService.putVegetableBasketOrder(currentOrder, transaction);
+                transaction.commit();
+            }
+
+            transaction = transactionService.beginTransaction(-1, "tryFulfillVegetableBasketOrder in loop");
+            currentOrder = orderService.getNextVegetableBasketOrder(Order.OrderStatus.PLACED,transaction);
+        }
+
+        // if we are here we either did not get any order or we got an order we already worked on --> rollback
+        transaction.rollback();
+
+        logger.debug("tryFulfilVegetableBasketOrder - fin");
+    }
+
+    private void tryFulfilBouquetOrder() {
+        logger.debug("tryFulfilBouquetOrder()");
+
+        Transaction transaction = transactionService.beginTransaction(-1);
+        List<String> alreadyCheckedOrderIds = new ArrayList<>();
+
+        Order<FlowerType,Flower> currentOrder = orderService.getNextBouquetOrder(Order.OrderStatus.PLACED,transaction);
+
+        while(currentOrder != null && !alreadyCheckedOrderIds.contains(currentOrder.getId())) {
+            logger.debug("tryFulfilBouquetOrder - got order to work on (Status: " + currentOrder.getOrderStatus() + ") - " + currentOrder.getId());
+
+            alreadyCheckedOrderIds.add(currentOrder.getId());
+
+            for (FlowerType type : FlowerType.values()) {
+
+                while (currentOrder.getMissingItems().get(type) != null && currentOrder.getMissingItems().get(type) > 0) {
+                    logger.debug("tryFulfilBouqetOrder - working on missing item " + type);
+
+                    Flower flower = packingService.getFlowerByType(type, transaction);
+
+                    // check if there is an appropriate flower
+                    if (flower == null) {
+                        break;
+                    }
+
+                    // add flower to order
+                    currentOrder.setAlreadyAcquiredItem(flower, FlowerType.valueOf(flower.getParentFlowerPlant().getTypeName()));
+                    currentOrder.addPackRobotId(this.getId());
+                    logger.info(String.format("PackRobot %s: added flower (%s) to order (%s)", getId(), flower.getId(), currentOrder.getId()));
+                }
+            }
+
+            if (currentOrder.getOrderStatus() == Order.OrderStatus.PACKED) {
+                // create bouquet basket
+                Bouquet bouquet = new Bouquet();
+                bouquet.setFlowers(currentOrder.getAlreadyAcquiredItems());
+                bouquet.setDeliveryRobotId(getId());
+                bouquet.setPackingRobotIds(currentOrder.getPackRobotIds());
+
+                waitPackingTime();
+
+                orderService.putBouquetOrder(currentOrder, transaction);
+
+                transaction.commit();
+
+                // deliver order
+                logger.info(String.format("PackRobot %s: start delivering bouquet (%s)", getId(), bouquet.getId()));
+
+                waitOneWayToDeliveryTime();
+
+                // deliver order and check if delivery was successful
+                if(orderService.deliverBouquet(bouquet, currentOrder.getAddress())){
+                    orderService.updateBouquetOrderStatus(currentOrder.getId(), Order.OrderStatus.PAID);
+                    logger.info(String.format("PackRobot %s: delivered bouquet (%s)", getId(), bouquet.getId()));
+
+                }else {
+                    orderService.updateBouquetOrderStatus(currentOrder.getId(), Order.OrderStatus.UNABLE_TO_DELIVER);
+                    logger.info(String.format("PackRobot %s: unable to deliver bouquet (%s)", getId(), bouquet.getId()));
+                }
+
+                waitOneWayToDeliveryTime();
+
+                logger.info(String.format("PackRobot %s: returned from delivery", getId()));
+            }
+            else {
+                orderService.putBouquetOrder(currentOrder, transaction);
+                transaction.commit();
+            }
+
+            transaction = transactionService.beginTransaction(-1);
+            currentOrder = orderService.getNextBouquetOrder(Order.OrderStatus.PLACED,transaction);
+        }
+
+        // if we are here we either did not get any order or we got an order we already worked on --> rollback
+        transaction.rollback();
+        logger.debug("tryFulfilBouquetOrder - fin");
     }
 
     List<Vegetable> getVegetablesOfSameType(VegetableType vegetableType, List<Vegetable> vegetables) {
@@ -339,6 +496,14 @@ public class PackRobot extends Robot {
             Thread.sleep(waitTime);
         } catch (InterruptedException e) {
             logger.trace("EXCEPTION", e);
+        }
+    }
+
+    private void waitOneWayToDeliveryTime(){
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

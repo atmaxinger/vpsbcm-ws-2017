@@ -19,7 +19,7 @@
 
         <TableView fx:id="tvResources" prefHeight="200.0" prefWidth="200.0">
             <columns>
-                <TableColumn fx:id="tcResourcesArt" prefWidth="125.0" text="Art" />
+                <TableColumn fx:id="tcResourcesArt" prefWidth="150.0" text="Art" />
                 <TableColumn fx:id="tcResourcesAmountStatus" prefWidth="125.0" text="Anzahl/Status" />
                 <TableColumn fx:id="tcResourcesBuy" prefWidth="122.0" text="Kaufen" />
             </columns>
