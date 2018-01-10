@@ -184,17 +184,13 @@ public class PackRobot extends Robot {
         }
     }
 
-    private void tryPutVegetablesIntoResearch() {
+    private void tryPutVegetablesIntoResearch(List<Vegetable> vegetables, Transaction transaction) {
         if (researchService.isExit()) {
             logger.info("you can quit me now...");
             return;
         }
 
-        Transaction transaction = transactionService.beginTransaction(TRANSACTION_TIMEOUT);
-        List<Vegetable> vegetables = packingService.readAllVegetables(transaction);
-
-        if (vegetables == null) {
-            transaction.rollback();
+        if (vegetables == null || vegetables.isEmpty()) {
             return;
         }
 
@@ -202,25 +198,21 @@ public class PackRobot extends Robot {
         for (int i = 0; i < Math.min(vegetables.size(), 10); i++) {
             Vegetable vegetable = packingService.getVegetable(vegetables.get(i).getId(), transaction);
             if (vegetable == null) {
-                transaction.rollback();
-
-                tryPutVegetablesIntoResearch();
-                return;
+                logger.fatal("should never happen");
             }
 
             vegetable.addPutResearchRobot(getId());
             researchService.putVegetable(vegetable, transaction);
+            vegetables.remove(i);
 
             logger.info(String.format("PackRobot %s: forward vegetable(%s) to research department.", this.getId(), vegetable.getId()));
 
             put++;
         }
 
-        transaction.commit();
-
         // If we have packed 10 into research, chances are good there are more...
         if (put == 10) {
-            tryPutVegetablesIntoResearch();
+            tryPutVegetablesIntoResearch(vegetables, transaction);
         }
     }
 
@@ -232,17 +224,10 @@ public class PackRobot extends Robot {
 
         tryFulfilVegetableBasketOrder();
 
-        if (marketService.getAmountOfVegetableBaskets() >= 3) {
-            tryPutVegetablesIntoResearch();
-            return;
-        }
-
         Transaction transaction = transactionService.beginTransaction(TRANSACTION_TIMEOUT);
         List<Vegetable> vegetables = packingService.readAllVegetables(transaction);
 
-        if (vegetables.size() <= 5) {
-            // not enough vegetables available
-            logger.info(String.format("PackRobot %s: not enough vegetable to create vegetable basket", this.getId()));
+        if (vegetables.isEmpty()) {
             transaction.commit();
             return;
         }
@@ -255,9 +240,17 @@ public class PackRobot extends Robot {
 
             if (!checkedVegetableTypes.contains(vegetableType)) {
 
+                checkedVegetableTypes.add(vegetableType);
+
                 List<Vegetable> vegetablesOfSameType = getVegetablesOfSameType(vegetableType, vegetables);
 
-                if (vegetablesOfSameType.size() >= 5) {
+                if (marketService.getAmountOfVegetableBaskets(vegetableType) >= 3) { // check if there are already 3 vegetable baskets filled  with the current vegetable type in the market
+                    logger.info("to many vegetable baskets");
+                    tryPutVegetablesIntoResearch(vegetablesOfSameType,transaction);
+                    continue;
+                }
+
+                if (vegetablesOfSameType.size() >= 5) { // check if there are enough vegetables of the same type to create a basket
 
                     // create vegetable basket
 
@@ -290,8 +283,6 @@ public class PackRobot extends Robot {
 
                     return;
                 }
-
-                checkedVegetableTypes.add(vegetableType);
             }
         }
 

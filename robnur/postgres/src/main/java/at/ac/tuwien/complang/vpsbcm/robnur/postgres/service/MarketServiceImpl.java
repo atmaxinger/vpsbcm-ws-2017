@@ -84,11 +84,6 @@ public class MarketServiceImpl extends MarketService {
     }
 
     @Override
-    public int getAmountOfVegetableBaskets() {
-        return readAllVegetableBaskets().size();
-    }
-
-    @Override
     public List<Bouquet> readAllBouquets() {
         return ServiceUtil.readAllItems(MARKET_BOUQUET_TABLE,Bouquet.class);
     }

@@ -1,7 +1,9 @@
 package at.ac.tuwien.complang.vpsbcm.robnur.shared.services;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Bouquet;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableBasket;
+import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableType;
 
 import java.util.List;
 
@@ -46,7 +48,23 @@ public abstract class MarketService implements Exitable {
      * get the amount of vegetable baskets that are in the market
      * @return number of vegetable baskets in the market
      */
-    public abstract int getAmountOfVegetableBaskets();
+    /**
+     * get the amount of vegetable baskets of a specific type that are in the market
+     * @param vegetableType the type of vegetables that the basket contains
+     * @return number of vegetable baskets of a specific type in the market
+     */
+    public int getAmountOfVegetableBaskets(VegetableType vegetableType){
+        List<VegetableBasket> vegetableBaskets = readAllVegetableBaskets();
+        int count = 0;
+
+        for (VegetableBasket vb: vegetableBaskets) {
+            if (vb.getVegetables().get(0).getParentVegetablePlant().getCultivationInformation().getVegetableType().equals(vegetableType)){
+                count ++;
+            }
+        }
+
+        return count;
+    }
 
     /**
      * reads all bouquets that are in the market
