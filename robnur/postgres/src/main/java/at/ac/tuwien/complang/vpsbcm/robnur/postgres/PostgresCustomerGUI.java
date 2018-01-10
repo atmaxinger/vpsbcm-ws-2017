@@ -68,7 +68,6 @@ public class PostgresCustomerGUI {
         }
 
 
-        // TODO: CREATE TABLE
         String server = "localhost";
         int port = 5432;
         String database = "customer_" + args[0];

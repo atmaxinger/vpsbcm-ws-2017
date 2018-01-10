@@ -83,10 +83,12 @@ public class ResearchServiceImpl extends ResearchService {
         return ServiceUtil.getAllItems(RESEARCH_VEGETABLE_TABLE,Vegetable.class,transaction);
     }
 
+    @Override
     public List<Flower> readAllFlowers(Transaction transaction) {
         return ServiceUtil.readAllItems(RESEARCH_FLOWER_TABLE,Flower.class);
     }
 
+    @Override
     public List<Vegetable> readAllVegetables(Transaction transaction) {
         return ServiceUtil.readAllItems(RESEARCH_VEGETABLE_TABLE,Vegetable.class);
     }

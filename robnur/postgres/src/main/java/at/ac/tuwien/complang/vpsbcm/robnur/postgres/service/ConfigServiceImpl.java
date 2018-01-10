@@ -64,10 +64,6 @@ public class ConfigServiceImpl extends ConfigService {
         }
     }
 
-    public FlowerPlantCultivationInformation getFlowerPlantCultivationInformation(String id, Transaction transaction) {
-        return ServiceUtil.getItemById(id,CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE,FlowerPlantCultivationInformation.class,transaction);
-    }
-
     @Override
     public FlowerPlantCultivationInformation getFlowerPlantCultivationInformation(FlowerType flowerType, Transaction transaction) {
         return ServiceUtil.getItemByParameter("'flowerType'",flowerType.name(),CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE,FlowerPlantCultivationInformation.class,transaction);
@@ -78,30 +74,17 @@ public class ConfigServiceImpl extends ConfigService {
         return ServiceUtil.getItemByParameter("'vegetableType'",vegetableType.name(), CONFIG_VEGETABLE_PLANT_CULTIVATION_INFORMATION_TABLE,VegetablePlantCultivationInformation.class,transaction);
     }
 
-    public void deleteFlowerPlantCultivationInformation(String id, Transaction transaction) {
-        try {
-            ServiceUtil.deleteItemById(id,CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE,transaction);
-        } catch (SQLException e) {
-            logger.trace("EXCEPTION", e);
-        }
-    }
-
-    public void deleteVegetablePlantCultivationInformation(String id, Transaction transaction) {
-        try {
-            ServiceUtil.deleteItemById(id,CONFIG_VEGETABLE_PLANT_CULTIVATION_INFORMATION_TABLE,transaction);
-        } catch (SQLException e) {
-            logger.trace("EXCEPTION", e);
-        }
-    }
-
+    @Override
     public void putFlowerPlantCultivationInformation(FlowerPlantCultivationInformation flowerPlantCultivationInformation, Transaction transaction) {
         ServiceUtil.writeItem(flowerPlantCultivationInformation,CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE,transaction);
     }
 
+    @Override
     public void putVegetablePlantCultivationInformation(VegetablePlantCultivationInformation vegetablePlantCultivationInformation, Transaction transaction) {
         ServiceUtil.writeItem(vegetablePlantCultivationInformation,CONFIG_VEGETABLE_PLANT_CULTIVATION_INFORMATION_TABLE,transaction);
     }
 
+    @Override
     public List<FlowerPlantCultivationInformation> readAllFlowerPlantCultivationInformation(Transaction transaction) {
         if(transaction == null) {
             return ServiceUtil.readAllItems(CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE,FlowerPlantCultivationInformation.class);
@@ -109,6 +92,7 @@ public class ConfigServiceImpl extends ConfigService {
         return ServiceUtil.readAllItems(CONFIG_FLOWER_PLANT_CULTIVATION_INFORMATION_TABLE,FlowerPlantCultivationInformation.class,transaction);
     }
 
+    @Override
     public List<VegetablePlantCultivationInformation> readAllVegetablePlantCultivationInformation(Transaction transaction) {
         if(transaction == null) {
             return ServiceUtil.readAllItems(CONFIG_VEGETABLE_PLANT_CULTIVATION_INFORMATION_TABLE,VegetablePlantCultivationInformation.class);

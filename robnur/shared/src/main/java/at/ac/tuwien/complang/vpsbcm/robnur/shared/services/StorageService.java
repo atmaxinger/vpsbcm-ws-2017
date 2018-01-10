@@ -336,14 +336,46 @@ public abstract class StorageService implements Exitable {
      */
     public abstract List<VegetableFertilizer> readAllVegetableFertilizer(Transaction transaction);
 
-
-
+    /**
+     * put multiple flower pesticides into the storage
+     * @param pesticides the pesticides
+     * @param transaction
+     */
     public abstract void putFlowerPesticides(List<FlowerPesticide> pesticides, Transaction transaction);
+
+    /**
+     * get flower pesticide from storage
+     * @param transaction
+     * @return flower pesticide, null if unsuccessful
+     */
     public abstract FlowerPesticide getFlowerPesticide(Transaction transaction);
+
+    /**
+     * reads all flower pesticides form the storage
+     * @param transaction
+     * @return list of flower pesticides, null if unsuccessful
+     */
     public abstract List<FlowerPesticide> readAllFlowerPesticides(Transaction transaction);
 
+    /**
+     * put multiple vegetable pesticides into the storage
+     * @param pesticides the pesticides
+     * @param transaction
+     */
     public abstract void putVegetablePesticides(List<VegetablePesticide> pesticides, Transaction transaction);
+
+    /**
+     * get vegetable pesticide from storage
+     * @param transaction
+     * @return vegetable pesticide, null if unsuccessful
+     */
     public abstract VegetablePesticide getVegetablePesticide(Transaction transaction);
+
+    /**
+     * reads all vegetable pesticides form the storage
+     * @param transaction
+     * @return list of vegetable pesticides, null if unsuccessful
+     */
     public abstract List<VegetablePesticide> readAllVegetablePesticides(Transaction transaction);
 
     /**

@@ -123,7 +123,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
 
         try {
             Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
-            int cnt = statement.executeUpdate("DELETE FROM " + GREENHOUSE_VEGETABLE_PLANT_TABLE);
+            statement.executeUpdate("DELETE FROM " + GREENHOUSE_VEGETABLE_PLANT_TABLE);
         } catch (SQLException e) {
             logger.trace("EXCEPTION", e);
             return null;
@@ -137,7 +137,7 @@ public class GreenhouseServiceImpl extends GreenhouseService {
 
         try {
             Statement statement = ((TransactionImpl) transaction).getConnection().createStatement();
-            int cnt = statement.executeUpdate("DELETE FROM " + GREENHOUSE_FLOWER_PLANT_TABLE);
+            statement.executeUpdate("DELETE FROM " + GREENHOUSE_FLOWER_PLANT_TABLE);
         } catch (SQLException e) {
             logger.trace("EXCEPTION", e);
             return null;

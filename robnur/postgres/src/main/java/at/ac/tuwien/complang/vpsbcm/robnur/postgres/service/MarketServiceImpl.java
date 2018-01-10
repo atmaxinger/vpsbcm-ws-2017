@@ -60,6 +60,7 @@ public class MarketServiceImpl extends MarketService {
         }
     }
 
+    @Override
     public void putBouquet(Bouquet bouquet, Transaction transaction) {
         if(transaction == null) {
             ServiceUtil.writeItem(bouquet,MARKET_BOUQUET_TABLE);
@@ -68,10 +69,12 @@ public class MarketServiceImpl extends MarketService {
         ServiceUtil.writeItem(bouquet,MARKET_BOUQUET_TABLE, transaction);
     }
 
+    @Override
     public int getAmountOfBouquets() {
         return readAllBouquets().size();
     }
 
+    @Override
     public void putVegetableBasket(VegetableBasket vegetableBasket, Transaction transaction) {
         if(transaction == null) {
             ServiceUtil.writeItem(vegetableBasket,MARKET_VEGETABLE_BASKET_TABLE);
@@ -80,14 +83,17 @@ public class MarketServiceImpl extends MarketService {
         ServiceUtil.writeItem(vegetableBasket,MARKET_VEGETABLE_BASKET_TABLE, transaction);
     }
 
+    @Override
     public int getAmountOfVegetableBaskets() {
         return readAllVegetableBaskets().size();
     }
 
+    @Override
     public List<Bouquet> readAllBouquets() {
         return ServiceUtil.readAllItems(MARKET_BOUQUET_TABLE,Bouquet.class);
     }
 
+    @Override
     public void sellBouquet(Bouquet bouquet) {
         try {
             ServiceUtil.deleteItemById(bouquet.getId(),MARKET_BOUQUET_TABLE);
@@ -96,10 +102,12 @@ public class MarketServiceImpl extends MarketService {
         }
     }
 
+    @Override
     public List<VegetableBasket> readAllVegetableBaskets() {
         return ServiceUtil.readAllItems(MARKET_VEGETABLE_BASKET_TABLE,VegetableBasket.class);
     }
 
+    @Override
     public void sellVegetableBasket(VegetableBasket vegetableBasket) {
         try {
             ServiceUtil.deleteItemById(vegetableBasket.getId(),MARKET_VEGETABLE_BASKET_TABLE);

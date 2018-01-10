@@ -53,7 +53,6 @@ public class PostgresHelper {
         }
         try {
             Connection connection = DriverManager.getConnection(url, props);
-            //logger.debug("NEW CONNECTION: " + connection + " reason: " + reason);
             return connection;
         } catch (SQLException e) {
             logger.trace("EXCEPTION", e);

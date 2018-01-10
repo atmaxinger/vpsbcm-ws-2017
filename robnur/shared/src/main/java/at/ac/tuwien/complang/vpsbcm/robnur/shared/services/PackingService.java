@@ -75,7 +75,19 @@ public abstract class PackingService implements Exitable {
      */
     public abstract List<Vegetable> readAllVegetables(Transaction transaction);
 
+    /**
+     * gets a vegetable of a specific type
+     * @param type type of the vegetable
+     * @param transaction
+     * @return a vegetable of the specified type, null if there is no vegetable of such a type, null if unsuccessful
+     */
     public abstract Vegetable getVegetableByType(VegetableType type, Transaction transaction);
 
+    /**
+     * gets a flower of a specific type
+     * @param type type of the flower
+     * @param transaction
+     * @return a flower of the specified type, null if there is no flower of such a type, null if unsuccessful
+     */
     public abstract Flower getFlowerByType(FlowerType type, Transaction transaction);
 }

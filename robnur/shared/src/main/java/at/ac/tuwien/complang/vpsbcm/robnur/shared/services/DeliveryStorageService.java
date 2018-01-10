@@ -44,6 +44,15 @@ public abstract class DeliveryStorageService {
         this.bouqetsChanged = bouqetsChanged;
     }
 
+    /**
+     * read all vegetable baskets
+     * @return a list of all vegetable baskets, null if unsuccessful
+     */
     public abstract List<VegetableBasket> readAllVegetableBaskets();
+
+    /**
+     * read all  bouquets
+     * @return a list of all bouquets, null if unsuccessful
+     */
     public abstract List<Bouquet> readAllBouquets();
 }

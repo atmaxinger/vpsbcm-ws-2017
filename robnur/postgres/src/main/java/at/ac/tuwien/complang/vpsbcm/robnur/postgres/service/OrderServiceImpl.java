@@ -138,8 +138,7 @@ public class OrderServiceImpl extends OrderService {
     public Order<VegetableType, Vegetable> getNextVegetableBasketOrder(Order.OrderStatus status, Transaction transaction) {
         logger.debug("getNextVegetableBasketOrder()");
 
-        TypeReference<Order<VegetableType, Vegetable>> typeReference = new TypeReference<Order<VegetableType, Vegetable>>() {
-        };
+        TypeReference<Order<VegetableType, Vegetable>> typeReference = new TypeReference<Order<VegetableType, Vegetable>>() {};
         Order<VegetableType, Vegetable> result = ServiceUtil.getItemByParameter("'orderStatus'",status.name(),VEGETABLE_ORDER_TABLE, typeReference,transaction);
 
         if(result == null){
@@ -151,8 +150,7 @@ public class OrderServiceImpl extends OrderService {
 
     @Override
     public Order<FlowerType, Flower> getNextBouquetOrder(Order.OrderStatus status, Transaction transaction) {
-        TypeReference<Order<FlowerType, Flower>> typeReference = new TypeReference<Order<FlowerType, Flower>>() {
-        };
+        TypeReference<Order<FlowerType, Flower>> typeReference = new TypeReference<Order<FlowerType, Flower>>() {};
 
         Order<FlowerType, Flower> result =  ServiceUtil.getItemByParameter("'orderStatus'",status.name(),FLOWER_ORDER_TABLE, typeReference,transaction);
 
@@ -166,8 +164,7 @@ public class OrderServiceImpl extends OrderService {
     @Override
     public List readAllOrdersForVegetables(Transaction transaction) {
         List result;
-        TypeReference<Order<VegetableType, Vegetable>> typeReference = new TypeReference<Order<VegetableType, Vegetable>>() {
-        };
+        TypeReference<Order<VegetableType, Vegetable>> typeReference = new TypeReference<Order<VegetableType, Vegetable>>() {};
 
         if(transaction == null) {
             result = ServiceUtil.readAllItems(VEGETABLE_ORDER_TABLE,typeReference);
@@ -185,8 +182,7 @@ public class OrderServiceImpl extends OrderService {
     @Override
     public List readAllOrdersForFlowers(Transaction transaction) {
         List result;
-        TypeReference<Order<FlowerType, Flower>> typeReference = new TypeReference<Order<FlowerType, Flower>>() {
-        };
+        TypeReference<Order<FlowerType, Flower>> typeReference = new TypeReference<Order<FlowerType, Flower>>() {};
 
         if(transaction == null) {
             result = ServiceUtil.readAllItems(FLOWER_ORDER_TABLE, typeReference);
@@ -202,9 +198,7 @@ public class OrderServiceImpl extends OrderService {
 
     @Override
     public void updateVegetableBasketOrderStatus(String id, Order.OrderStatus orderStatus) {
-        TypeReference<Order<VegetableType, Vegetable>> typeReference = new TypeReference<Order<VegetableType, Vegetable>>() {
-        };
-
+        TypeReference<Order<VegetableType, Vegetable>> typeReference = new TypeReference<Order<VegetableType, Vegetable>>() {};
 
         TransactionService transactionService = new TransactionServiceImpl();
         Transaction transaction = transactionService.beginTransaction(-1);
@@ -219,9 +213,7 @@ public class OrderServiceImpl extends OrderService {
 
     @Override
     public void updateBouquetOrderStatus(String id, Order.OrderStatus orderStatus) {
-        TypeReference<Order<FlowerType, Flower>> typeReference = new TypeReference<Order<FlowerType, Flower>>() {
-        };
-
+        TypeReference<Order<FlowerType, Flower>> typeReference = new TypeReference<Order<FlowerType, Flower>>() {};
 
         TransactionService transactionService = new TransactionServiceImpl();
         Transaction transaction = transactionService.beginTransaction(-1);

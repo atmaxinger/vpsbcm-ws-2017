@@ -76,5 +76,11 @@ abstract class Listener extends Thread {
         shouldRun = false;
     }
 
+    /**
+     * Implements the action that shall be executed in the case of a certain db method.
+     *
+     * @param pid The ProcessId of the notification.
+     * @param method The data base method that was executed.
+     */
     public abstract void onNotify(int pid, DBMETHOD method);
 }

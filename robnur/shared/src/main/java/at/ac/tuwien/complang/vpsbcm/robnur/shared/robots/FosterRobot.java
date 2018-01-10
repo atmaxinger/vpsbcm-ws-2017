@@ -113,7 +113,7 @@ public class FosterRobot extends Robot {
     }
 
     private void doFoster(Plant plant) {
-        logger.info(String.format("fostering plant %s (%s)...", plant.getTypeName(), plant.getId()));
+        logger.info(String.format("FosterRobot %s: fostering plant %s (%s)...", getId(), plant.getTypeName(), plant.getId()));
 
         float infestation = plant.getInfestation();
         float infestationBefore = infestation;

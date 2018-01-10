@@ -34,24 +34,6 @@ public class PostgresMonitoringRobot {
             try {
                 Statement statement = ((TransactionImpl)transaction).getConnection().createStatement();
 
-                /*
-
-                UPDATE gvp g1 SET
-                                    data =
-                                    (SELECT jsonb (data) || jsonb_build_object('growth',
-                                                              ((SELECT (data->>'growth')::int
-                                                                      FROM gvp g3
-                                                                      WHERE (g3.data->>'id')::text = (g1.data->>'id')::text) + (10))::int)
-                                                          || jsonb_build_object('infestation',
-                                                                (Select
-                                                                       Case (Select (random() * 100 <= ((g1.data->>'cultivationInformation')::json ->>'vulnerability')::float))
-                                                                            WHEN true THEN (SELECT (g1.data->>'infestation')::float + 0.1)::float
-                                                                            WHEN false THEN (SELECT (g1.data->>'infestation')::float)::float
-                                                                       END))
-                                      FROM gvp g2
-                                      WHERE g1.id = g2.id)
-
-                 */
                 statement.execute(
                         "UPDATE gvp g1 SET" +
                                 "    data =" +
