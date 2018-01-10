@@ -30,7 +30,7 @@ public class PostgresMonitoringRobot {
         connection = PostgresHelper.getNewConnection("monitor_token",-1);
         try {
             statement = connection.createStatement();
-            //statement.execute("CREATE TABLE monitor_token()");
+            statement.execute("CREATE TABLE monitor_token()");
         } catch (SQLException e) {
             logger.trace("EXCEPTION", e);
             connection.close();
