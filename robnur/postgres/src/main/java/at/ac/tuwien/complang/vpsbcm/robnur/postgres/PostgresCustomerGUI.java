@@ -63,12 +63,11 @@ public class PostgresCustomerGUI {
 
     public static void main(String[] args) throws SQLException {
         if(args.length == 0) {
-            System.err.println("You need to specify the id");
+            System.err.println("You need to specify the id and a server address");
             System.exit(1);
         }
 
-
-        String server = "localhost";
+        String server = args[1];
         int port = 5432;
         String database = "customer_" + args[0];
         String url = String.format("jdbc:postgresql://%s:%d/%s", server, port, database);
