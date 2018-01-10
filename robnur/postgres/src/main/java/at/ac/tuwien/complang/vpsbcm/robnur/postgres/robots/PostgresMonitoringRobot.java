@@ -9,17 +9,40 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.GreenhouseService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Random;
+import java.util.Scanner;
 
 public class PostgresMonitoringRobot {
 
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(GreenhouseServiceImpl.class);
 
+    private static Connection connection;
+    private static Statement statement;
 
-    public static void main(String[] args) {
+    private static boolean exit = false;
+
+    public static void main(String[] args) throws SQLException {
+
+        connection = PostgresHelper.getNewConnection("monitor_token",-1);
+        try {
+            statement = connection.createStatement();
+            statement.execute("CREATE TABLE monitor_token()");
+        } catch (SQLException e) {
+            logger.trace("EXCEPTION", e);
+            connection.close();
+            statement.close();
+            logger.info("There is already one active monitoring robot.");
+            return;
+        }
+
+        UserInputListener inputListener = new UserInputListener();
+        Thread thread = new Thread(inputListener);
+        thread.start();
+
         monitorGreenhouse();
     }
 
@@ -27,7 +50,7 @@ public class PostgresMonitoringRobot {
 
         TransactionService transactionService = new TransactionServiceImpl();
 
-        while (true) {
+        while (!exit) {
 
             Transaction transaction = transactionService.beginTransaction(-1);
 
@@ -80,6 +103,25 @@ public class PostgresMonitoringRobot {
             } catch (InterruptedException e) {
                 logger.trace("EXCEPTION", e);
             }
+        }
+
+        try {
+            statement.execute("DROP TABLE monitor_token");
+        } catch (SQLException e) {
+            return;
+        }
+
+
+    }
+
+    private static class UserInputListener implements Runnable{
+
+        @Override
+        public void run() {
+            Scanner scanner = new Scanner (System.in);
+
+            while(!scanner.hasNext("exit")){ scanner.next();}
+            exit = true;
         }
     }
 }
