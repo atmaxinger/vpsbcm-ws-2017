@@ -198,7 +198,8 @@ public class PackRobot extends Robot {
         for (int i = 0; i < Math.min(vegetables.size(), 10); i++) {
             Vegetable vegetable = packingService.getVegetable(vegetables.get(i).getId(), transaction);
             if (vegetable == null) {
-                logger.fatal("should never happen");
+                return;
+            //    logger.fatal("should never happen");
             }
 
             vegetable.addPutResearchRobot(getId());

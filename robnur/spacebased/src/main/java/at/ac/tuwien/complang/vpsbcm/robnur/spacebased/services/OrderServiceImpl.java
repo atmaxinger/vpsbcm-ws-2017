@@ -61,27 +61,6 @@ public class OrderServiceImpl extends OrderService {
 
     @Override
     public boolean canPlaceOrder(String address) {
-        /*ComparableProperty addressProperty = ComparableProperty.forName("address");
-        ComparableProperty orderStatusProperty = ComparableProperty.forName("orderStatus");
-
-        Matchmaker matchmaker = Matchmakers.and(addressProperty.equalTo(addressProperty),Matchmakers.or(orderStatusProperty.equalTo(Order.OrderStatus.PLACED), orderStatusProperty.equalTo(Order.OrderStatus.PACKED)));
-        Query query = new Query().filter(addressProperty.equalTo(address)).filter(matchmaker);
-        Selector selector = QueryCoordinator.newSelector(query, 1);
-
-        List<Order<FlowerType,Flower>> result = ServiceUtil.readAllItems(flowerOrderContainer,selector,null,capi);
-        if (result == null || result.isEmpty()){
-            logger.debug("canPlaceOrder result is " + result);
-            result = ServiceUtil.readAllItems(vegetableOrderContainer,selector,null,capi);
-            if (result == null || result.isEmpty()){
-                logger.debug("canPlaceOrder result is " + result);
-                return true;
-            }
-        }
-
-        logger.debug("--- canPlaceOrder result is " + result);
-
-        return false;*/
-
        List<String> allAddresses = ServiceUtil.readAllItems(addressContainer,null,capi);
        if(allAddresses != null){
            for(String a : allAddresses) {
@@ -105,7 +84,7 @@ public class OrderServiceImpl extends OrderService {
     public boolean placeOrderForBouquet(Order<FlowerType, Flower> order) {
         ServiceUtil.writeItem(new Entry(order.getAddress(), LabelCoordinator.newCoordinationData(order.getAddress())), addressContainer, null, capi);
 
-        return ServiceUtil.writeItem(order,flowerOrderContainer,null,capi);
+        return ServiceUtil.writeItem(order, newFlowerOrderContainer,null,capi);
     }
 
     @Override
@@ -181,7 +160,7 @@ public class OrderServiceImpl extends OrderService {
         List<Order<FlowerType,Flower>> result = ServiceUtil.getAllItems(flowerOrderContainer,selector,transaction,capi);
 
         if (result == null || result.isEmpty()){
-            result = ServiceUtil.getAllItems(flowerOrderContainer,selector,transaction,capi);
+            result = ServiceUtil.getAllItems(newFlowerOrderContainer,selector,transaction,capi);
             if (result == null || result.isEmpty()) {
                 return null;
             }
