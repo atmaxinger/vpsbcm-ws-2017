@@ -68,16 +68,6 @@ public class GreenhouseServiceImpl extends GreenhouseService {
 
         greenhouseContainer = CapiUtil.lookupOrCreateContainer(greenhouseContainerName, spaceUri, coordinators, null, capi);
 
-        /*try {
-            greenhouseContainer = capi.lookupContainer(greenhouseContainerName, spaceUri, MzsConstants.RequestTimeout.DEFAULT, null);
-        } catch (ContainerNotFoundException var9) {
-            try {
-                greenhouseContainer = capi.createContainer(greenhouseContainerName, spaceUri, 20, coordinators, null, null); // create bounded container
-            } catch (ContainerNameNotAvailableException var8) {
-                greenhouseContainer = capi.lookupContainer(greenhouseContainerName, spaceUri, MzsConstants.RequestTimeout.DEFAULT, null);
-            }
-        }*/
-
         notifications.add(notificationManager.createNotification(greenhouseContainer, (notification, operation, list) -> raiseChangedEvent(), Operation.DELETE, Operation.TAKE, Operation.WRITE));
     }
 
