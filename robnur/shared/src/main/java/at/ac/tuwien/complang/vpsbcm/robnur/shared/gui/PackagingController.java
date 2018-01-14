@@ -3,6 +3,7 @@ package at.ac.tuwien.complang.vpsbcm.robnur.shared.gui;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Flower;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.PackingService;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ObservableList;
@@ -74,14 +75,18 @@ public class PackagingController {
 
 
     private synchronized void initVegsData(List<Vegetable> vegs) {
-        ObservableList<Vegetable> obs = tvVegetables.getItems();
-        obs.clear();
-        obs.addAll(vegs);
+        Platform.runLater(() -> {
+            ObservableList<Vegetable> obs = tvVegetables.getItems();
+            obs.clear();
+            obs.addAll(vegs);
+        });
     }
 
     private synchronized void initFlowerData(List<Flower> flowers) {
-        ObservableList<Flower> obs = tvFlowers.getItems();
-        obs.clear();
-        obs.addAll(flowers);
+        Platform.runLater(() -> {
+            ObservableList<Flower> obs = tvFlowers.getItems();
+            obs.clear();
+            obs.addAll(flowers);
+        });
     }
 }

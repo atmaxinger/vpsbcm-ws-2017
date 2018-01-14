@@ -4,6 +4,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.CultivationInformation;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.FlowerPlantCultivationInformation;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlantCultivationInformation;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ConfigService;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ObservableList;
@@ -68,9 +69,11 @@ public class ConfigController {
 
 
     private synchronized void setVegeTableData(List<VegetablePlantCultivationInformation> cis) {
-        ObservableList<VegetablePlantCultivationInformation> obs = tvVegetables.getItems();
-        obs.clear();
-        obs.addAll(cis);
+        Platform.runLater(() -> {
+            ObservableList<VegetablePlantCultivationInformation> obs = tvVegetables.getItems();
+            obs.clear();
+            obs.addAll(cis);
+        });
     }
 
     private void initVegeTable() {
@@ -92,9 +95,11 @@ public class ConfigController {
 
 
     private synchronized void setFlowerTableData(List<FlowerPlantCultivationInformation> cis) {
-        ObservableList<FlowerPlantCultivationInformation> obs = tvFlowers.getItems();
-        obs.clear();
-        obs.addAll(cis);
+        Platform.runLater(() -> {
+            ObservableList<FlowerPlantCultivationInformation> obs = tvFlowers.getItems();
+            obs.clear();
+            obs.addAll(cis);
+        });
     }
 
     private void initFlowerTable() {

@@ -5,6 +5,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.EndProduct;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Idable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetableBasket;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.MarketService;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ObservableList;
@@ -29,11 +30,13 @@ public class MarketController {
     private MarketService marketService = RobNurGUI.marketService;
 
     private synchronized void updateData(List<VegetableBasket> vegetableBasketList, List<Bouquet> bouquetList) {
-        ObservableList<EndProduct> obs = tvMarket.getItems();
-        obs.clear();
+        Platform.runLater(() -> {
+            ObservableList<EndProduct> obs = tvMarket.getItems();
+            obs.clear();
 
-        obs.addAll(vegetableBasketList);
-        obs.addAll(bouquetList);
+            obs.addAll(vegetableBasketList);
+            obs.addAll(bouquetList);
+        });
     }
 
 

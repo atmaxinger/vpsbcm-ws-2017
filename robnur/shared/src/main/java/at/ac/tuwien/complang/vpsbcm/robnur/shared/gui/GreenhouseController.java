@@ -3,6 +3,7 @@ package at.ac.tuwien.complang.vpsbcm.robnur.shared.gui;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Plant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.VegetablePlant;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.GreenhouseService;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ObservableList;
@@ -28,9 +29,11 @@ public class GreenhouseController {
 
 
     private synchronized void updateData(List<Plant> data) {
-        ObservableList<Plant> plants = greenHouse.getItems();
-        plants.clear();
-        plants.addAll(data);
+        Platform.runLater(() -> {
+            ObservableList<Plant> plants = greenHouse.getItems();
+            plants.clear();
+            plants.addAll(data);
+        });
     }
 
     @FXML

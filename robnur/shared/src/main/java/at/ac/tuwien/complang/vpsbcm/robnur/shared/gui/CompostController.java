@@ -2,6 +2,7 @@ package at.ac.tuwien.complang.vpsbcm.robnur.shared.gui;
 
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.CompostService;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ObservableList;
@@ -57,9 +58,11 @@ public class CompostController {
     }
 
     private synchronized void setFlowerPlantsTableData(List<FlowerPlant> plants) {
-        ObservableList<FlowerPlant> obs = tvFlowerPlants.getItems();
-        obs.clear();
-        obs.addAll(plants);
+        Platform.runLater(() -> {
+            ObservableList<FlowerPlant> obs = tvFlowerPlants.getItems();
+            obs.clear();
+            obs.addAll(plants);
+        });
     }
     private void initFlowerPlantsTable() {
         setFlowerPlantsTableData(compostService.readAllFlowerPlants());
@@ -75,9 +78,11 @@ public class CompostController {
     }
 
     private synchronized void setFlowersTableData(List<Flower> flowers) {
-        ObservableList<Flower> obs = tvFlowers.getItems();
-        obs.clear();
-        obs.addAll(flowers);
+        Platform.runLater(() -> {
+            ObservableList<Flower> obs = tvFlowers.getItems();
+            obs.clear();
+            obs.addAll(flowers);
+        });
     }
     private void initFlowersTable() {
         setFlowersTableData(compostService.readAllFlowers());
@@ -97,9 +102,11 @@ public class CompostController {
 
 
     private synchronized void setVegetablePlantsTableData(List<VegetablePlant> plants) {
-        ObservableList<VegetablePlant> obs = tvVegetablePlants.getItems();
-        obs.clear();
-        obs.addAll(plants);
+        Platform.runLater(() -> {
+            ObservableList<VegetablePlant> obs = tvVegetablePlants.getItems();
+            obs.clear();
+            obs.addAll(plants);
+        });
     }
     private void initVegetablePlantsTable() {
         setVegetablePlantsTableData(compostService.readAllVegetablePlants());
@@ -116,9 +123,11 @@ public class CompostController {
     }
 
     private synchronized void setVegetablesTableData(List<Vegetable> Vegetables) {
-        ObservableList<Vegetable> obs = tvVegetables.getItems();
-        obs.clear();
-        obs.addAll(Vegetables);
+        Platform.runLater(() -> {
+            ObservableList<Vegetable> obs = tvVegetables.getItems();
+            obs.clear();
+            obs.addAll(Vegetables);
+        });
     }
     private void initVegetablesTable() {
         setVegetablesTableData(compostService.readAllVegetables());

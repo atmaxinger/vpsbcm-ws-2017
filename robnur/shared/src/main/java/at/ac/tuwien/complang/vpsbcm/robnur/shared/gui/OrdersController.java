@@ -5,6 +5,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.customergui.NewOrderController
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.*;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ConfigService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.OrderService;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ObservableList;
@@ -58,19 +59,23 @@ public class OrdersController {
     }
 
     private synchronized void updateFlowersData(List<Order<FlowerType, Flower>> orders) {
-        ObservableList<Order<FlowerType, Flower>> obs = tvFlowerOrders.getItems();
-        obs.clear();
-        obs.addAll(orders);
+        Platform.runLater(() -> {
+            ObservableList<Order<FlowerType, Flower>> obs = tvFlowerOrders.getItems();
+            obs.clear();
+            obs.addAll(orders);
 
-        tvFlowerOrders.refresh();
+            tvFlowerOrders.refresh();
+        });
     }
 
     private synchronized void updateVegetablesData(List<Order<VegetableType, Vegetable>> orders) {
-        ObservableList<Order<VegetableType, Vegetable>> obs = tvVegetableOrders.getItems();
-        obs.clear();
-        obs.addAll(orders);
+        Platform.runLater(() -> {
+            ObservableList<Order<VegetableType, Vegetable>> obs = tvVegetableOrders.getItems();
+            obs.clear();
+            obs.addAll(orders);
 
-        tvVegetableOrders.refresh();
+            tvVegetableOrders.refresh();
+        });
     }
 
     private void initVegetables() {

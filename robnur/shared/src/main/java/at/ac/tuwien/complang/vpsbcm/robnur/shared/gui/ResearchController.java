@@ -3,6 +3,7 @@ package at.ac.tuwien.complang.vpsbcm.robnur.shared.gui;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Flower;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.plants.Vegetable;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ResearchService;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ObservableList;
@@ -55,15 +56,19 @@ public class ResearchController {
     }
 
     private synchronized void updateVegetableData(List<Vegetable> vegetableList) {
-        ObservableList<Vegetable> obs = tvVegetables.getItems();
-        obs.clear();
-        obs.addAll(vegetableList);
+        Platform.runLater(() -> {
+            ObservableList<Vegetable> obs = tvVegetables.getItems();
+            obs.clear();
+            obs.addAll(vegetableList);
+        });
     }
 
     private synchronized void updateFlowerData(List<Flower> flowers) {
-        ObservableList<Flower> obs = tvFlowers.getItems();
-        obs.clear();
-        obs.addAll(flowers);
+        Platform.runLater(() -> {
+            ObservableList<Flower> obs = tvFlowers.getItems();
+            obs.clear();
+            obs.addAll(flowers);
+        });
     }
 
     // wow - such creative - much thought - very wow

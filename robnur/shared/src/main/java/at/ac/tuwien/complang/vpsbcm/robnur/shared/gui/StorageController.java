@@ -6,6 +6,7 @@ import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.ConfigService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.StorageService;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.Transaction;
 import at.ac.tuwien.complang.vpsbcm.robnur.shared.services.TransactionService;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ChangeListener;
@@ -132,69 +133,71 @@ public class StorageController {
 
 
     private synchronized void initSeedsData() {
-        List<Plant> allSeeds = new LinkedList<>();
-        allSeeds.addAll(storageService.readAllVegetableSeeds());
-        allSeeds.addAll(storageService.readAllFlowerSeeds());
+        Platform.runLater(() -> {
+            List<Plant> allSeeds = new LinkedList<>();
+            allSeeds.addAll(storageService.readAllVegetableSeeds());
+            allSeeds.addAll(storageService.readAllFlowerSeeds());
 
-        ObservableList<SeedsTableDataModel> obs = tvSeeds.getItems();
-        obs.clear();
+            ObservableList<SeedsTableDataModel> obs = tvSeeds.getItems();
+            obs.clear();
 
-        List<FlowerPlantCultivationInformation> fcpis = configService.readAllFlowerPlantCultivationInformation(null);
-        for(FlowerPlantCultivationInformation fcpi : fcpis) {
-            SeedsTableDataModel dataModel = new SeedsTableDataModel() {
-                @Override
-                void buyAction(int amount) {
-                    Transaction t = transactionService.beginTransaction(-1);
-                    List<FlowerPlant> flowerSeeds = new LinkedList<>();
-                    for(int i=0;i<amount; i++) {
-                        FlowerPlant fp = new FlowerPlant();
-                        fp.setCultivationInformation(fcpi);
-                        fp.setGrowth(Plant.STATUS_PLANTED);
+            List<FlowerPlantCultivationInformation> fcpis = configService.readAllFlowerPlantCultivationInformation(null);
+            for(FlowerPlantCultivationInformation fcpi : fcpis) {
+                SeedsTableDataModel dataModel = new SeedsTableDataModel() {
+                    @Override
+                    void buyAction(int amount) {
+                        Transaction t = transactionService.beginTransaction(-1);
+                        List<FlowerPlant> flowerSeeds = new LinkedList<>();
+                        for(int i=0;i<amount; i++) {
+                            FlowerPlant fp = new FlowerPlant();
+                            fp.setCultivationInformation(fcpi);
+                            fp.setGrowth(Plant.STATUS_PLANTED);
 
-                        flowerSeeds.add(fp);
+                            flowerSeeds.add(fp);
+                        }
+                        storageService.putFlowerSeeds(flowerSeeds, t);
+                        t.commit();
                     }
-                    storageService.putFlowerSeeds(flowerSeeds, t);
-                    t.commit();
-                }
-            };
-            dataModel.amount =  getCountOfFlowerSeed(allSeeds, fcpi.getFlowerType());
-            dataModel.type = fcpi.getFlowerType().toString();
-            dataModel.fertilizer = fcpi.getFertilizerAmount();
-            dataModel.soil = fcpi.getSoilAmount();
-            dataModel.water = fcpi.getWaterAmount();
-            dataModel.isFlower = true;
+                };
+                dataModel.amount =  getCountOfFlowerSeed(allSeeds, fcpi.getFlowerType());
+                dataModel.type = fcpi.getFlowerType().toString();
+                dataModel.fertilizer = fcpi.getFertilizerAmount();
+                dataModel.soil = fcpi.getSoilAmount();
+                dataModel.water = fcpi.getWaterAmount();
+                dataModel.isFlower = true;
 
-            obs.add(dataModel);
-        }
+                obs.add(dataModel);
+            }
 
-        List<VegetablePlantCultivationInformation> vpis = configService.readAllVegetablePlantCultivationInformation(null);
-        for(VegetablePlantCultivationInformation vpci : vpis) {
-            SeedsTableDataModel dataModel = new SeedsTableDataModel() {
-                @Override
-                void buyAction(int amount) {
-                    Transaction t = transactionService.beginTransaction(-1);
-                    List<VegetablePlant> vegetableSeeds = new LinkedList<>();
-                    for(int i=0; i<amount; i++) {
-                        VegetablePlant vp = new VegetablePlant();
-                        vp.setCultivationInformation(vpci);
-                        vp.setGrowth(Plant.STATUS_PLANTED);
+            List<VegetablePlantCultivationInformation> vpis = configService.readAllVegetablePlantCultivationInformation(null);
+            for(VegetablePlantCultivationInformation vpci : vpis) {
+                SeedsTableDataModel dataModel = new SeedsTableDataModel() {
+                    @Override
+                    void buyAction(int amount) {
+                        Transaction t = transactionService.beginTransaction(-1);
+                        List<VegetablePlant> vegetableSeeds = new LinkedList<>();
+                        for(int i=0; i<amount; i++) {
+                            VegetablePlant vp = new VegetablePlant();
+                            vp.setCultivationInformation(vpci);
+                            vp.setGrowth(Plant.STATUS_PLANTED);
 
-                        vegetableSeeds.add(vp);
+                            vegetableSeeds.add(vp);
+                        }
+
+                        storageService.putVegetableSeeds(vegetableSeeds, t);
+                        t.commit();
                     }
+                };
+                dataModel.isFlower = false;
+                dataModel.amount =  getCountOfVeggiSeeds(allSeeds, vpci.getVegetableType());
+                dataModel.type = vpci.getVegetableType().toString();
+                dataModel.fertilizer = vpci.getFertilizerAmount();
+                dataModel.soil = vpci.getSoilAmount();
+                dataModel.water = vpci.getWaterAmount();
 
-                    storageService.putVegetableSeeds(vegetableSeeds, t);
-                    t.commit();
-                }
-            };
-            dataModel.isFlower = false;
-            dataModel.amount =  getCountOfVeggiSeeds(allSeeds, vpci.getVegetableType());
-            dataModel.type = vpci.getVegetableType().toString();
-            dataModel.fertilizer = vpci.getFertilizerAmount();
-            dataModel.soil = vpci.getSoilAmount();
-            dataModel.water = vpci.getWaterAmount();
-
-            obs.add(dataModel);
-        }
+                obs.add(dataModel);
+            }
+        });
     }
 
     private synchronized void initSeedsTableView() {
@@ -247,134 +250,135 @@ public class StorageController {
 
 
     private synchronized void initResourcesData() {
-        ObservableList<ResourceTableDataModel> obs = tvResources.getItems();
-        obs.clear();
+        Platform.runLater(() -> {
+            ObservableList<ResourceTableDataModel> obs = tvResources.getItems();
+            obs.clear();
 
-        ResourceTableDataModel soil = new ResourceTableDataModel() {
-            @Override
-            void buyAction(int amount) {
-                Transaction t = transactionService.beginTransaction(-1);
-                List<SoilPackage> soilPackages = new LinkedList<>();
-                for(int i=0; i< amount; i++) {
-                    SoilPackage sp = new SoilPackage();
-                    soilPackages.add(sp);
+            ResourceTableDataModel soil = new ResourceTableDataModel() {
+                @Override
+                void buyAction(int amount) {
+                    Transaction t = transactionService.beginTransaction(-1);
+                    List<SoilPackage> soilPackages = new LinkedList<>();
+                    for(int i=0; i< amount; i++) {
+                        SoilPackage sp = new SoilPackage();
+                        soilPackages.add(sp);
+                    }
+
+                    storageService.putSoilPackages(soilPackages, t);
+                    t.commit();
                 }
+            };
+            soil.resource = "Erde";
+            List<SoilPackage> soilPackages = storageService.readAllSoilPackage();
+            if(soilPackages != null) {
+                soil.amount = "" + soilPackages.size();
 
-                storageService.putSoilPackages(soilPackages, t);
-                t.commit();
-            }
-        };
-        soil.resource = "Erde";
-        List<SoilPackage> soilPackages = storageService.readAllSoilPackage();
-        if(soilPackages != null) {
-            soil.amount = "" + soilPackages.size();
-
-            // count liters
-            int liters=0;
-            for(SoilPackage sp : soilPackages) {
-                liters += sp.getAmount();
-            }
-            soil.amount += String.format(" (%d Liter)", liters);
-        } else {
-            soil.amount = "0";
-        }
-
-
-        ResourceTableDataModel flowerFertilizer = new ResourceTableDataModel() {
-            @Override
-            void buyAction(int amount) {
-                Transaction t = transactionService.beginTransaction(-1);
-
-                List<FlowerFertilizer> flowerFertilizers = new LinkedList<>();
-                for(int i=0; i<amount; i++) {
-                    FlowerFertilizer ff = new FlowerFertilizer();
-                    flowerFertilizers.add(ff);
+                // count liters
+                int liters=0;
+                for(SoilPackage sp : soilPackages) {
+                    liters += sp.getAmount();
                 }
-
-                storageService.putFlowerFertilizers(flowerFertilizers, t);
-                t.commit();
+                soil.amount += String.format(" (%d Liter)", liters);
+            } else {
+                soil.amount = "0";
             }
-        };
-        flowerFertilizer.resource = "Blumen Dünger";
-        List tmp = storageService.readAllFlowerFertilizer();
-        if(tmp != null) {
-            flowerFertilizer.amount = "" + tmp.size();
-        } else {
-            flowerFertilizer.amount = "0";
-        }
 
 
-        ResourceTableDataModel vegFert = new ResourceTableDataModel() {
-            @Override
-            void buyAction(int amount) {
-                Transaction t = transactionService.beginTransaction(-1);
+            ResourceTableDataModel flowerFertilizer = new ResourceTableDataModel() {
+                @Override
+                void buyAction(int amount) {
+                    Transaction t = transactionService.beginTransaction(-1);
 
-                List<VegetableFertilizer> vegetableFertilizers = new LinkedList<>();
-                for(int i=0; i<amount; i++) {
-                    VegetableFertilizer vf = new VegetableFertilizer();
-                    vegetableFertilizers.add(vf);
+                    List<FlowerFertilizer> flowerFertilizers = new LinkedList<>();
+                    for(int i=0; i<amount; i++) {
+                        FlowerFertilizer ff = new FlowerFertilizer();
+                        flowerFertilizers.add(ff);
+                    }
+
+                    storageService.putFlowerFertilizers(flowerFertilizers, t);
+                    t.commit();
                 }
-
-                storageService.putVegetableFertilizers(vegetableFertilizers, t);
-                t.commit();
+            };
+            flowerFertilizer.resource = "Blumen Dünger";
+            List tmp = storageService.readAllFlowerFertilizer();
+            if(tmp != null) {
+                flowerFertilizer.amount = "" + tmp.size();
+            } else {
+                flowerFertilizer.amount = "0";
             }
-        };
-        vegFert.resource = "Gemüse Dünger";
-        tmp = storageService.readAllVegetableFertilizer();
-        if(tmp != null) {
-            vegFert.amount = "" + tmp.size();
-        } else {
-            vegFert.amount = "0";
-        }
 
-        ResourceTableDataModel flowerPesticide = new ResourceTableDataModel() {
-            @Override
-            void buyAction(int amount) {
-                Transaction t = transactionService.beginTransaction(-1);
 
-                List<FlowerPesticide> flowerPesticides = new LinkedList<>();
-                for(int i=0; i<amount; i++) {
-                    FlowerPesticide ff = new FlowerPesticide();
-                    flowerPesticides.add(ff);
+            ResourceTableDataModel vegFert = new ResourceTableDataModel() {
+                @Override
+                void buyAction(int amount) {
+                    Transaction t = transactionService.beginTransaction(-1);
+
+                    List<VegetableFertilizer> vegetableFertilizers = new LinkedList<>();
+                    for(int i=0; i<amount; i++) {
+                        VegetableFertilizer vf = new VegetableFertilizer();
+                        vegetableFertilizers.add(vf);
+                    }
+
+                    storageService.putVegetableFertilizers(vegetableFertilizers, t);
+                    t.commit();
                 }
-
-                storageService.putFlowerPesticides(flowerPesticides, t);
-                t.commit();
+            };
+            vegFert.resource = "Gemüse Dünger";
+            tmp = storageService.readAllVegetableFertilizer();
+            if(tmp != null) {
+                vegFert.amount = "" + tmp.size();
+            } else {
+                vegFert.amount = "0";
             }
-        };
-        flowerPesticide.resource = "Blumen Schutzmittel";
-        tmp = storageService.readAllFlowerPesticides(null);
-        if(tmp != null) {
-            flowerPesticide.amount = "" + tmp.size();
-        } else {
-            flowerPesticide.amount = "0";
-        }
 
-        ResourceTableDataModel vegetablePesticide = new ResourceTableDataModel() {
-            @Override
-            void buyAction(int amount) {
-                Transaction t = transactionService.beginTransaction(-1);
+            ResourceTableDataModel flowerPesticide = new ResourceTableDataModel() {
+                @Override
+                void buyAction(int amount) {
+                    Transaction t = transactionService.beginTransaction(-1);
 
-                List<VegetablePesticide> vegetablePesticides = new LinkedList<>();
-                for(int i=0; i<amount; i++) {
-                    VegetablePesticide pesticide = new VegetablePesticide();
-                    vegetablePesticides.add(pesticide);
+                    List<FlowerPesticide> flowerPesticides = new LinkedList<>();
+                    for(int i=0; i<amount; i++) {
+                        FlowerPesticide ff = new FlowerPesticide();
+                        flowerPesticides.add(ff);
+                    }
+
+                    storageService.putFlowerPesticides(flowerPesticides, t);
+                    t.commit();
                 }
-
-                storageService.putVegetablePesticides(vegetablePesticides, t);
-                t.commit();
+            };
+            flowerPesticide.resource = "Blumen Schutzmittel";
+            tmp = storageService.readAllFlowerPesticides(null);
+            if(tmp != null) {
+                flowerPesticide.amount = "" + tmp.size();
+            } else {
+                flowerPesticide.amount = "0";
             }
-        };
-        vegetablePesticide.resource = "Gemüse Schutzmittel";
-        tmp = storageService.readAllVegetablePesticides(null);
-        if(tmp != null) {
-            vegetablePesticide.amount = "" + tmp.size();
-        } else {
-            vegetablePesticide.amount = "0";
-        }
 
+            ResourceTableDataModel vegetablePesticide = new ResourceTableDataModel() {
+                @Override
+                void buyAction(int amount) {
+                    Transaction t = transactionService.beginTransaction(-1);
 
-        obs.addAll(soil, flowerFertilizer, vegFert, flowerPesticide, vegetablePesticide, waterModel);
+                    List<VegetablePesticide> vegetablePesticides = new LinkedList<>();
+                    for(int i=0; i<amount; i++) {
+                        VegetablePesticide pesticide = new VegetablePesticide();
+                        vegetablePesticides.add(pesticide);
+                    }
+
+                    storageService.putVegetablePesticides(vegetablePesticides, t);
+                    t.commit();
+                }
+            };
+            vegetablePesticide.resource = "Gemüse Schutzmittel";
+            tmp = storageService.readAllVegetablePesticides(null);
+            if(tmp != null) {
+                vegetablePesticide.amount = "" + tmp.size();
+            } else {
+                vegetablePesticide.amount = "0";
+            }
+
+            obs.addAll(soil, flowerFertilizer, vegFert, flowerPesticide, vegetablePesticide, waterModel);
+        });
     }
 
 
